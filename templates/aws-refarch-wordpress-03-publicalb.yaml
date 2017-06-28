@@ -1,0 +1,144 @@
+
+AWSTemplateFormatVersion: 2010-09-09
+
+Description: Reference Architecture to host WordPress on AWS - Creates an Application Load Balancer
+
+Metadata:
+
+  AWS::CloudFormation::Interface:
+    ParameterGroups:
+    - Label:
+        default: ALB Parameters
+      Parameters:
+        - Vpc
+        - PublicAlbAcmCertificate
+        - PublicAlbSecurityGroup
+        - PublicSubnet0
+        - PublicSubnet1
+        - PublicSubnet2
+    ParameterLabels:
+      Vpc:
+        default: Vpc Id
+      PublicAlbAcmCertificate:
+        default: ALB Certificate ARN
+      PublicAlbSecurityGroup:
+        default: Public ALB Security Group
+      PublicSubnet0:
+        default: Public Subnet for AZ 0
+      PublicSubnet1:
+        default: Public Subnet for AZ 1
+      PublicSubnet2:
+        default: Public Subnet for AZ 2
+
+Parameters:
+
+  PublicAlbAcmCertificate:
+    AllowedPattern: ^$|(arn:aws:acm:)([a-z0-9/:-])*([a-z0-9])$
+    Description: '[ Optional ] The AWS Certification Manager certificate ARN for the ALB certificate - this certificate should be created in the region you wish to run the ALB and must reference the WordPress domain name you use below.'
+    Type: String
+  PublicAlbSecurityGroup:
+    Description: Select the ALB security group.
+    Type: AWS::EC2::SecurityGroup::Id
+  PublicSubnet0:
+    Description: Select an existing public subnet for AZ 0.
+    Type: AWS::EC2::Subnet::Id
+  PublicSubnet1:
+    Description: Select an existing public subnet for AZ 1.
+    Type: AWS::EC2::Subnet::Id
+  PublicSubnet2:
+    Description: Select an existing public subnet for AZ 2.
+    Type: AWS::EC2::Subnet::Id
+  Vpc:
+    Description: Select an existing Vpc
+    Type: AWS::EC2::VPC::Id
+
+Conditions:
+
+  SslCertificate:
+    !Not [!Equals [ '', !Ref PublicAlbAcmCertificate ] ]
+  NoSslCertificate:
+    !Equals [ '', !Ref PublicAlbAcmCertificate ]
+  MoreThan2AZ:
+    !Or [
+      !Equals [ !Ref 'AWS::Region', us-east-1 ],
+      !Equals [ !Ref 'AWS::Region', us-east-2 ],
+      !Equals [ !Ref 'AWS::Region', us-west-2 ],
+      !Equals [ !Ref 'AWS::Region', eu-west-1 ],
+      !Equals [ !Ref 'AWS::Region', sa-east-1 ],
+      !Equals [ !Ref 'AWS::Region', ap-northeast-1 ],
+      !Equals [ !Ref 'AWS::Region', ap-southeast-2 ]
+    ]
+
+Resources:
+  
+  PublicAlbListenerNoSslCertificate:
+    Type : AWS::ElasticLoadBalancingV2::Listener
+    Properties:
+      DefaultActions:
+      - Type: forward
+        TargetGroupArn: !Ref PublicAlbTargetGroup
+      LoadBalancerArn: !Ref PublicApplicationLoadBalancer
+      Port: 80
+      Protocol: HTTP
+  PublicAlbListenerSslCertificate:
+    Condition: SslCertificate
+    Type : AWS::ElasticLoadBalancingV2::Listener
+    Properties:
+      Certificates:
+      - CertificateArn: !Ref PublicAlbAcmCertificate
+      DefaultActions:
+      - Type: forward
+        TargetGroupArn: !Ref PublicAlbTargetGroup
+      LoadBalancerArn: !Ref PublicApplicationLoadBalancer
+      Port: 443
+      Protocol: HTTPS
+  PublicApplicationLoadBalancer: 
+    Type: AWS::ElasticLoadBalancingV2::LoadBalancer
+    Properties:
+      Scheme: internet-facing
+      Subnets:
+        !If [
+          MoreThan2AZ,
+          [ !Ref PublicSubnet0, !Ref PublicSubnet1, !Ref PublicSubnet2 ],
+          [ !Ref PublicSubnet0, !Ref PublicSubnet1 ]
+        ]
+      LoadBalancerAttributes:
+      - Key: idle_timeout.timeout_seconds
+        Value: 60
+      SecurityGroups:
+      - !Ref PublicAlbSecurityGroup
+      Tags:
+      - Key: Name
+        Value: !Join [ '', [ 'Public ALB / ', !Ref 'AWS::StackName' ] ]
+  PublicAlbTargetGroup:
+    Type: AWS::ElasticLoadBalancingV2::TargetGroup
+    Properties:
+      HealthCheckIntervalSeconds: 30
+      HealthCheckPath: /
+      HealthCheckTimeoutSeconds: 5
+      Name: 'WordPressPublicAlb'
+      Port: 80
+      Protocol: HTTP
+      Tags:
+      - Key: Name
+        Value: !Join [ '', [ 'Public ALB / ', !Ref 'AWS::StackName' ] ]
+      UnhealthyThresholdCount: 5
+      VpcId: !Ref Vpc
+
+Outputs:
+
+  PublicAlbTargetGroupArn:
+    Value:
+      !Ref PublicAlbTargetGroup
+  PublicAlbCanonicalHostedZoneId:
+    Value:
+      !GetAtt PublicApplicationLoadBalancer.CanonicalHostedZoneID
+  PublicAlbDnsName:
+    Value:
+      !GetAtt PublicApplicationLoadBalancer.DNSName
+  PublicAlbHostname:
+    Value:
+      !If [ NoSslCertificate, !Join [ '', [ 'http://', !GetAtt PublicApplicationLoadBalancer.DNSName ] ], !Join [ '', [ 'https://', !GetAtt PublicApplicationLoadBalancer.DNSName ] ] ]
+  SslCertificate:
+    Value:
+      !If [ SslCertificate, True, False ]

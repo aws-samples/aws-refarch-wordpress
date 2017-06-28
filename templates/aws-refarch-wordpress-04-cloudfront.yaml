@@ -1,0 +1,211 @@
+---
+AWSTemplateFormatVersion: 2010-09-09
+
+Description: Reference Architecture to host WordPress on AWS - Creates CloudFront distribution (if selected)
+
+Metadata:
+
+  AWS::CloudFormation::Interface:
+    ParameterGroups:
+    - Label:
+        default: AWS Parameters
+      Parameters:
+        - CloudFrontAcmCertificate
+        - WPDomainName
+        - PublicAlbDnsName
+    ParameterLabels:
+      CloudFrontAcmCertificate:
+        default: CloudFront Certificate ARN
+      PublicAlbDnsName:
+        default: Public ALB DNS Name
+      WPDomainName:
+        default: Domain name of the WordPress site
+
+Parameters:
+
+  CloudFrontAcmCertificate:
+    AllowedPattern: ^$|(arn:aws:acm:)([a-z0-9/:-])*([a-z0-9])$
+    Description: '[ Optional ] The AWS Certification Manager certificate ARN for the CloudFront distribution certificate - this certificate should be created in the us-east-1 (N. Virginia) region and must reference the WordPress domain name you use below.'
+    Type: String
+  PublicAlbDnsName:
+    Description: The public application load balancer dns name.
+    Type: String
+  WPDomainName:
+    AllowedPattern: ^$|(([a-zA-Z0-9]|[a-zA-Z0-9][a-zA-Z0-9\-]*[a-zA-Z0-9])\.)*([A-Za-z0-9]|[A-Za-z0-9][A-Za-z0-9\-]*[A-Za-z0-9])$
+    Description: '[ Optional ] The main domain name of the WordPress site (e.g. example.com).'
+    Type: String
+
+Conditions:
+
+  SslCertificate:
+    !Not [ !Equals [ '', !Ref CloudFrontAcmCertificate ] ]
+  NoSslCertificate:
+    !Equals [ '', !Ref CloudFrontAcmCertificate ]
+  WPDomainName:
+    !Not [ !Equals [ '', !Ref WPDomainName ] ]  
+  NoWPDomainName:
+    !Equals [ '', !Ref WPDomainName ]
+
+Resources:
+
+  CloudFrontDistributionNoSslCertificate:
+    Type: AWS::CloudFront::Distribution
+    Condition: NoSslCertificate
+    Properties:
+      DistributionConfig:
+        Aliases:
+        - !If [ WPDomainName, !Join [ '', [ '*.', !Ref WPDomainName ] ], !Ref 'AWS::NoValue' ]
+        CacheBehaviors:
+        - PathPattern: wp-includes/*
+          AllowedMethods:
+          - DELETE
+          - GET
+          - HEAD
+          - OPTIONS
+          - PATCH
+          - POST
+          - PUT
+          DefaultTTL: 900
+          MaxTTL: 900
+          MinTTL: 900
+          ForwardedValues:
+            QueryString: true
+            Headers:
+            - Host
+          TargetOriginId: elb
+          ViewerProtocolPolicy: allow-all
+          Compress: true
+        - PathPattern: wp-content/*
+          AllowedMethods:
+          - DELETE
+          - GET
+          - HEAD
+          - OPTIONS
+          - PATCH
+          - POST
+          - PUT
+          DefaultTTL: 900
+          MaxTTL: 900
+          MinTTL: 900
+          ForwardedValues:
+            QueryString: true
+            Headers:
+            - Host
+          TargetOriginId: elb
+          ViewerProtocolPolicy: allow-all
+          Compress: true
+        Comment: !Ref 'AWS::StackName'
+        DefaultCacheBehavior:
+          AllowedMethods:
+          - DELETE
+          - GET
+          - HEAD
+          - OPTIONS
+          - PATCH
+          - POST
+          - PUT
+          DefaultTTL: 0
+          MaxTTL: 0
+          MinTTL: 0
+          ForwardedValues:
+            QueryString: true
+            Headers:
+            - '*'
+            Cookies:
+              Forward: all
+          TargetOriginId: elb
+          ViewerProtocolPolicy: allow-all
+          Compress: true
+        Enabled: true
+        Origins:
+        - DomainName: !Ref PublicAlbDnsName
+          Id: elb
+          CustomOriginConfig:
+            OriginProtocolPolicy: http-only
+        PriceClass: PriceClass_100
+  CloudFrontDistributionSslCertificate:
+    Type: AWS::CloudFront::Distribution
+    Condition: SslCertificate
+    Properties:
+      DistributionConfig:
+        Aliases:
+        - !If [ WPDomainName, !Join [ '', [ '*.', !Ref WPDomainName ] ], !Ref 'AWS::NoValue' ]
+        CacheBehaviors:
+        - PathPattern: wp-includes/*
+          AllowedMethods:
+          - DELETE
+          - GET
+          - HEAD
+          - OPTIONS
+          - PATCH
+          - POST
+          - PUT
+          DefaultTTL: 900
+          MaxTTL: 900
+          MinTTL: 900
+          ForwardedValues:
+            QueryString: true
+            Headers:
+            - Host
+          TargetOriginId: elb
+          ViewerProtocolPolicy: redirect-to-https
+          Compress: true
+        - PathPattern: wp-content/*
+          AllowedMethods:
+          - DELETE
+          - GET
+          - HEAD
+          - OPTIONS
+          - PATCH
+          - POST
+          - PUT
+          DefaultTTL: 900
+          MaxTTL: 900
+          MinTTL: 900
+          ForwardedValues:
+            QueryString: true
+            Headers:
+            - Host
+          TargetOriginId: elb
+          ViewerProtocolPolicy: redirect-to-https
+          Compress: true
+        Comment: !Ref 'AWS::StackName'
+        DefaultCacheBehavior:
+          AllowedMethods:
+          - DELETE
+          - GET
+          - HEAD
+          - OPTIONS
+          - PATCH
+          - POST
+          - PUT
+          DefaultTTL: 0
+          MaxTTL: 0
+          MinTTL: 0
+          ForwardedValues:
+            QueryString: true
+            Headers:
+            - '*'
+            Cookies:
+              Forward: all
+          TargetOriginId: elb
+          ViewerProtocolPolicy: redirect-to-https
+          Compress: true
+        Enabled: true
+        Origins:
+        - DomainName: !Ref PublicAlbDnsName
+          Id: elb
+          CustomOriginConfig:
+            OriginProtocolPolicy: https-only
+        PriceClass: PriceClass_100
+        ViewerCertificate:
+          AcmCertificateArn: !Ref CloudFrontAcmCertificate
+          SslSupportMethod: sni-only
+          MinimumProtocolVersion: TLSv1
+
+Outputs:
+
+  DnsEndpoint:
+    Value: !If [ NoSslCertificate, !GetAtt CloudFrontDistributionNoSslCertificate.DomainName, !GetAtt CloudFrontDistributionSslCertificate.DomainName ]
+  DnsHostname:
+    Value: !If [ NoSslCertificate, !Join [ '', [ 'http://', !GetAtt CloudFrontDistributionNoSslCertificate.DomainName ] ], !Join [ '', [ 'https://', !GetAtt CloudFrontDistributionSslCertificate.DomainName ] ] ]

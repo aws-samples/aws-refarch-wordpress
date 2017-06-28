@@ -1,0 +1,408 @@
+---
+AWSTemplateFormatVersion: 2010-09-09
+
+Description: Reference Architecture to host WordPress on AWS - Creates New VPC
+
+Conditions:
+
+  MoreThan2AZ:
+    !Or [
+      !Equals [ !Ref 'AWS::Region', us-east-1 ],
+      !Equals [ !Ref 'AWS::Region', us-east-2 ],
+      !Equals [ !Ref 'AWS::Region', us-west-2 ],
+      !Equals [ !Ref 'AWS::Region', eu-west-1 ],
+      !Equals [ !Ref 'AWS::Region', sa-east-1 ],
+      !Equals [ !Ref 'AWS::Region', ap-northeast-1 ],
+      !Equals [ !Ref 'AWS::Region', ap-southeast-2 ]
+    ]
+
+Mappings:
+
+  SubnetConfig:
+    Vpc:
+      CIDR: 10.0.0.0/16
+    WebSubnet0:
+      CIDR: 10.0.0.0/22
+    WebSubnet1:
+      CIDR: 10.0.4.0/22
+    WebSubnet2:
+      CIDR: 10.0.8.0/22
+    DataSubnet0:
+      CIDR: 10.0.12.0/22
+    DataSubnet1:
+      CIDR: 10.0.16.0/22
+    DataSubnet2:
+      CIDR: 10.0.20.0/22
+    PublicSubnet0:
+      CIDR: 10.0.250.0/23
+    PublicSubnet1:
+      CIDR: 10.0.252.0/23
+    PublicSubnet2:
+      CIDR: 10.0.254.0/23
+
+Resources:
+
+  WebSubnet0:
+    Type: AWS::EC2::Subnet
+    Properties:
+      AvailabilityZone: !Select [ 0, !GetAZs '' ]
+      CidrBlock: !FindInMap [ SubnetConfig, WebSubnet0, CIDR ]
+      MapPublicIpOnLaunch: false
+      Tags:
+        - Key: Name
+          Value: !Join [ '', [ 'WebSubnet0 / ', !Ref 'AWS::StackName' ] ]
+        - Key: SubnetType
+          Value: Private
+      VpcId: !Ref Vpc
+  WebSubnet1:
+    Type: AWS::EC2::Subnet
+    Properties:
+      AvailabilityZone: !Select [ 1, !GetAZs '' ]
+      CidrBlock: !FindInMap [ SubnetConfig, WebSubnet1, CIDR ]
+      MapPublicIpOnLaunch: false
+      Tags:
+        - Key: Name
+          Value: !Join [ '', [ 'WebSubnet1 / ', !Ref 'AWS::StackName' ] ]
+        - Key: SubnetType
+          Value: Private
+      VpcId: !Ref Vpc
+  WebSubnet2:
+    Condition: MoreThan2AZ
+    Type: AWS::EC2::Subnet
+    Properties:
+      AvailabilityZone: !Select [ 2, !GetAZs '' ]
+      CidrBlock: !FindInMap [ SubnetConfig, WebSubnet2, CIDR ]
+      MapPublicIpOnLaunch: false
+      Tags:
+        - Key: Name
+          Value: !Join [ '', [ 'WebSubnet2 / ', !Ref 'AWS::StackName' ] ]
+        - Key: SubnetType
+          Value: Private
+      VpcId: !Ref Vpc
+  WebSubnetRouteTableAssociation0:
+    Type: AWS::EC2::SubnetRouteTableAssociation
+    Properties:
+      RouteTableId: !Ref NatRouteTable0
+      SubnetId: !Ref WebSubnet0
+  WebSubnetRouteTableAssociation1:
+    Type: AWS::EC2::SubnetRouteTableAssociation
+    Properties:
+      RouteTableId: !Ref NatRouteTable1
+      SubnetId: !Ref WebSubnet1
+  WebSubnetRouteTableAssociation2:
+    Type: AWS::EC2::SubnetRouteTableAssociation
+    Condition: MoreThan2AZ
+    Properties:
+      RouteTableId: !Ref NatRouteTable2
+      SubnetId: !Ref WebSubnet2
+  AttachInternetGateway:
+    Type: AWS::EC2::VPCGatewayAttachment
+    Properties:
+      InternetGatewayId: !Ref InternetGateway
+      VpcId: !Ref Vpc
+
+  DataSubnet0:
+    Type: AWS::EC2::Subnet
+    Properties:
+      AvailabilityZone: !Select [ 0, !GetAZs '' ]
+      CidrBlock: !FindInMap [ SubnetConfig, DataSubnet0, CIDR ]
+      MapPublicIpOnLaunch: false
+      Tags:
+        - Key: Name
+          Value: !Join [ '', [ 'DataSubnet0 / ', !Ref 'AWS::StackName' ] ]
+        - Key: SubnetType
+          Value: Private
+      VpcId: !Ref Vpc
+  DataSubnet1:
+    Type: AWS::EC2::Subnet
+    Properties:
+      AvailabilityZone: !Select [ 1, !GetAZs '' ]
+      CidrBlock: !FindInMap [ SubnetConfig, DataSubnet1, CIDR ]
+      MapPublicIpOnLaunch: false
+      Tags:
+        - Key: Name
+          Value: !Join [ '', [ 'DataSubnet1 / ', !Ref 'AWS::StackName' ] ]
+        - Key: SubnetType
+          Value: Private
+      VpcId: !Ref Vpc
+  DataSubnet2:
+    Condition: MoreThan2AZ
+    Type: AWS::EC2::Subnet
+    Properties:
+      AvailabilityZone: !Select [ 2, !GetAZs '' ]
+      CidrBlock: !FindInMap [ SubnetConfig, DataSubnet2, CIDR ]
+      MapPublicIpOnLaunch: false
+      Tags:
+        - Key: Name
+          Value: !Join [ '', [ 'DataSubnet2 / ', !Ref 'AWS::StackName' ] ]
+        - Key: SubnetType
+          Value: Private
+      VpcId: !Ref Vpc
+  DataSubnetRouteTableAssociation0:
+    Type: AWS::EC2::SubnetRouteTableAssociation
+    Properties:
+      RouteTableId: !Ref NatRouteTable0
+      SubnetId: !Ref DataSubnet0
+  DataSubnetRouteTableAssociation1:
+    Type: AWS::EC2::SubnetRouteTableAssociation
+    Properties:
+      RouteTableId: !Ref NatRouteTable1
+      SubnetId: !Ref DataSubnet1
+  DataSubnetRouteTableAssociation2:
+    Type: AWS::EC2::SubnetRouteTableAssociation
+    Condition: MoreThan2AZ
+    Properties:
+      RouteTableId: !Ref NatRouteTable2
+      SubnetId: !Ref DataSubnet2
+
+  InternetGateway:
+    Type: AWS::EC2::InternetGateway
+    Properties:
+      Tags:
+        - Key: Name
+          Value: !Join [ '', [ 'InternetGateway / ', !Ref 'AWS::StackName' ] ]
+
+  NatEIP0:
+    Type: AWS::EC2::EIP
+    Properties:
+      Domain: vpc
+  NatGateway0:
+    Type: AWS::EC2::NatGateway
+    DependsOn: AttachInternetGateway
+    Properties:
+      AllocationId: !GetAtt NatEIP0.AllocationId
+      SubnetId: !Ref PublicSubnet0
+  NatRoute0:
+    Type: AWS::EC2::Route
+    Properties:
+      RouteTableId: !Ref NatRouteTable0
+      DestinationCidrBlock: 0.0.0.0/0
+      NatGatewayId: !Ref NatGateway0
+  NatRouteTable0:
+    Type: AWS::EC2::RouteTable
+    Properties:
+      Tags:
+        - Key: Name
+          Value: !Join [ '', ['NatRouteTable0 / ', !Ref 'AWS::StackName' ] ]
+        - Key: Network
+          Value: Public
+      VpcId: !Ref Vpc
+  NatEIP1:
+    Type: AWS::EC2::EIP
+    Properties:
+      Domain: vpc
+  NatGateway1:
+    Type: AWS::EC2::NatGateway
+    DependsOn: AttachInternetGateway
+    Properties:
+      AllocationId: !GetAtt NatEIP1.AllocationId
+      SubnetId: !Ref PublicSubnet1
+  NatRoute1:
+    Type: AWS::EC2::Route
+    Properties:
+      RouteTableId: !Ref NatRouteTable1
+      DestinationCidrBlock: 0.0.0.0/0
+      NatGatewayId: !Ref NatGateway1
+  NatRouteTable1:
+    Type: AWS::EC2::RouteTable
+    Properties:
+      Tags:
+        - Key: Name
+          Value: !Join [ '', [ 'NatRouteTable1 / ', !Ref 'AWS::StackName' ] ]
+        - Key: Network
+          Value: Public
+      VpcId: !Ref Vpc
+  NatEIP2:
+    Type: AWS::EC2::EIP
+    Condition: MoreThan2AZ
+    Properties:
+      Domain: vpc
+  NatGateway2:
+    Type: AWS::EC2::NatGateway
+    Condition: MoreThan2AZ
+    DependsOn: AttachInternetGateway
+    Properties:
+      AllocationId: !GetAtt NatEIP2.AllocationId
+      SubnetId: !Ref PublicSubnet2
+  NatRoute2:
+    Type: AWS::EC2::Route
+    Condition: MoreThan2AZ
+    Properties:
+      RouteTableId: !Ref NatRouteTable2
+      DestinationCidrBlock: 0.0.0.0/0
+      NatGatewayId: !Ref NatGateway2
+  NatRouteTable2:
+    Type: AWS::EC2::RouteTable
+    Condition: MoreThan2AZ
+    Properties:
+      Tags:
+        - Key: Name
+          Value: !Join [ '', [ 'NatRouteTable2 / ', !Ref 'AWS::StackName' ] ]
+        - Key: Network
+          Value: Public
+      VpcId: !Ref Vpc
+     
+  PublicRoute:
+    Type: AWS::EC2::Route
+    DependsOn: AttachInternetGateway
+    Properties:
+      RouteTableId: !Ref PublicRouteTable
+      DestinationCidrBlock: 0.0.0.0/0
+      GatewayId: !Ref InternetGateway
+  PublicRouteTable:
+    Type: AWS::EC2::RouteTable
+    Properties:
+      Tags:
+        - Key: Name
+          Value: !Join [ '', [ 'PublicRouteTable / ', !Ref 'AWS::StackName' ] ]
+        - Key: Network
+          Value: Public
+      VpcId: !Ref Vpc
+  PublicRouteTableAssociation0:
+    Type: AWS::EC2::SubnetRouteTableAssociation
+    Properties:
+      SubnetId: !Ref PublicSubnet0
+      RouteTableId: !Ref PublicRouteTable
+  PublicRouteTableAssociation1:
+    Type: AWS::EC2::SubnetRouteTableAssociation
+    Properties:
+      SubnetId: !Ref PublicSubnet1
+      RouteTableId: !Ref PublicRouteTable
+  PublicRouteTableAssociation2:
+    Type: AWS::EC2::SubnetRouteTableAssociation
+    Condition: MoreThan2AZ
+    Properties:
+      SubnetId: !Ref PublicSubnet2
+      RouteTableId: !Ref PublicRouteTable
+  PublicSubnet0:
+    Type: AWS::EC2::Subnet
+    Properties:
+      AvailabilityZone: !Select [ 0, !GetAZs '' ]
+      CidrBlock: !FindInMap [ SubnetConfig, PublicSubnet0, CIDR ]
+      MapPublicIpOnLaunch: true
+      Tags:
+        - Key: Name
+          Value: !Join [ '', [ 'PublicSubnet0 / ', !Ref 'AWS::StackName' ] ]
+        - Key: SubnetType
+          Value: Public
+      VpcId: !Ref Vpc
+  PublicSubnet1:
+    Type: AWS::EC2::Subnet
+    Properties:
+      AvailabilityZone: !Select [ 1, !GetAZs '' ]
+      CidrBlock: !FindInMap [ SubnetConfig, PublicSubnet1, CIDR ]
+      MapPublicIpOnLaunch: true
+      Tags:
+        - Key: Name
+          Value: !Join [ '', [ 'PublicSubnet1 / ', !Ref 'AWS::StackName' ] ]
+        - Key: SubnetType
+          Value: Public
+      VpcId: !Ref Vpc
+  PublicSubnet2:
+    Condition: MoreThan2AZ
+    Type: AWS::EC2::Subnet
+    Properties:
+      AvailabilityZone: !Select [ 2, !GetAZs '' ]
+      CidrBlock: !FindInMap [ SubnetConfig, PublicSubnet2, CIDR ]
+      MapPublicIpOnLaunch: true
+      Tags:
+        - Key: Name
+          Value: !Join [ '', [ 'PublicSubnet2 / ', !Ref 'AWS::StackName' ] ]
+        - Key: SubnetType
+          Value: Public
+      VpcId: !Ref Vpc
+
+  Vpc:
+    Type: AWS::EC2::VPC
+    Properties:
+      CidrBlock: !FindInMap [ SubnetConfig, Vpc, CIDR ]
+      EnableDnsHostnames: true
+      EnableDnsSupport: true
+      Tags:
+        - Key: Name
+          Value: !Join [ '', [ 'Vpc / ', !Ref 'AWS::StackName' ] ]
+  VpcFlowLog:
+    Type: AWS::EC2::FlowLog
+    Properties:
+      DeliverLogsPermissionArn: !GetAtt VpcFlowLogsRole.Arn
+      LogGroupName: !Join [ '', [ !Ref 'AWS::StackName', '-FlowLog' ] ]
+      ResourceId: !Ref Vpc
+      ResourceType: VPC
+      TrafficType: ALL
+  VpcFlowLogsLogGroup:
+    Type: AWS::Logs::LogGroup
+  VpcFlowLogsRole:
+    Type: AWS::IAM::Role
+    Properties:
+      AssumeRolePolicyDocument:
+        Version: 2012-10-17
+        Statement:
+          - Action:
+              - sts:AssumeRole
+            Effect: Allow
+            Principal:
+              Service:
+                - vpc-flow-logs.amazonaws.com
+      Path: '/'
+      Policies:
+        - PolicyName: root
+          PolicyDocument:
+            Version: 2012-10-17
+            Statement:
+              - Action:
+                  - logs:CreateLogGroup
+                  - logs:CreateLogStream
+                  - logs:DescribeLogGroups
+                  - logs:DescribeLogStreams
+                  - logs:PutLogEvents
+                Effect: Allow
+                Resource: '*'
+
+Outputs:
+  
+  Vpc:
+    Value: !Ref Vpc
+  VpcCidr:
+    Value: !FindInMap [ SubnetConfig, Vpc, CIDR ]
+  WebSubnet0:
+    Value: !Ref WebSubnet0
+  WebSubnet0Cidr:
+    Value: !FindInMap [ SubnetConfig, WebSubnet0, CIDR ]
+  WebSubnet1:
+    Value: !Ref WebSubnet1
+  WebSubnet1Cidr:
+    Value: !FindInMap [ SubnetConfig, WebSubnet1, CIDR ]
+  WebSubnet2:
+    Condition: MoreThan2AZ
+    Value: !Ref WebSubnet2
+  WebSubnet2Cidr:
+    Condition: MoreThan2AZ
+    Value: !FindInMap [ SubnetConfig, WebSubnet2, CIDR ]
+  DataSubnet0:
+    Value: !Ref DataSubnet0
+  DataSubnet0Cidr:
+    Value: !FindInMap [ SubnetConfig, DataSubnet0, CIDR ]
+  DataSubnet1:
+    Value: !Ref DataSubnet1
+  DataSubnet1Cidr:
+    Value: !FindInMap [ SubnetConfig, DataSubnet1, CIDR ]
+  DataSubnet2:
+    Condition: MoreThan2AZ
+    Value: !Ref DataSubnet2
+  DataSubnet2Cidr:
+    Condition: MoreThan2AZ
+    Value: !FindInMap [ SubnetConfig, DataSubnet2, CIDR ]
+  PublicSubnet0:
+    Value: !Ref PublicSubnet0
+  PublicSubnet0Cidr:
+    Value: !FindInMap [ SubnetConfig, PublicSubnet0, CIDR ]
+  PublicSubnet1:
+    Value: !Ref PublicSubnet1
+  PublicSubnet1Cidr:
+    Value: !FindInMap [ SubnetConfig, PublicSubnet1, CIDR ]
+  PublicSubnet2:
+    Condition: MoreThan2AZ
+    Value: !Ref PublicSubnet2
+  PublicSubnet2Cidr:
+    Condition: MoreThan2AZ
+    Value: !FindInMap [ SubnetConfig, PublicSubnet2, CIDR ]

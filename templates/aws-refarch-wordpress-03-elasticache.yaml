@@ -1,0 +1,128 @@
+---
+AWSTemplateFormatVersion: 2010-09-09
+
+Description: Reference Architecture to host WordPress on AWS - Creates ElastiCache cache cluster
+
+Metadata:
+
+  AWS::CloudFormation::Interface:
+    ParameterGroups:
+    - Label:
+        default: Cache Parameters
+      Parameters:
+        - ElastiCacheNodeType
+        - ElastiCacheClusterName
+        - ElastiCacheSecurityGroup
+        - DataSubnet0
+        - DataSubnet1
+        - DataSubnet2
+    ParameterLabels:
+      DataSubnet0:
+        default: DataSubnet0
+      DataSubnet1:
+        default: DataSubnet1
+      DataSubnet2:
+        default: DataSubnet2
+      ElastiCacheClusterName:
+        default: Cache Cluster Name
+      ElastiCacheNodeType:
+        default: Cache Cluster Node Type
+      ElastiCacheSecurityGroup:
+        default: ElastiCache Security Group
+
+Parameters:
+
+  DataSubnet0:
+    Description: Select an existing database subnet for AZ 0.
+    Type: AWS::EC2::Subnet::Id
+  DataSubnet1:
+    Description: Select an existing database subnet for AZ 1.
+    Type: AWS::EC2::Subnet::Id
+  DataSubnet2:
+    Description: Select an existing database subnet for AZ 2.
+    Type: AWS::EC2::Subnet::Id
+  ElastiCacheClusterName:
+    AllowedPattern: ^([a-zA-Z0-9]*)$
+    Description: The ElastiCache cluster name. Defaults to the Amazon RDS database name.
+    Type: String
+  ElastiCacheNodeType:
+    AllowedValues:
+      - cache.t2.micro
+      - cache.t2.small
+      - cache.t2.medium
+      - cache.m4.large
+      - cache.m4.xlarge
+      - cache.m4.2xlarge
+      - cache.m4.4xlarge
+      - cache.m4.10xlarge
+      - cache.m3.medium
+      - cache.m3.large
+      - cache.m3.xlarge
+      - cache.m3.2xlarge
+      - cache.r3.large
+      - cache.r3.xlarge
+      - cache.r3.2xlarge
+      - cache.r3.4xlarge
+      - cache.r3.8xlarge
+    ConstraintDescription: Must be a valid Amazon ElastiCache node type.
+    Default: cache.t2.medium
+    Description: The Amazon ElastiCache cluster node type.
+    Type: String
+  ElastiCacheSecurityGroup:
+    Description: Select the ElastiCache security group.
+    Type: AWS::EC2::SecurityGroup::Id
+
+Conditions:
+
+  MoreThan2AZ:
+    !Or [
+      !Equals [ !Ref 'AWS::Region', us-east-1 ],
+      !Equals [ !Ref 'AWS::Region', us-east-2 ],
+      !Equals [ !Ref 'AWS::Region', us-west-2 ],
+      !Equals [ !Ref 'AWS::Region', eu-west-1 ],
+      !Equals [ !Ref 'AWS::Region', sa-east-1 ],
+      !Equals [ !Ref 'AWS::Region', ap-northeast-1 ],
+      !Equals [ !Ref 'AWS::Region', ap-southeast-2 ]
+    ]
+
+Resources:
+
+  ElastiCacheCluster:
+    Type: AWS::ElastiCache::CacheCluster
+    Properties:
+      AZMode: cross-az
+      CacheNodeType: !Ref ElastiCacheNodeType
+      CacheSubnetGroupName: !Ref ElastiCacheSubnetGroup
+      ClusterName: !Ref ElastiCacheClusterName
+      Engine: memcached
+      NumCacheNodes:
+        !If [
+          MoreThan2AZ,
+          3,
+          2
+        ]
+      PreferredAvailabilityZones:
+        !If [
+          MoreThan2AZ,
+          [ !Select [ 0, !GetAZs '' ], !Select [ 1, !GetAZs '' ], !Select [ 2, !GetAZs '' ] ],
+          [ !Select [ 0, !GetAZs '' ], !Select [ 1, !GetAZs '' ] ]
+        ]
+      Tags:
+        - Key: Name
+          Value: !Join [ '', [ 'WordPress / ', !Ref 'AWS::StackName' ] ]
+      VpcSecurityGroupIds:
+      - !Ref ElastiCacheSecurityGroup       
+  ElastiCacheSubnetGroup: 
+    Type: AWS::ElastiCache::SubnetGroup
+    Properties: 
+      CacheSubnetGroupName: !Join [ '', [ !Ref ElastiCacheClusterName, SubnetGroup ] ]
+      Description: ElastiCache Subnet Group for WordPress
+      SubnetIds: 
+        !If [
+          MoreThan2AZ,
+          [ !Ref DataSubnet0, !Ref DataSubnet1, !Ref DataSubnet2 ],
+          [ !Ref DataSubnet0, !Ref DataSubnet1 ]
+        ]
+Outputs:
+  ElastiCacheClusterEndpointAddress:
+    Value: !GetAtt ElastiCacheCluster.ConfigurationEndpoint.Address

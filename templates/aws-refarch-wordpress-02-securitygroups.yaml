@@ -1,0 +1,127 @@
+---
+AWSTemplateFormatVersion: 2010-09-09
+
+Description: Reference Architecture to host WordPress on AWS - Creates VPC security groups
+
+Metadata:
+  AWS::CloudFormation::Interface:
+    ParameterGroups:
+    - Label:
+        default: AWS Parameters
+      Parameters:
+        - SshAccessCidr
+        - Vpc
+    ParameterLabels:
+      SshAccessCidr:
+        default: SSH Access From
+      Vpc:
+        default: Vpc Id
+
+Parameters:
+  SshAccessCidr:
+    AllowedPattern: ^(([0-9]|[1-9][0-9]|1[0-9]{2}|2[0-4][0-9]|25[0-5])\.){3}([0-9]|[1-9][0-9]|1[0-9]{2}|2[0-4][0-9]|25[0-5])(\/([0-9]|[1-2][0-9]|3[0-2]))$
+    Description: The CIDR IP range that is permitted to SSH to bastion instance. Note - a value of 0.0.0.0/0 will allow access from ANY IP address.
+    Type: String
+    Default: 0.0.0.0/0
+  Vpc:
+    AllowedPattern: ^(vpc-)([a-z0-9]{8})$
+    Description: The Vpc Id of an existing Vpc.
+    Type: AWS::EC2::VPC::Id
+
+Resources:
+
+  BastionSecurityGroup:
+    Type: AWS::EC2::SecurityGroup
+    Properties:
+      GroupDescription: Security group for Bastion instances
+      SecurityGroupIngress:
+        - IpProtocol: tcp
+          FromPort: 22
+          ToPort: 22
+          CidrIp: !Ref SshAccessCidr
+      VpcId:
+        !Ref Vpc
+
+  DatabaseSecurityGroup:
+    Type: AWS::EC2::SecurityGroup
+    Properties:
+      GroupDescription: Security group for Amazon RDS cluster
+      SecurityGroupIngress:
+        - IpProtocol: tcp
+          FromPort: 3306
+          ToPort: 3306
+          SourceSecurityGroupId: !Ref WebSecurityGroup
+      VpcId:
+        !Ref Vpc
+
+  ElastiCacheSecurityGroup:
+    Type: AWS::EC2::SecurityGroup
+    Properties:
+      GroupDescription: Security group for ElastiCache cache cluster
+      SecurityGroupIngress:
+        - IpProtocol: tcp
+          FromPort: 11211
+          ToPort: 11211
+          SourceSecurityGroupId: !Ref WebSecurityGroup
+      VpcId:
+        !Ref Vpc
+  EfsSecurityGroup:
+    Type: AWS::EC2::SecurityGroup
+    Properties:
+      GroupDescription: Security group for EFS mount targets
+      VpcId: !Ref Vpc
+      SecurityGroupIngress:
+        - IpProtocol: tcp
+          FromPort: 2049
+          ToPort: 2049
+          SourceSecurityGroupId: !Ref WebSecurityGroup
+
+  PublicAlbSecurityGroup:
+    Type: AWS::EC2::SecurityGroup
+    Properties:
+      GroupDescription: Security group for ALB
+      SecurityGroupIngress:
+        - IpProtocol: tcp
+          FromPort: 443
+          ToPort: 443
+          CidrIp: 0.0.0.0/0
+        - IpProtocol: tcp
+          FromPort: 80
+          ToPort: 80
+          CidrIp: 0.0.0.0/0
+      VpcId:
+        !Ref Vpc       
+
+  WebSecurityGroup:
+    Type: AWS::EC2::SecurityGroup
+    Properties:
+      GroupDescription: Security group for web instances
+      SecurityGroupIngress:
+        - IpProtocol: tcp
+          FromPort: 80
+          ToPort: 80
+          SourceSecurityGroupId: !Ref PublicAlbSecurityGroup
+        - IpProtocol: tcp
+          FromPort: 443
+          ToPort: 443
+          SourceSecurityGroupId: !Ref PublicAlbSecurityGroup
+        - IpProtocol: tcp
+          FromPort: 22
+          ToPort: 22
+          SourceSecurityGroupId: !Ref BastionSecurityGroup
+      VpcId:
+        !Ref Vpc
+
+Outputs:
+  BastionSecurityGroup:
+    Value: !Ref BastionSecurityGroup
+  DatabaseSecurityGroup:
+    Value: !Ref DatabaseSecurityGroup
+  EfsSecurityGroup:
+    Value: !Ref EfsSecurityGroup
+  ElastiCacheSecurityGroup:
+    Value: !Ref ElastiCacheSecurityGroup
+  PublicAlbSecurityGroup:
+    Value: !Ref PublicAlbSecurityGroup
+  WebSecurityGroup:
+    Value: !Ref WebSecurityGroup

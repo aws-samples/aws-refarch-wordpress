@@ -1,0 +1,476 @@
+---
+AWSTemplateFormatVersion: 2010-09-09
+
+Description: Stack to deploy a highly available, elastic, scalable WordPress environment. This master stack launches multiple nested stacks for different tiers. !! This can only be run in certain AWS Regions - 'us-east-1', 'us-east-2', 'us-west-2', 'eu-west-1'.
+
+Metadata:
+
+  AWS::CloudFormation::Interface:
+    ParameterGroups:
+    - Label:
+        default: AWS Parameters
+      Parameters:
+        - KeyName
+        - SshAccessCidr
+    - Label:
+        default: Database Parameters
+      Parameters:
+        - DatabaseInstanceType
+        - DatabaseMasterUsername
+        - DatabaseMasterPassword
+        - DatabaseName
+        - UseElastiCacheBoolean
+        - ElastiCacheNodeType
+    - Label:
+        default: Web Tier Parameters
+      Parameters:
+        - UseRoute53Boolean
+        - UseCloudFrontBoolean
+        - CloudFrontAcmCertificate
+        - PublicAlbAcmCertificate
+        - WebInstanceType
+        - WebAsgMax
+        - WebAsgMin
+    - Label:
+        default: WordPress Parameters
+      Parameters:
+        - WPTitle
+        - WPAdminUsername
+        - WPAdminPassword
+        - WPAdminEmail
+        - WPDirectory
+        - WPDomainName
+        - WPLocale
+    ParameterLabels:
+      CloudFrontAcmCertificate:
+        default: CloudFront Certificate ARN
+      DatabaseInstanceType:
+        default: DB Instance Class
+      DatabaseMasterUsername:
+        default: DB Master Username
+      DatabaseMasterPassword:
+        default: DB Master Password
+      DatabaseName:
+        default: DB Name
+      ElastiCacheNodeType:
+        default: Cache Cluster Node Type
+      PublicAlbAcmCertificate:
+        default: ALB Certificate ARN
+      KeyName:
+        default: Existing Key Pair
+      SshAccessCidr:
+        default: SSH Access From
+      UseElastiCacheBoolean:
+        default: Use a Cache Cluster?
+      UseCloudFrontBoolean:
+        default: Use a CDN (CloudFront)?
+      UseRoute53Boolean:
+        default: Create record set (Route53)?
+      WebAsgMax:
+        default: Web ASG Max
+      WebAsgMin:
+        default: Web ASG Min
+      WebInstanceType:
+        default: Web Tier Instance Type
+      WPTitle:
+        default: Site Title
+      WPAdminUsername:
+        default: Admin Username
+      WPAdminPassword:
+        default: Admin Password
+      WPAdminEmail:
+        default: Admin Email
+      WPDirectory:
+        default: Site Directory
+      WPDomainName:
+        default: Site Domain
+      WPLocale:
+        default: Language Code
+
+Parameters:
+
+  CloudFrontAcmCertificate:
+    AllowedPattern: ^$|(arn:aws:acm:)([a-z0-9/:-])*([a-z0-9])$
+    Description: '[ Optional ] The AWS Certification Manager certificate ARN for the CloudFront distribution certificate - this certificate should be created in the us-east-1 (N. Virginia) region and must reference the WordPress domain name you use below.'
+    Type: String
+  DatabaseInstanceType:
+    AllowedValues:
+      - db.t2.small
+      - db.t2.medium
+      - db.r3.large
+      - db.r3.xlarge
+      - db.r3.2xlarge
+      - db.r3.4xlarge
+      - db.r3.8xlarge
+    ConstraintDescription: Must be a valid RDS instance class.
+    Default: db.t2.medium
+    Description: The Amazon RDS database instance class.
+    Type: String
+  DatabaseMasterUsername:
+    AllowedPattern: ^([a-zA-Z0-9]*)$
+    Description: The Amazon RDS master username.
+    ConstraintDescription: Must contain only alphanumeric characters and be at least 8 characters.
+    MaxLength: 16
+    MinLength: 1
+    Type: String
+  DatabaseMasterPassword:
+    AllowedPattern: ^([a-zA-Z0-9`~!#$%^&*()_+,\\-])*$
+    ConstraintDescription: Must be letters (upper or lower), numbers, spaces, and these special characters `~!#$%^&*()_+,-
+    Description: The Amazon RDS master password. Letters, numbers, spaces, and these special characters `~!#$%^&*()_+,-
+    MaxLength: 41
+    MinLength: 8
+    NoEcho: true
+    Type: String
+  DatabaseName:
+    AllowedPattern: ^([a-zA-Z0-9]*)$
+    Description: The Amazon RDS master database name.
+    Type: String
+  ElastiCacheNodeType:
+    AllowedValues:
+      - cache.t2.micro
+      - cache.t2.small
+      - cache.t2.medium
+      - cache.m4.large
+      - cache.m4.xlarge
+      - cache.m4.2xlarge
+      - cache.m4.4xlarge
+      - cache.m4.10xlarge
+      - cache.m3.medium
+      - cache.m3.large
+      - cache.m3.xlarge
+      - cache.m3.2xlarge
+      - cache.r3.large
+      - cache.r3.xlarge
+      - cache.r3.2xlarge
+      - cache.r3.4xlarge
+      - cache.r3.8xlarge
+    ConstraintDescription: Must be a valid Amazon ElastiCache node type.
+    Default: cache.t2.medium
+    Description: The Amazon ElastiCache cluster node type.
+    Type: String
+  KeyName:
+    AllowedPattern: ^([a-zA-Z0-9 @.`~!#$%^&*()_+,\\-])*$
+    ConstraintDescription: Must be letters (upper or lower), numbers, and special characters.
+    Description: Name of an EC2 KeyPair. Your bastion & Web instances will launch with this KeyPair.
+    Type: AWS::EC2::KeyPair::KeyName
+  PublicAlbAcmCertificate:
+    AllowedPattern: ^$|(arn:aws:acm:)([a-z0-9/:-])*([a-z0-9])$
+    Description: '[ Optional ] The AWS Certification Manager certificate ARN for the ALB certificate - this certificate should be created in the region you wish to run the ALB and must reference the WordPress domain name you use below.'
+    Type: String
+  SshAccessCidr:
+    AllowedPattern: ^(([0-9]|[1-9][0-9]|1[0-9]{2}|2[0-4][0-9]|25[0-5])\.){3}([0-9]|[1-9][0-9]|1[0-9]{2}|2[0-4][0-9]|25[0-5])(\/([0-9]|[1-2][0-9]|3[0-2]))$
+    Description: The CIDR IP range that is permitted to SSH to bastion instance. Note - a value of 0.0.0.0/0 will allow access from ANY IP address.
+    Type: String
+    Default: 0.0.0.0/0
+  UseCloudFrontBoolean:
+    AllowedValues:
+      - True
+      - False
+    Default: True
+    Description: Specifies whether a CloudFront Distribution should be created to serve the WordPress website content.
+    Type: String
+  UseElastiCacheBoolean:
+    AllowedValues:
+      - True
+      - False
+    Default: True
+    Description: Specifies whether an ElastiCache Cache Cluster should be created to cache WordPress database content.
+    Type: String
+  UseRoute53Boolean:
+    AllowedValues:
+      - True
+      - False
+    Default: True
+    Description: Specifies whether a record set should be created in Route 53 for your WordPress domain name.
+    Type: String
+  WebAsgMax:
+    AllowedPattern: ^((?!0$)[1-2]?[0-9]|30)$
+    ConstraintDescription: Must be a number between 1 and 30.
+    Default: 4
+    Description: Specifies the maximum number of EC2 instances in the Web Autoscaling Group.
+    Type: String
+  WebAsgMin:
+    AllowedPattern: ^([0-0]?[0-9]|10)$
+    ConstraintDescription: Must be a number between 0 and 10.
+    Default: 2
+    Description: Specifies the minimum number of EC2 instances in the Web Autoscaling Group.
+    Type: String
+  WebInstanceType:
+    AllowedValues:
+      - t2.micro
+      - t2.small
+      - t2.medium
+      - t2.large
+      - m4.large
+      - m4.xlarge
+      - m4.2xlarge
+      - m4.4xlarge
+      - m4.10xlarge
+      - m3.medium
+      - m3.large
+      - m3.xlarge
+      - m3.2xlarge
+      - r3.large
+      - r3.xlarge
+      - r3.2xlarge
+      - r3.4xlarge
+      - r3.8xlarge
+    ConstraintDescription: Must be a valid Amazon EC2 instance type.
+    Default: t2.large
+    Description: The Amazon EC2 instance type for your web instances.
+    Type: String
+  WPAdminEmail:
+    AllowedPattern: ^(([^<>()\[\]\\.,;:\s@"]+(\.[^<>()\[\]\\.,;:\s@"]+)*)|(".+"))@((\[[0-9]{1,3}\.[0-9]{1,3}\.[0-9]{1,3}\.[0-9]{1,3}])|(([a-zA-Z\-0-9]+\.)+[a-zA-Z]{2,}))$
+    Description: The WordPress admin email address.
+    Type: String
+  WPAdminPassword:
+    AllowedPattern: ^([a-zA-Z0-9`~!#$%^&*()_+,\\-])*$
+    ConstraintDescription: Must be letters (upper or lower), numbers, spaces, and these special characters `~!#$%^&*()_+,-    
+    Description: The WordPress admin password. Letters, numbers, spaces, and these special characters `~!#$%^&*()_+,-
+    Type: String
+    NoEcho: true
+  WPAdminUsername:
+    AllowedPattern: ^([a-zA-Z0-9])([a-zA-Z0-9_-])*([a-zA-Z0-9])$
+    Description: The WordPress admin username.
+    Type: String
+  WPDirectory:
+    AllowedPattern: ^([a-zA-Z0-9])([a-zA-Z0-9_-])*([a-zA-Z0-9])$
+    Description: The WordPress site directory.
+    Type: String
+  WPDomainName:
+    AllowedPattern: ^$|(([a-zA-Z0-9]|[a-zA-Z0-9][a-zA-Z0-9\-]*[a-zA-Z0-9])\.)*([A-Za-z0-9]|[A-Za-z0-9][A-Za-z0-9\-]*[A-Za-z0-9])$
+    Description: '[ Optional ] The main domain name of the WordPress site (e.g. example.com).'
+    Type: String
+  WPLocale:
+    Description: "The main language of the WordPress site, as per https://codex.WordPress.org/Installing_WordPress_in_Your_Language. The default is 'en_GB'."
+    Type: String
+    Default: en_GB
+  WPTitle:
+    Default: This is a new WordPress site on Amazon Web Services
+    AllowedPattern: ^([a-zA-Z0-9])([a-zA-Z0-9 _-]*)([a-zA-Z0-9])$
+    Description: The WordPress website title.
+    Type: String
+
+Conditions:
+
+  AvailableAWSRegion:
+    !Or [
+      !Equals [ !Ref 'AWS::Region', ap-southeast-2 ],
+      !Equals [ !Ref 'AWS::Region', eu-west-1 ],
+      !Equals [ !Ref 'AWS::Region', us-east-1 ],
+      !Equals [ !Ref 'AWS::Region', us-east-2 ],
+      !Equals [ !Ref 'AWS::Region', us-west-2 ]
+    ]
+  CreateRecordSet:
+    !Equals [ True, !Ref UseRoute53Boolean ]
+  DeployCloudFront:
+    !Equals [ True, !Ref UseCloudFrontBoolean ]
+  DeployElastiCache:
+    !Equals [ True, !Ref UseElastiCacheBoolean ]
+
+Resources:
+
+  bastion:
+    Condition: AvailableAWSRegion
+    DependsOn: [ newvpc, securitygroups ]
+    Type: AWS::CloudFormation::Stack
+    Properties:
+      Parameters:
+        BastionSecurityGroup:
+          !GetAtt [ securitygroups, Outputs.BastionSecurityGroup ]
+        KeyName:
+          !Ref KeyName
+        PublicSubnet0:
+          !GetAtt [ newvpc, Outputs.PublicSubnet0 ]
+        PublicSubnet1:
+          !GetAtt [ newvpc, Outputs.PublicSubnet1 ]
+        PublicSubnet2:
+          !GetAtt [ newvpc, Outputs.PublicSubnet2 ]
+      TemplateURL: https://s3.amazonaws.com/aws-us-east-1/reference-architecture/wordpress/latest/templates/aws-refarch-wordpress-03-bastion.yaml
+  cloudfront:
+    Condition: AvailableAWSRegion
+    Condition: DeployCloudFront
+    DependsOn: [ publicalb, web ]
+    Type: AWS::CloudFormation::Stack
+    Properties:
+      Parameters:
+        CloudFrontAcmCertificate:
+          !Ref CloudFrontAcmCertificate
+        PublicAlbDnsName:
+          !GetAtt [ publicalb, Outputs.PublicAlbDnsName ]
+        WPDomainName:
+          !Ref WPDomainName
+      TemplateURL: https://s3.amazonaws.com/aws-us-east-1/reference-architecture/wordpress/latest/templates/aws-refarch-wordpress-04-cloudfront.yaml
+  efs:
+    Condition: AvailableAWSRegion
+    DependsOn: [ newvpc, securitygroups ]
+    Type: AWS::CloudFormation::Stack
+    Properties:
+      Parameters:
+        EfsSecurityGroup:
+          !GetAtt [ securitygroups, Outputs.EfsSecurityGroup ]
+        DataSubnet0:
+          !GetAtt [ newvpc, Outputs.DataSubnet0 ]
+        DataSubnet1:
+          !GetAtt [ newvpc, Outputs.DataSubnet1 ]
+        DataSubnet2:
+          !GetAtt [ newvpc, Outputs.DataSubnet2 ]
+      TemplateURL: https://s3.amazonaws.com/aws-us-east-1/reference-architecture/wordpress/latest/templates/aws-refarch-wordpress-03-efs.yaml
+  elasticache:
+    Condition: AvailableAWSRegion
+    Condition: DeployElastiCache
+    DependsOn: [ newvpc, securitygroups ]
+    Type: AWS::CloudFormation::Stack
+    Properties:
+      Parameters:
+        DataSubnet0:
+          !GetAtt [ newvpc, Outputs.DataSubnet0 ]
+        DataSubnet1:
+          !GetAtt [ newvpc, Outputs.DataSubnet1 ]
+        DataSubnet2:
+          !GetAtt [ newvpc, Outputs.DataSubnet2 ]
+        ElastiCacheClusterName:
+          !Ref DatabaseName
+        ElastiCacheNodeType:
+          !Ref ElastiCacheNodeType
+        ElastiCacheSecurityGroup:
+          !GetAtt [ securitygroups, Outputs.ElastiCacheSecurityGroup ]
+      TemplateURL: https://s3.amazonaws.com/aws-us-east-1/reference-architecture/wordpress/latest/templates/aws-refarch-wordpress-03-elasticache.yaml
+  newvpc:
+    Type: AWS::CloudFormation::Stack
+    Properties:
+      TemplateURL: https://s3.amazonaws.com/aws-us-east-1/reference-architecture/wordpress/latest/templates/aws-refarch-wordpress-01-newvpc.yaml
+  publicalb:
+    Condition: AvailableAWSRegion
+    DependsOn: [ newvpc, securitygroups ]
+    Type: AWS::CloudFormation::Stack
+    Properties:
+      Parameters:
+        PublicSubnet0:
+          !GetAtt [ newvpc, Outputs.PublicSubnet0 ]
+        PublicSubnet1:
+          !GetAtt [ newvpc, Outputs.PublicSubnet1 ]
+        PublicSubnet2:
+          !GetAtt [ newvpc, Outputs.PublicSubnet2 ]
+        PublicAlbAcmCertificate:
+          !Ref PublicAlbAcmCertificate
+        PublicAlbSecurityGroup:
+          !GetAtt [ securitygroups, Outputs.PublicAlbSecurityGroup ]
+        Vpc:
+          !GetAtt [ newvpc, Outputs.Vpc ]
+      TemplateURL: https://s3.amazonaws.com/aws-us-east-1/reference-architecture/wordpress/latest/templates/aws-refarch-wordpress-03-publicalb.yaml
+  rds:
+    Condition: AvailableAWSRegion
+    DependsOn: [ newvpc, securitygroups ]
+    Type: AWS::CloudFormation::Stack
+    Properties:
+      Parameters:
+        DatabaseInstanceType:
+          !Ref DatabaseInstanceType
+        DatabaseMasterUsername:
+          !Ref DatabaseMasterUsername
+        DatabaseMasterPassword:
+          !Ref DatabaseMasterPassword
+        DatabaseName:
+          !Ref DatabaseName
+        DatabaseSecurityGroup:
+          !GetAtt [ securitygroups, Outputs.DatabaseSecurityGroup ]
+        DataSubnet0:
+          !GetAtt [ newvpc, Outputs.DataSubnet0 ]
+        DataSubnet1:
+          !GetAtt [ newvpc, Outputs.DataSubnet1 ]
+        DataSubnet2:
+          !GetAtt [ newvpc, Outputs.DataSubnet2 ]
+      TemplateURL: https://s3.amazonaws.com/aws-us-east-1/reference-architecture/wordpress/latest/templates/aws-refarch-wordpress-03-rds.yaml
+  route53:
+    Condition: AvailableAWSRegion
+    Condition: CreateRecordSet
+    DependsOn: [ publicalb, web ]
+    Type: AWS::CloudFormation::Stack
+    Properties:
+      Parameters:
+        DnsEndpoint:
+          !If [ DeployCloudFront, !GetAtt [ cloudfront, Outputs.DnsEndpoint ], !GetAtt [ publicalb, Outputs.PublicAlbDnsName ] ]
+        DnsHostId:
+          !If [ DeployCloudFront, 'Z2FDTNDATAQYW2', !GetAtt [ publicalb, Outputs.PublicAlbCanonicalHostedZoneId ] ]
+        WPDomainName:
+          !Ref WPDomainName
+      TemplateURL: https://s3.amazonaws.com/aws-us-east-1/reference-architecture/wordpress/latest/templates/aws-refarch-wordpress-05-route53.yaml
+  securitygroups:
+    Condition: AvailableAWSRegion
+    DependsOn: newvpc
+    Type: AWS::CloudFormation::Stack
+    Properties:
+      Parameters:
+        SshAccessCidr:
+          !Ref SshAccessCidr
+        Vpc:
+          !GetAtt [ newvpc, Outputs.Vpc ]
+      TemplateURL: https://s3.amazonaws.com/aws-us-east-1/reference-architecture/wordpress/latest/templates/aws-refarch-wordpress-02-securitygroups.yaml
+  web:
+    Condition: AvailableAWSRegion
+    DependsOn: [ efs, newvpc, publicalb, securitygroups ]
+    Type: AWS::CloudFormation::Stack
+    Properties:
+      Parameters:
+        DatabaseClusterEndpointAddress:
+          !GetAtt [ rds, Outputs.DatabaseClusterEndpointAddress ]
+        DatabaseMasterUsername:
+          !Ref DatabaseMasterUsername
+        DatabaseMasterPassword:
+          !Ref DatabaseMasterPassword
+        DatabaseName:
+          !Ref DatabaseName
+        ElasticFileSystem:
+          !GetAtt [ efs, Outputs.ElasticFileSystem ]
+        KeyName:
+          !Ref KeyName
+        PublicAlbTargetGroupArn:
+          !GetAtt [ publicalb, Outputs.PublicAlbTargetGroupArn ]
+        PublicAlbHostname:
+          !GetAtt [ publicalb, Outputs.PublicAlbHostname ]
+        SslCertificate:
+          !GetAtt [ publicalb, Outputs.SslCertificate ]
+        WebAsgMax:
+          !Ref WebAsgMax
+        WebAsgMin:
+          !Ref WebAsgMin
+        WebInstanceType:
+          !Ref WebInstanceType
+        WebSecurityGroup:
+          !GetAtt [ securitygroups, Outputs.WebSecurityGroup ]
+        WebSubnet0:
+          !GetAtt [ newvpc, Outputs.WebSubnet0 ]
+        WebSubnet1:
+          !GetAtt [ newvpc, Outputs.WebSubnet1 ]
+        WebSubnet2:
+          !GetAtt [ newvpc, Outputs.WebSubnet2 ]
+        WPAdminEmail:
+          !Ref WPAdminEmail
+        WPAdminPassword:
+          !Ref WPAdminPassword
+        WPAdminUsername:
+          !Ref WPAdminUsername
+        WPDirectory:
+          !Ref WPDirectory
+        WPDomainName:
+          !Ref WPDomainName
+        WPLocale:
+          !Ref WPLocale
+        WPTitle:
+          !Ref WPTitle
+      TemplateURL: https://s3.amazonaws.com/aws-us-east-1/reference-architecture/wordpress/latest/templates/aws-refarch-wordpress-04-web.yaml
+
+Outputs:
+
+  StackStatus:
+    Description: Master Stack Status
+    Value: !If [ AvailableAWSRegion, !Join [ '', [ 'Stack created in an available region: ', !Ref 'AWS::Region' ] ], "!!ERROR!!! - Nothing to do! - unavailable AWS Region. You must create this stack in an available AWS Region: 'us-east-1', 'us-east-2', 'us-west-2', 'eu-west-1', 'ap-southeast-2'." ]
+  WPSiteUrl:
+    Description: The URL of the WordPress site
+    Value: !If [ CreateRecordSet, !Join [ '', [ 'http://www.', !Ref WPDomainName ] ], !If [ DeployCloudFront, !GetAtt [ cloudfront, Outputs.DnsHostname ], !GetAtt [ publicalb, Outputs.PublicAlbHostname ] ] ]
+  OpCacheValidationUrl:
+    Description: A page to validate OpCache has been enabled for each instance in the ASG. Refresh the page to see the status of each instance in the ASG.
+    Value: !Join [ '', [ !If [ CreateRecordSet, !Join [ '', [ 'http://www.', !Ref WPDomainName ] ], !If [ DeployCloudFront, !GetAtt [ cloudfront, Outputs.DnsHostname ], !GetAtt [ publicalb, Outputs.PublicAlbHostname ] ] ], '/opcache-instanceid.php' ] ]
+
+    

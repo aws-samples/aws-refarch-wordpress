@@ -1,0 +1,166 @@
+---
+AWSTemplateFormatVersion: 2010-09-09
+
+Description: Reference Architecture to host WordPress on AWS - Creates RDS Aurora database cluster
+
+Metadata:
+  AWS::CloudFormation::Interface:
+    ParameterGroups:
+    - Label:
+        default: Database Parameters
+      Parameters:
+        - DatabaseInstanceType
+        - DatabaseMasterUsername
+        - DatabaseMasterPassword
+        - DatabaseName
+        - DatabaseSecurityGroup
+        - DataSubnet0
+        - DataSubnet1
+        - DataSubnet2
+    ParameterLabels:
+      DatabaseInstanceType:
+        default: DB Instance Class
+      DatabaseMasterUsername:
+        default: DB Master Username
+      DatabaseMasterPassword:
+        default: DB Master Password
+      DatabaseName:
+        default: DB Name
+      DatabaseSecurityGroup:
+        default: DB Security Group
+      DataSubnet0:
+        default: Data Subnet for AZ 0
+      DataSubnet1:
+        default: Data Subnet for AZ 1
+      DataSubnet2:
+        default: Data Subnet for AZ 2
+
+Parameters:
+
+  DatabaseInstanceType:
+    AllowedValues:
+      - db.t2.small
+      - db.t2.medium
+      - db.r3.large
+      - db.r3.xlarge
+      - db.r3.2xlarge
+      - db.r3.4xlarge
+      - db.r3.8xlarge    
+    ConstraintDescription: Must be a valid RDS instance class.
+    Default: db.t2.medium
+    Description: The Amazon RDS database instance class.
+    Type: String
+  DatabaseMasterUsername:
+    AllowedPattern: ^([a-zA-Z0-9]*)$
+    Description: The Amazon RDS master username.
+    ConstraintDescription: Must contain only alphanumeric characters and be at least 8 characters.
+    MaxLength: 16
+    MinLength: 1
+    Type: String
+  DatabaseMasterPassword:
+    AllowedPattern: ^([a-z0-9A-Z`~!#$%^&*()_+,\\-])*$
+    ConstraintDescription: Must be letters (upper or lower), numbers, and these special characters '_'`~!#$%^&*()_+,-    
+    Description: The Amazon RDS master password.
+    MaxLength: 41
+    MinLength: 8
+    NoEcho: true
+    Type: String
+  DatabaseName:
+    AllowedPattern: ^([a-zA-Z0-9]*)$
+    Description: The Amazon RDS master database name.
+    Type: String
+  DatabaseSecurityGroup:
+    Description: Select the database security group.
+    Type: AWS::EC2::SecurityGroup::Id
+  DataSubnet0:
+    Description: Select an existing database subnet for AZ 0.
+    Type: AWS::EC2::Subnet::Id
+  DataSubnet1:
+    Description: Select an existing database subnet for AZ 1.
+    Type: AWS::EC2::Subnet::Id
+  DataSubnet2:
+    Description: Select an existing database subnet for AZ 2.
+    Type: AWS::EC2::Subnet::Id
+
+Conditions:
+
+  MoreThan2AZ:
+    !Or [
+      !Equals [ !Ref 'AWS::Region', us-east-1 ],
+      !Equals [ !Ref 'AWS::Region', us-east-2 ],
+      !Equals [ !Ref 'AWS::Region', us-west-2 ],
+      !Equals [ !Ref 'AWS::Region', eu-west-1 ],
+      !Equals [ !Ref 'AWS::Region', sa-east-1 ],
+      !Equals [ !Ref 'AWS::Region', ap-northeast-1 ],
+      !Equals [ !Ref 'AWS::Region', ap-southeast-2 ]
+    ]
+
+Resources:
+
+  DatabaseCluster:
+    Type: AWS::RDS::DBCluster
+    Properties:
+      BackupRetentionPeriod: 30
+      DatabaseName: !Ref DatabaseName
+      DBSubnetGroupName: !Ref DataSubnetGroup
+      Engine: aurora
+      MasterUsername: !Ref DatabaseMasterUsername
+      MasterUserPassword: !Ref DatabaseMasterPassword
+      Port: 3306
+      Tags:
+        - Key: Name
+          Value: !Join [ '', [ 'WordPress / ', !Ref 'AWS::StackName' ] ]
+      VpcSecurityGroupIds:
+      - !Ref DatabaseSecurityGroup
+  DatabaseInstance0:
+    Type: AWS::RDS::DBInstance
+    Properties:
+      AllowMajorVersionUpgrade: false
+      AutoMinorVersionUpgrade: true
+      DBClusterIdentifier: !Ref DatabaseCluster
+      DBInstanceClass: !Ref DatabaseInstanceType
+      DBSubnetGroupName: !Ref DataSubnetGroup
+      Engine: aurora
+      Tags:
+        - Key: Name
+          Value: !Join [ '', [ 'WordPress / ', !Ref 'AWS::StackName' ] ]
+  DatabaseInstance1:
+    Type: AWS::RDS::DBInstance
+    Properties:
+      AllowMajorVersionUpgrade: false
+      AutoMinorVersionUpgrade: true
+      DBClusterIdentifier: !Ref DatabaseCluster
+      DBInstanceClass: !Ref DatabaseInstanceType
+      DBSubnetGroupName: !Ref DataSubnetGroup
+      Engine: aurora
+      Tags:
+        - Key: Name
+          Value: !Join [ '', [ 'WordPress / ', !Ref 'AWS::StackName' ] ]
+  DataSubnetGroup:
+    Type: AWS::RDS::DBSubnetGroup
+    Properties:
+      DBSubnetGroupDescription: RDS Database Subnet Group for WordPress
+      SubnetIds:
+        !If [
+          MoreThan2AZ,
+          [ !Ref DataSubnet0, !Ref DataSubnet1, !Ref DataSubnet2 ],
+          [ !Ref DataSubnet0, !Ref DataSubnet1 ]
+        ]
+      Tags:
+        - Key: Name
+          Value: !Join [ '', [ 'WordPress / ', !Ref 'AWS::StackName' ] ]
+
+Outputs:
+  DatabaseCluster:
+    Value: !Ref DatabaseCluster
+  DatabaseName:
+    Value: !Ref DatabaseName
+  DatabaseInstance0:
+    Value: !Ref DatabaseInstance0
+  DatabaseInstance1:
+    Value: !Ref DatabaseInstance1
+  DataSubnetGroup:
+    Value: !Ref DataSubnetGroup
+  DatabaseClusterEndpointAddress:
+    Value: !GetAtt DatabaseCluster.Endpoint.Address
+

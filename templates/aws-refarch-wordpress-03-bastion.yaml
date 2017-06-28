@@ -1,0 +1,154 @@
+---
+AWSTemplateFormatVersion: 2010-09-09
+
+Description: Reference Architecture to host WordPress on AWS - Creates bastion (desired:0; min:0; max:1) Auto Scaling group
+
+Metadata:
+
+  AWS::CloudFormation::Interface:
+    ParameterGroups:
+    - Label:
+        default: AWS Parameters
+      Parameters:
+        - KeyName
+        - BastionSecurityGroup
+    ParameterLabels:
+      BastionSecurityGroup:
+        default: Bastion Security Group
+      KeyName:
+        default: Existing Key Pair
+      PublicSubnet0:
+        default: Public Subnet for AZ 0
+      PublicSubnet1:
+        default: Public Subnet for AZ 1
+      PublicSubnet2:
+        default: Public Subnet for AZ 2
+
+Parameters:
+
+  BastionSecurityGroup:
+    Description: Select the bastion security group.
+    Type: AWS::EC2::SecurityGroup::Id
+  KeyName:
+    AllowedPattern: ^([a-zA-Z0-9 @.`~!#$%^&*()_+,\\-])*$
+    ConstraintDescription: Must be letters (upper or lower), numbers, and special characters.
+    Description: Name of an EC2 KeyPair. Your bastion instances will launch with this KeyPair.
+    Type: AWS::EC2::KeyPair::KeyName
+  PublicSubnet0:
+    Description: Select an existing public subnet for AZ 0.
+    Type: AWS::EC2::Subnet::Id
+  PublicSubnet1:
+    Description: Select an existing public subnet for AZ 1.
+    Type: AWS::EC2::Subnet::Id
+  PublicSubnet2:
+    Description: Select an existing public subnet for AZ 2.
+    Type: AWS::EC2::Subnet::Id
+
+Conditions:
+
+  MoreThan2AZ:
+    !Or [
+      !Equals [ !Ref 'AWS::Region', us-east-1 ],
+      !Equals [ !Ref 'AWS::Region', us-east-2 ],
+      !Equals [ !Ref 'AWS::Region', us-west-2 ],
+      !Equals [ !Ref 'AWS::Region', eu-west-1 ],
+      !Equals [ !Ref 'AWS::Region', sa-east-1 ],
+      !Equals [ !Ref 'AWS::Region', ap-northeast-1 ],
+      !Equals [ !Ref 'AWS::Region', ap-southeast-2 ]
+    ]
+
+Mappings:
+
+  RegionMap:
+    ap-northeast-1:
+      AMI: ami-56d4ad31
+    ap-northeast-2:
+      AMI: ami-dac312b4
+    ap-south-1:
+      AMI: ami-f9daac96
+    ap-southeast-1:
+      AMI: ami-dc9339bf
+    ap-southeast-2:
+      AMI: ami-1c47407f
+    ca-central-1:
+      AMI: ami-ebed508f
+    eu-central-1:
+      AMI: ami-af0fc0c0
+    eu-west-1:
+      AMI: ami-70edb016
+    eu-west-2:
+      AMI: ami-f1949e95
+    sa-east-1:
+      AMI: ami-80086dec
+    us-east-1:
+      AMI: ami-0b33d91d
+    us-east-2:
+      AMI: ami-c55673a0
+    us-west-1:
+      AMI: ami-165a0876
+    us-west-2:
+      AMI: ami-f173cc91
+
+Resources:
+
+  BastionAutoScalingGroup:
+    Type: AWS::AutoScaling::AutoScalingGroup
+    Properties:
+      Cooldown: 60
+      HealthCheckGracePeriod: 120
+      HealthCheckType: EC2
+      LaunchConfigurationName: !Ref BastionLaunchConfiguration
+      MaxSize: 1
+      MinSize: 0
+      Tags:
+        - Key: Name
+          Value: !Join [ '', [ 'Bastion / ', !Ref 'AWS::StackName' ] ]
+          PropagateAtLaunch: true
+      VPCZoneIdentifier:
+        !If [
+          MoreThan2AZ,
+          [ !Ref PublicSubnet0, !Ref PublicSubnet1, !Ref PublicSubnet2 ],
+          [ !Ref PublicSubnet0, !Ref PublicSubnet1 ]
+        ]
+  BastionLaunchConfiguration:
+    Type: AWS::AutoScaling::LaunchConfiguration
+    Properties:
+      IamInstanceProfile: !Ref BastionInstanceProfile
+      ImageId: !FindInMap [ RegionMap, !Ref 'AWS::Region', AMI ]
+      InstanceMonitoring: true
+      InstanceType: t2.large
+      KeyName: !Ref KeyName
+      SecurityGroups:
+        - !Ref BastionSecurityGroup
+  BastionInstanceProfile:
+    Type: AWS::IAM::InstanceProfile
+    Properties:
+      Path: '/'
+      Roles:
+      - !Ref BastionInstanceRole
+  BastionInstanceRole:
+    Type: AWS::IAM::Role
+    Properties:
+      AssumeRolePolicyDocument:
+        Version: 2012-10-17
+        Statement:
+        - Effect: Allow
+          Principal:
+            Service:
+            - ec2.amazonaws.com
+          Action:
+          - sts:AssumeRole
+      Path: '/'
+      Policies:
+      - PolicyName: logs
+        PolicyDocument:
+          Version: 2012-10-17
+          Statement:
+          - Effect: Allow
+            Action:
+            - logs:CreateLogGroup
+            - logs:CreateLogStream
+            - logs:PutLogEvents
+            - logs:DescribeLogStreams
+            Resource:
+            - arn:aws:logs:*:*:*
