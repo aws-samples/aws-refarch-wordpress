@@ -51,7 +51,7 @@ Please confirm that the following options are not used when mounting the EFS fil
   ?>
 ```
  
-- Please get the number of php files using “find . -type f -print | grep php | wc –l” in your WordPress directory. This number should be smaller than your opcache.max_accelerated_files settings. This setting controls how many PHP files, at most, can be held in memory at once. It's important that your project has LESS FILES than whatever you set this at.
+- Please get the number of php files using “find . -type f -print | grep php | wc -l” in your WordPress directory. This number should be smaller than your opcache.max_accelerated_files settings. This setting controls how many PHP files, at most, can be held in memory at once. It's important that your project has LESS FILES than whatever you set this at.
 
 - Please set the opcache.memory consumption to 512MB (opcache.memory_consumption=512). The default value for this 64 (MB). In case memory size turns out to be a limiting factor for your workload, we can even configure opcache.file_cache. Also, please disable the opcache.validate_timestamps. Though it is not recommended that validate_timestamps is disabled in production, this ensures that calls are not being made to the NFS server to ensure opcache’s coherency during your testing.
 
