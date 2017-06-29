@@ -323,7 +323,7 @@ Resources:
     CreationPolicy:
       ResourceSignal:
         Count: !Ref WebAsgMin
-        Timeout: PT5M
+        Timeout: PT10M
   WebLaunchConfiguration:
     Type: AWS::AutoScaling::LaunchConfiguration
     Metadata:
