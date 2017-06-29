@@ -237,33 +237,33 @@ Mappings:
 
   RegionMap:
     ap-northeast-1:
-      AMI: ami-56d4ad31
+      AMI: ami-3bd3c45c
     ap-northeast-2:
-      AMI: ami-dac312b4
+      AMI: ami-e21cc38c
     ap-south-1:
-      AMI: ami-f9daac96
+      AMI: ami-47205e28
     ap-southeast-1:
-      AMI: ami-dc9339bf
+      AMI: ami-77af2014
     ap-southeast-2:
-      AMI: ami-1c47407f
+      AMI: ami-10918173
     ca-central-1:
-      AMI: ami-ebed508f
+      AMI: ami-a7aa15c3
     eu-central-1:
-      AMI: ami-af0fc0c0
+      AMI: ami-82be18ed
     eu-west-1:
-      AMI: ami-70edb016
+      AMI: ami-d7b9a2b1
     eu-west-2:
-      AMI: ami-f1949e95
+      AMI: ami-ed100689
     sa-east-1:
-      AMI: ami-80086dec
+      AMI: ami-87dab1eb
     us-east-1:
-      AMI: ami-0b33d91d
+      AMI: ami-a4c7edb2
     us-east-2:
-      AMI: ami-c55673a0
+      AMI: ami-8a7859ef
     us-west-1:
-      AMI: ami-165a0876
+      AMI: ami-327f5352
     us-west-2:
-      AMI: ami-f173cc91
+      AMI: ami-6df1e514
 
 Resources:
 
@@ -381,7 +381,7 @@ Resources:
               content:
                 !Sub |
                   #!/bin/bash -xe
-                  aws s3 cp 's3://aws-us-east-1/reference-architecture/wordpress/latest/bits/AmazonElastiCacheClusterClient-2.0.1-PHP70-64bit.tar.gz' /tmp/.
+                  aws s3 cp 's3://aws-refarch/wordpress/latest/bits/AmazonElastiCacheClusterClient-2.0.1-PHP70-64bit.tar.gz' /tmp/.
                   tar -xf '/tmp/AmazonElastiCacheClusterClient-2.0.1-PHP70-64bit.tar.gz'
                   cp '/tmp/artifact/amazon-elasticache-cluster-client.so' /usr/lib64/php/7.0/modules/
                   if [ ! -f /etc/php-7.0.d/50-memcached.ini ]; then
@@ -409,7 +409,7 @@ Resources:
                   sed -i 's/;opcache.file_cache=.*/opcache.file_cache=\/var\/www\/.opcache/' /etc/php-7.0.d/10-opcache.ini
                   # download opcache-instance.php to verify opcache status
                   if [ ! -f /var/www/wordpress/${WPDirectory}/opcache-instanceid.php ]; then
-                      aws s3 cp 's3://aws-us-east-1/reference-architecture/wordpress/latest/bits/opcache-instanceid.php' /var/www/wordpress/${WPDirectory}/.
+                      aws s3 cp 's3://aws-refarch/wordpress/latest/bits/opcache-instanceid.php' /var/www/wordpress/${WPDirectory}/.
                   fi
               mode: 000500
               owner: root
@@ -448,7 +448,7 @@ Resources:
                     "       chown -R apache:apache /var/www/wordpress/", !Ref WPDirectory, "\n",
                     "       chmod u+wrx /var/www/wordpress/", !Ref WPDirectory, "/wp-content/*\n",
                     "       if [ ! -f /var/www/wordpress/", !Ref WPDirectory, "/opcache-instanceid.php ]; then\n",
-                    "           aws s3 cp 's3://aws-us-east-1/reference-architecture/wordpress/latest/bits/opcache-instanceid.php' /var/www/wordpress/", !Ref WPDirectory, "/.\n",
+                    "           aws s3 cp 's3://aws-refarch/wordpress/latest/bits/opcache-instanceid.php' /var/www/wordpress/", !Ref WPDirectory, "/.\n",
                     "       fi\n",
                     "   fi\n",
                     "   RESULT=$?\n",
