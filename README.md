@@ -44,10 +44,12 @@ OPcache is a byte-code cache engine running on each EC2 instance that caches pre
 Please confirm that the following options are not used when mounting the EFS file system: actimeo=3 or acregmax=3 or acdirmax=3. These options generate significantly higher metadata operations by timing out the attribute caches more frequently.
  
 - Set the realpath_cache_size to 512k. Also, please get the realpath_cache_size for your workload and make sure that it is less than 512k. You can do this by placing a php file (you can use any name – for example realpathcache.php) with the following contents in your WordPress directory and accessing. Please refresh the page multiple times before getting the final value:
-  (<?php
+```
+  <?php
   var_dump(realpath_cache_size());
   var_dump(realpath_cache_get());
-  ?>)
+  ?>
+```
  
 - Please get the number of php files using “find . -type f -print | grep php | wc –l” in your WordPress directory. This number should be smaller than your opcache.max_accelerated_files settings. This setting controls how many PHP files, at most, can be held in memory at once. It's important that your project has LESS FILES than whatever you set this at.
 
