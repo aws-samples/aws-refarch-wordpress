@@ -204,9 +204,9 @@ If you found yourself wishing this set of frequently asked questions had an answ
 
 Portions copyright.
 
-  WordPress is licensed under the General Public License (GPLv2 or later) from the Free Software Foundation.
+- WordPress is licensed under the General Public License (GPLv2 or later) from the Free Software Foundation.
 
-  OPcache is licensed under PHP License, version 3.01.
+- OPcache is licensed under PHP License, version 3.01.
 
 Please see LICENSE.txt for applicable license terms and NOTICE.txt for applicable notices.
 
