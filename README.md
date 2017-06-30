@@ -43,7 +43,7 @@ OPcache is a byte-code cache engine running on each EC2 instance that caches pre
 - Mount the EFS file system using the default Linux mount options identified in the [Amazon EFS User Guide](http://docs.aws.amazon.com/efs/latest/ug/mounting-fs-mount-cmd-general.html).
 Please confirm that the following options are not used when mounting the EFS file system: actimeo=3 or acregmax=3 or acdirmax=3. These options generate significantly higher metadata operations by timing out the attribute caches more frequently.
  
-- Set the realpath_cache_size to 512k. Also, please get the realpath_cache_size for your workload and make sure that it is less than 512k. You can do this by placing a php file (you can use any name – for example realpathcache.php) with the following contents in your WordPress directory and accessing. Please refresh the page multiple times before getting the final value:
+- Set the realpath_cache_size to atleast 512k. Also, please get the realpath_cache_size for your workload and make sure that it is less than 512k. You can do this by placing a php file (you can use any name – for example realpathcache.php) with the following contents in your WordPress directory and accessing. Please refresh the page multiple times before getting the final value:
 ```
 <?php
  print_r(realpath_cache_size());
