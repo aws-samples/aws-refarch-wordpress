@@ -237,33 +237,33 @@ Mappings:
 
   RegionMap:
     ap-northeast-1:
-      AMI: ami-3bd3c45c
+      AMI: ami-56d4ad31
     ap-northeast-2:
-      AMI: ami-e21cc38c
+      AMI: ami-dac312b4
     ap-south-1:
-      AMI: ami-47205e28
+      AMI: ami-f9daac96
     ap-southeast-1:
-      AMI: ami-77af2014
+      AMI: ami-dc9339bf
     ap-southeast-2:
-      AMI: ami-10918173
+      AMI: ami-1c47407f
     ca-central-1:
-      AMI: ami-a7aa15c3
+      AMI: ami-ebed508f
     eu-central-1:
-      AMI: ami-82be18ed
+      AMI: ami-af0fc0c0
     eu-west-1:
-      AMI: ami-d7b9a2b1
+      AMI: ami-70edb016
     eu-west-2:
-      AMI: ami-ed100689
+      AMI: ami-f1949e95
     sa-east-1:
-      AMI: ami-87dab1eb
+      AMI: ami-80086dec
     us-east-1:
-      AMI: ami-a4c7edb2
+      AMI: ami-0b33d91d
     us-east-2:
-      AMI: ami-8a7859ef
+      AMI: ami-c55673a0
     us-west-1:
-      AMI: ami-327f5352
+      AMI: ami-165a0876
     us-west-2:
-      AMI: ami-6df1e514
+      AMI: ami-f173cc91
 
 Resources:
 
@@ -323,7 +323,7 @@ Resources:
     CreationPolicy:
       ResourceSignal:
         Count: !Ref WebAsgMin
-        Timeout: PT5M
+        Timeout: PT10M
   WebLaunchConfiguration:
     Type: AWS::AutoScaling::LaunchConfiguration
     Metadata:
@@ -381,7 +381,7 @@ Resources:
               content:
                 !Sub |
                   #!/bin/bash -xe
-                  wget -P /tmp/ https://s3.amazonaws.com/aws-refarch/wordpress/latest/bits/AmazonElastiCacheClusterClient-2.0.1-PHP70-64bit.tar.gz
+                  aws s3 cp 's3://aws-refarch/wordpress/latest/bits/AmazonElastiCacheClusterClient-2.0.1-PHP70-64bit.tar.gz' /tmp/.
                   tar -xf '/tmp/AmazonElastiCacheClusterClient-2.0.1-PHP70-64bit.tar.gz'
                   cp '/tmp/artifact/amazon-elasticache-cluster-client.so' /usr/lib64/php/7.0/modules/
                   if [ ! -f /etc/php-7.0.d/50-memcached.ini ]; then
@@ -407,10 +407,9 @@ Resources:
                   fi
                   # enable opcache in /etc/php-7.0.d/10-opcache.ini
                   sed -i 's/;opcache.file_cache=.*/opcache.file_cache=\/var\/www\/.opcache/' /etc/php-7.0.d/10-opcache.ini
-                  sed -i 's/opcache.memory_consumption=.*/opcache.memory_consumption=512/' /etc/php-7.0.d/10-opcache.ini
                   # download opcache-instance.php to verify opcache status
                   if [ ! -f /var/www/wordpress/${WPDirectory}/opcache-instanceid.php ]; then
-                      wget -P /var/www/wordpress/${WPDirectory}/ https://s3.amazonaws.com/aws-refarch/wordpress/latest/bits/opcache-instanceid.php
+                      aws s3 cp 's3://aws-refarch/wordpress/latest/bits/opcache-instanceid.php' /var/www/wordpress/${WPDirectory}/.
                   fi
               mode: 000500
               owner: root
@@ -449,7 +448,7 @@ Resources:
                     "       chown -R apache:apache /var/www/wordpress/", !Ref WPDirectory, "\n",
                     "       chmod u+wrx /var/www/wordpress/", !Ref WPDirectory, "/wp-content/*\n",
                     "       if [ ! -f /var/www/wordpress/", !Ref WPDirectory, "/opcache-instanceid.php ]; then\n",
-                    "         wget -P /var/www/wordpress/", !Ref WPDirectory, "/ https://s3.amazonaws.com/aws-refarch/wordpress/latest/bits/opcache-instanceid.php\n",
+                    "           aws s3 cp 's3://aws-refarch/wordpress/latest/bits/opcache-instanceid.php' /var/www/wordpress/", !Ref WPDirectory, "/.\n",
                     "       fi\n",
                     "   fi\n",
                     "   RESULT=$?\n",
