@@ -58,8 +58,7 @@ To learn more about OPcache, please read http://php.net/manual/en/book.opcache.p
 
 #### Offloading Static Assets
 
-WordPress has a large partner ecosystem to further enhance the usability, performance, and ease of maintenance 
-We need to advise customers on pros/cons of offloading serving of static assets to S3/Cloudfront with plugins like W3TotalCache. EFS will still be solving the problem of installing plugins that modify the filesystem. Of course for some customers the simplicity of just storing everything on EFS will be preferred.
+WordPress has a large partner ecosystem to further enhance the usability, performance, and ease of maintenance of WordPress deployments. Plugins, like W3TotalCache, allow you to leverage other AWS services like Amazon S3 and AWS CloudFront to offload and store static content. Others may like the simplicity of storing all content on Amazon EFS and avoid installing and managing 3rd party plugins. 
 
 ## Master Template
 The master template receives all input parameters and passes them to the appropriate nested template which are executed in order based on conditions and dependencies.
