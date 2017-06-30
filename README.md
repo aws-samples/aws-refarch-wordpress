@@ -45,10 +45,9 @@ Please confirm that the following options are not used when mounting the EFS fil
  
 - Set the realpath_cache_size to 512k. Also, please get the realpath_cache_size for your workload and make sure that it is less than 512k. You can do this by placing a php file (you can use any name – for example realpathcache.php) with the following contents in your WordPress directory and accessing. Please refresh the page multiple times before getting the final value:
 ```
-  <?php
-  var_dump(realpath_cache_size());
-  var_dump(realpath_cache_get());
-  ?>
+<?php
+ print_r(realpath_cache_size());
+?>
 ```
  
 - Please get the number of php files using “find . -type f -print | grep php | wc -l” in your WordPress directory. This number should be smaller than your opcache.max_accelerated_files settings. This setting controls how many PHP files, at most, can be held in memory at once. It's important that your project has LESS FILES than whatever you set this at.
