@@ -56,11 +56,6 @@ Please confirm that the following options are not used when mounting the EFS fil
 
 To learn more about OPcache, please read http://php.net/manual/en/book.opcache.php
 
-#### Offloading Static Assets
-
-WordPress has a large partner ecosystem to further enhance the usability, performance, and ease of maintenance 
-We need to advise customers on pros/cons of offloading serving of static assets to S3/Cloudfront with plugins like W3TotalCache. EFS will still be solving the problem of installing plugins that modify the filesystem. Of course for some customers the simplicity of just storing everything on EFS will be preferred.
-
 ## Master Template
 The master template receives all input parameters and passes them to the appropriate nested template which are executed in order based on conditions and dependencies.
 Review the template here [aws-refarch-wordpress-master.yaml](templates/aws-refarch-wordpress-master.yaml)
