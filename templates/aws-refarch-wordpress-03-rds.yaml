@@ -114,6 +114,7 @@ Resources:
       - !Ref DatabaseSecurityGroup
   DatabaseInstance0:
     Type: AWS::RDS::DBInstance
+    DeletionPolicy: Delete
     Properties:
       AllowMajorVersionUpgrade: false
       AutoMinorVersionUpgrade: true
@@ -126,6 +127,7 @@ Resources:
           Value: !Join [ '', [ 'WordPress / ', !Ref 'AWS::StackName' ] ]
   DatabaseInstance1:
     Type: AWS::RDS::DBInstance
+    DeletionPolicy: Delete
     Properties:
       AllowMajorVersionUpgrade: false
       AutoMinorVersionUpgrade: true
