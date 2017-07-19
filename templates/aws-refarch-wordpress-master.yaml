@@ -261,12 +261,15 @@ Conditions:
       !Equals [ !Ref 'AWS::Region', us-east-2 ],
       !Equals [ !Ref 'AWS::Region', us-west-2 ]
     ]
-  CreateRecordSet:
-    !Equals [ True, !Ref UseRoute53Boolean ]
-  DeployCloudFront:
-    !Equals [ True, !Ref UseCloudFrontBoolean ]
-  DeployElastiCache:
-    !Equals [ True, !Ref UseElastiCacheBoolean ]
+  CreateRecordSet: !And
+    - !Equals [ True, !Ref UseRoute53Boolean ]
+    - !Condition AvailableAWSRegion
+  DeployCloudFront: !And
+    - !Equals [ True, !Ref UseCloudFrontBoolean ]
+    - !Condition AvailableAWSRegion   
+  DeployElastiCache: !And
+    - !Equals [ True, !Ref UseElastiCacheBoolean ]
+    - !Condition AvailableAWSRegion
 
 Resources:
 
@@ -288,7 +291,6 @@ Resources:
           !GetAtt [ newvpc, Outputs.PublicSubnet2 ]
       TemplateURL: https://s3.amazonaws.com/aws-refarch/wordpress/latest/templates/aws-refarch-wordpress-03-bastion.yaml
   cloudfront:
-    Condition: AvailableAWSRegion
     Condition: DeployCloudFront
     DependsOn: [ publicalb, web ]
     Type: AWS::CloudFormation::Stack
@@ -317,7 +319,6 @@ Resources:
           !GetAtt [ newvpc, Outputs.DataSubnet2 ]
       TemplateURL: https://s3.amazonaws.com/aws-refarch/wordpress/latest/templates/aws-refarch-wordpress-03-efs.yaml
   elasticache:
-    Condition: AvailableAWSRegion
     Condition: DeployElastiCache
     DependsOn: [ newvpc, securitygroups ]
     Type: AWS::CloudFormation::Stack
@@ -383,7 +384,6 @@ Resources:
           !GetAtt [ newvpc, Outputs.DataSubnet2 ]
       TemplateURL: https://s3.amazonaws.com/aws-refarch/wordpress/latest/templates/aws-refarch-wordpress-03-rds.yaml
   route53:
-    Condition: AvailableAWSRegion
     Condition: CreateRecordSet
     DependsOn: [ publicalb, web ]
     Type: AWS::CloudFormation::Stack
