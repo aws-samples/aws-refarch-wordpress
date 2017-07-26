@@ -177,7 +177,7 @@ Review the template here [aws-refarch-wordpress-03-efs.yaml](templates/aws-refar
 ## Amazon ElastiCache Template
 Review the template here [aws-refarch-wordpress-03-elasticache.yaml](templates/aws-refarch-wordpress-03-elasticache.yaml)
 
-## Amaazon Elastic Load Balancing - Application Load Balancer Template
+## Amazon Elastic Load Balancing - Application Load Balancer Template
 Review the template here [aws-refarch-wordpress-03-publicelb.yaml](templates/aws-refarch-wordpress-03-publicalb.yaml)
 
 ## Amazon RDS Template
