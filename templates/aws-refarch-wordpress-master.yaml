@@ -13,6 +13,11 @@ Metadata:
         - KeyName
         - SshAccessCidr
     - Label:
+        default: File System Parameters
+      Parameters:
+        - EfsEncrpytedBoolean
+        - EfsCmk
+    - Label:
         default: Database Parameters
       Parameters:
         - DatabaseInstanceType
@@ -52,6 +57,10 @@ Metadata:
         default: DB Master Password
       DatabaseName:
         default: DB Name
+      EfsEncrpytedBoolean:
+        default: Encrpyted EFS file system?
+      EfsCmk:
+        default: Existing AWS KMS CMK for EFS
       ElastiCacheNodeType:
         default: Cache Cluster Node Type
       PublicAlbAcmCertificate:
@@ -124,6 +133,18 @@ Parameters:
   DatabaseName:
     AllowedPattern: ^([a-zA-Z0-9]*)$
     Description: The Amazon RDS master database name.
+    Type: String
+  EfsEncrpytedBoolean:
+    AllowedValues:
+      - True
+      - False
+    Default: True
+    Description: Create an encrypted Amazon EFS file system.
+    Type: String
+  EfsCmk:
+    AllowedPattern: ^$|(arn:aws:kms:)([a-z0-9/:-])*([a-z0-9])$
+    ConstraintDescription: Must be an existing ARN for an AWS KMS CMK.
+    Description: '[ Optional ] The AWS KMS customer-managed CMK ARN to encrypt & decrypt the EFS file system.'
     Type: String
   ElastiCacheNodeType:
     AllowedValues:
@@ -256,6 +277,7 @@ Conditions:
   AvailableAWSRegion:
     !Or [
       !Equals [ !Ref 'AWS::Region', ap-southeast-2 ],
+      !Equals [ !Ref 'AWS::Region', eu-central-1 ],
       !Equals [ !Ref 'AWS::Region', eu-west-1 ],
       !Equals [ !Ref 'AWS::Region', us-east-1 ],
       !Equals [ !Ref 'AWS::Region', us-east-2 ],
@@ -309,6 +331,10 @@ Resources:
     Type: AWS::CloudFormation::Stack
     Properties:
       Parameters:
+        EfsEncrpytedBoolean:
+          !Ref EfsEncrpytedBoolean
+        EfsCmk:
+          !Ref EfsCmk
         EfsSecurityGroup:
           !GetAtt [ securitygroups, Outputs.EfsSecurityGroup ]
         DataSubnet0:

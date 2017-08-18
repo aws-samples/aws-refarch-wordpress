@@ -10,11 +10,17 @@ Metadata:
     - Label:
         default: File System Parameters
       Parameters:
+        - EfsEncrpytedBoolean
+        - EfsCmk
         - EfsSecurityGroup
         - DataSubnet0
         - DataSubnet1
         - DataSubnet2
     ParameterLabels:
+      EfsEncrpytedBoolean:
+        default: Encrypted EFS File system
+      EfsCmk:
+        default: AWS KMS Customer Master Key (CMK) to encrypt EFS
       EfsSecurityGroup:
         default: EFS Security Group
       DataSubnet0:
@@ -26,6 +32,16 @@ Metadata:
 
 Parameters:
 
+  EfsEncrpytedBoolean:
+    AllowedValues:
+      - True
+      - False
+    Default: True
+    Description: Create an encrypted Amazon EFS file system.
+    Type: String
+  EfsCmk:
+    Description: An existing AWS KMS CMK ARN
+    Type: String
   EfsSecurityGroup:
     Description: Select the EFS security group.
     Type: AWS::EC2::SecurityGroup::Id
@@ -41,11 +57,14 @@ Parameters:
 
 Conditions:
   
+  UseAWS-ManagedCMK:
+    !Equals ['', !Ref EfsCmk]
   MoreThan2AZ:
     !Or [
       !Equals [ !Ref 'AWS::Region', us-east-1 ],
       !Equals [ !Ref 'AWS::Region', us-east-2 ],
       !Equals [ !Ref 'AWS::Region', us-west-2 ],
+      !Equals [ !Ref 'AWS::Region', eu-central-1 ],
       !Equals [ !Ref 'AWS::Region', eu-west-1 ],
       !Equals [ !Ref 'AWS::Region', sa-east-1 ],
       !Equals [ !Ref 'AWS::Region', ap-northeast-1 ],
@@ -57,6 +76,9 @@ Resources:
   ElasticFileSystem:
     Type: AWS::EFS::FileSystem
     Properties:
+      Encrypted: !Ref EfsEncrpytedBoolean
+      KmsKeyId:
+        !If [ UseAWS-ManagedCMK, !Ref 'AWS::NoValue', !Ref EfsCmk ]
       FileSystemTags:
         - Key: Name
           Value: !Join [ '', [ 'WordPress / ', !Ref 'AWS::StackName' ] ]

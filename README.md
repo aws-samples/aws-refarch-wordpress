@@ -10,6 +10,7 @@ You can launch this CloudFormation stack, using your account, in the following A
 | us-east-2 |US East (Ohio)| [![cloudformation-launch-stack](images/cloudformation-launch-stack.png)](https://console.aws.amazon.com/cloudformation/home?region=us-east-2#/stacks/new?stackName=WordPress&templateURL=https://s3.amazonaws.com/aws-refarch/wordpress/latest/templates/aws-refarch-wordpress-master.yaml) |
 | us-west-2 |US West (Oregon)| [![cloudformation-launch-stack](images/cloudformation-launch-stack.png)](https://console.aws.amazon.com/cloudformation/home?region=us-west-2#/stacks/new?stackName=WordPress&templateURL=https://s3.amazonaws.com/aws-refarch/wordpress/latest/templates/aws-refarch-wordpress-master.yaml) |
 | eu-west-1 |EU (Ireland)| [![cloudformation-launch-stack](images/cloudformation-launch-stack.png)](https://console.aws.amazon.com/cloudformation/home?region=eu-west-1#/stacks/new?stackName=WordPress&templateURL=https://s3.amazonaws.com/aws-refarch/wordpress/latest/templates/aws-refarch-wordpress-master.yaml) |
+| eu-central-1 |EU (Frankfurt)| [![cloudformation-launch-stack](images/cloudformation-launch-stack.png)](https://console.aws.amazon.com/cloudformation/home?region=eu-central-1#/stacks/new?stackName=WordPress&templateURL=https://s3.amazonaws.com/aws-refarch/wordpress/latest/templates/aws-refarch-wordpress-master.yaml) |
 | ap-southeast-2 |AP (Sydney)| [![cloudformation-launch-stack](images/cloudformation-launch-stack.png)](https://console.aws.amazon.com/cloudformation/home?region=ap-southeast-2#/stacks/new?stackName=WordPress&templateURL=https://s3.amazonaws.com/aws-refarch/wordpress/latest/templates/aws-refarch-wordpress-master.yaml) |
 
 ## Overview
@@ -21,6 +22,10 @@ The repository consists of a set of nested templates which are run in order from
 
 ## Steps to Run
 To launch the entire stack and deploy a WordPress site on AWS, click on one of the ***Launch Stack*** links above or download the Master template and launch it locally.
+
+#### Optional: Encrypting Amazon EFS Data & Metadata at Rest
+
+Amazon EFS integrates with AWS Key Management Service (KMS) to support encryting file system contents using AWS KMS Customer Master Keys (CMKs). In an encrypted file system, data and metadata are automatically encrypted before being written to the file system. Similarly, as data and metadata are read, they are automatically decrypted before being presented to the application. These processes are handled transparently by Amazon EFS, so you don’t have to modify WordPress to take advantage of encrypted file systems. Encryption at rest is enabled by default for file systems you create using this cloudformation template. This option is exposed as a configurable Cloudformation template parameter. 'true' creates an encrypted file system. 'false' creates an unencrypted file system. To use the AWS-managed CMK for Amazon EFS (key alias: aws/elasticfilesystem) leave the "Existing AWS KMS CMK for EFS" parameter empty. To use a specific customer-managed CMK (within this AWS account or another AWS account) enter the CMKs ARN in the "Existing AWS KMS CMK for EFS" parameter field.
 
 #### Optional: Amazon Certificate Manager SSL/TLS Certificates
 
@@ -87,6 +92,10 @@ Review the template here [aws-refarch-wordpress-master.yaml](templates/aws-refar
 #### AWS Parameters
 - EC2 Key Name Pair
 - SSH Access CIDR block (to access bastion host)
+
+#### File System Parameters
+- Encrypted file system (boolean)
+- AWS KMS Customer Master Key ARN (if enabling encryption and using customer-managed CMK)
 
 #### Database Parameters
 - Database Name

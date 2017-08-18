@@ -89,6 +89,7 @@ Conditions:
       !Equals [ !Ref 'AWS::Region', us-east-1 ],
       !Equals [ !Ref 'AWS::Region', us-east-2 ],
       !Equals [ !Ref 'AWS::Region', us-west-2 ],
+      !Equals [ !Ref 'AWS::Region', eu-central-1 ],
       !Equals [ !Ref 'AWS::Region', eu-west-1 ],
       !Equals [ !Ref 'AWS::Region', sa-east-1 ],
       !Equals [ !Ref 'AWS::Region', ap-northeast-1 ],
