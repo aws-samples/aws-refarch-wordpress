@@ -115,7 +115,7 @@ Resources:
     Type: AWS::ElasticLoadBalancingV2::TargetGroup
     Properties:
       HealthCheckIntervalSeconds: 30
-      HealthCheckPath: /
+      HealthCheckPath: /wp-login.php
       HealthCheckTimeoutSeconds: 5
       Name: 'WordPressPublicAlb'
       Port: 80

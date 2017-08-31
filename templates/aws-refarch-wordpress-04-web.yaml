@@ -305,7 +305,7 @@ Resources:
     Properties:
       Cooldown: 60
       HealthCheckGracePeriod: 120
-      HealthCheckType: EC2
+      HealthCheckType: ELB
       LaunchConfigurationName: !Ref WebLaunchConfiguration
       MaxSize: !Ref WebAsgMax
       MinSize: !Ref WebAsgMin
