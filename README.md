@@ -15,7 +15,7 @@ You can launch this CloudFormation stack, using your account, in the following A
 
 ## Overview
 
-![architecture-overview](images/aws-refarch-wordpress-v20170418.jpg)
+![architecture-overview](images/aws-refarch-wordpress-v20171026.jpg)
 
 The repository consists of a set of nested templates which are run in order from the master template. Run the master template to create the entire stack, entering the appropriate parameters. Nested templates can be run individually in order, entering the appropriate input parameters for each stack.
 
