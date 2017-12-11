@@ -332,7 +332,6 @@ Parameters:
     Description: The Amazon RDS database instance class.
     Type: String
   DatabaseMasterUsername:
-    Default: administrator
     AllowedPattern: ^([a-zA-Z0-9]*)$
     Description: The Amazon RDS master username.
     ConstraintDescription: Must contain only alphanumeric characters and be at least 8 characters.
@@ -340,7 +339,6 @@ Parameters:
     MinLength: 1
     Type: String
   DatabaseMasterPassword:
-    Default: administrator
     AllowedPattern: ^([a-zA-Z0-9`~!#$%^&*()_+,\\-])*$
     ConstraintDescription: Must be letters (upper or lower), numbers, spaces, and these special characters `~!#$%^&*()_+,-
     Description: The Amazon RDS master password. Letters, numbers, spaces, and these special characters `~!#$%^&*()_+,-
@@ -349,7 +347,6 @@ Parameters:
     NoEcho: true
     Type: String
   DatabaseName:
-    Default: administrator
     AllowedPattern: ^([a-zA-Z0-9]*)$
     Description: The Amazon RDS master database name.
     Type: String
@@ -636,21 +633,21 @@ Parameters:
     AllowedValues:
       - true
       - false
-    Default: false
+    Default: true
     Description: Specifies whether a CloudFront Distribution should be created to serve the WordPress website content.
     Type: String
   UseElastiCacheBoolean:
     AllowedValues:
       - true
       - false
-    Default: false
+    Default: true
     Description: Specifies whether an ElastiCache Cache Cluster should be created to cache WordPress database content.
     Type: String
   UseRoute53Boolean:
     AllowedValues:
       - true
       - false
-    Default: false
+    Default: true
     Description: Specifies whether a record set should be created in Route 53 for your WordPress domain name.
     Type: String
   WebAsgMax:
@@ -761,24 +758,20 @@ Parameters:
     Description: The Amazon EC2 instance type for your web instances.
     Type: String
   AdminEmail:
-    Default: darrylo@amazon.com
     AllowedPattern: ^(([^<>()\[\]\\.,;:\s@"]+(\.[^<>()\[\]\\.,;:\s@"]+)*)|(".+"))@((\[[0-9]{1,3}\.[0-9]{1,3}\.[0-9]{1,3}\.[0-9]{1,3}])|(([a-zA-Z\-0-9]+\.)+[a-zA-Z]{2,}))$
     Description: The admin email address for WordPress and AWS notifications.
     Type: String
   WPAdminPassword:
-    Default: administrator
     AllowedPattern: ^([a-zA-Z0-9`~!#$%^&*()_+,\\-])*$
     ConstraintDescription: Must be letters (upper or lower), numbers, spaces, and these special characters `~!#$%^&*()_+,-    
     Description: The WordPress admin password. Letters, numbers, spaces, and these special characters `~!#$%^&*()_+,-
     Type: String
     NoEcho: true
   WPAdminUsername:
-    Default: administrator
     AllowedPattern: ^([a-zA-Z0-9])([a-zA-Z0-9_-])*([a-zA-Z0-9])$
     Description: The WordPress admin username.
     Type: String
   WPDirectory:
-    Default: administrator
     AllowedPattern: ^([a-zA-Z0-9])([a-zA-Z0-9_-])*([a-zA-Z0-9])$
     Description: The WordPress site directory.
     Type: String
