@@ -75,6 +75,18 @@ Resources:
           FromPort: 2049
           ToPort: 2049
           SourceSecurityGroupId: !Ref WebSecurityGroup
+        - IpProtocol: tcp
+          FromPort: 22
+          ToPort: 22
+          SourceSecurityGroupId: !Ref BastionSecurityGroup
+  EfsSecurityGroupIngress:
+    Type: AWS::EC2::SecurityGroupIngress
+    Properties:
+      IpProtocol: tcp
+      FromPort: 2049
+      ToPort: 2049
+      SourceSecurityGroupId: !GetAtt EfsSecurityGroup.GroupId
+      GroupId: !GetAtt EfsSecurityGroup.GroupId
 
   PublicAlbSecurityGroup:
     Type: AWS::EC2::SecurityGroup

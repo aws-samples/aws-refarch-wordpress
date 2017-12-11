@@ -13,34 +13,22 @@ Metadata:
         - ElastiCacheNodeType
         - ElastiCacheClusterName
         - ElastiCacheSecurityGroup
-        - DataSubnet0
-        - DataSubnet1
-        - DataSubnet2
+        - NumberOfSubnets
+        - Subnet
     ParameterLabels:
-      DataSubnet0:
-        default: DataSubnet0
-      DataSubnet1:
-        default: DataSubnet1
-      DataSubnet2:
-        default: DataSubnet2
       ElastiCacheClusterName:
         default: Cache Cluster Name
       ElastiCacheNodeType:
         default: Cache Cluster Node Type
       ElastiCacheSecurityGroup:
         default: ElastiCache Security Group
+      NumberOfSubnets:
+        default: Number of subnets
+      Subnet:
+        default: Subnets
 
 Parameters:
 
-  DataSubnet0:
-    Description: Select an existing database subnet for AZ 0.
-    Type: AWS::EC2::Subnet::Id
-  DataSubnet1:
-    Description: Select an existing database subnet for AZ 1.
-    Type: AWS::EC2::Subnet::Id
-  DataSubnet2:
-    Description: Select an existing database subnet for AZ 2.
-    Type: AWS::EC2::Subnet::Id
   ElastiCacheClusterName:
     AllowedPattern: ^([a-zA-Z0-9]*)$
     Description: The ElastiCache cluster name. Defaults to the Amazon RDS database name.
@@ -50,20 +38,26 @@ Parameters:
       - cache.t2.micro
       - cache.t2.small
       - cache.t2.medium
+      - cache.m3.medium
+      - cache.m3.large
+      - cache.m3.xlarge
+      - cache.m3.2xlarge
       - cache.m4.large
       - cache.m4.xlarge
       - cache.m4.2xlarge
       - cache.m4.4xlarge
       - cache.m4.10xlarge
-      - cache.m3.medium
-      - cache.m3.large
-      - cache.m3.xlarge
-      - cache.m3.2xlarge
       - cache.r3.large
       - cache.r3.xlarge
       - cache.r3.2xlarge
       - cache.r3.4xlarge
       - cache.r3.8xlarge
+      - cache.r4.large
+      - cache.r4.xlarge
+      - cache.r4.2xlarge
+      - cache.r4.4xlarge
+      - cache.r4.8xlarge
+      - cache.r4.16xlarge
     ConstraintDescription: Must be a valid Amazon ElastiCache node type.
     Default: cache.t2.medium
     Description: The Amazon ElastiCache cluster node type.
@@ -71,20 +65,60 @@ Parameters:
   ElastiCacheSecurityGroup:
     Description: Select the ElastiCache security group.
     Type: AWS::EC2::SecurityGroup::Id
+  NumberOfSubnets:
+    AllowedValues:
+    - 2
+    - 3
+    - 4
+    - 5
+    - 6
+    Default: 3
+    Description: Number of subnets. This must match your selections in the list of subnets below.
+    Type: String 
+  Subnet:
+    Description: Select existing subnets. The number selected must match the number of subnets above. Subnets selected must be in separate AZs.
+    Type: List<AWS::EC2::Subnet::Id>
 
 Conditions:
 
-  MoreThan2AZ:
-    !Or [
-      !Equals [ !Ref 'AWS::Region', us-east-1 ],
-      !Equals [ !Ref 'AWS::Region', us-east-2 ],
-      !Equals [ !Ref 'AWS::Region', us-west-2 ],
-      !Equals [ !Ref 'AWS::Region', eu-central-1 ],
-      !Equals [ !Ref 'AWS::Region', eu-west-1 ],
-      !Equals [ !Ref 'AWS::Region', sa-east-1 ],
-      !Equals [ !Ref 'AWS::Region', ap-northeast-1 ],
-      !Equals [ !Ref 'AWS::Region', ap-southeast-2 ]
-    ]
+  NumberOfSubnets1:
+      !Equals [ 1, !Ref NumberOfSubnets ]
+  NumberOfSubnets2:
+      !Equals [ 2, !Ref NumberOfSubnets ]
+  NumberOfSubnets3:
+      !Equals [ 3, !Ref NumberOfSubnets ]
+  NumberOfSubnets4:
+      !Equals [ 4, !Ref NumberOfSubnets ]
+  NumberOfSubnets5:
+      !Equals [ 5, !Ref NumberOfSubnets ]
+  NumberOfSubnets6:
+      !Equals [ 6, !Ref NumberOfSubnets ]
+  Subnet0: !Or
+    - !Condition NumberOfSubnets1
+    - !Condition NumberOfSubnets2
+    - !Condition NumberOfSubnets3
+    - !Condition NumberOfSubnets4
+    - !Condition NumberOfSubnets5
+    - !Condition NumberOfSubnets6
+  Subnet1: !Or
+    - !Condition NumberOfSubnets2
+    - !Condition NumberOfSubnets3
+    - !Condition NumberOfSubnets4
+    - !Condition NumberOfSubnets5
+    - !Condition NumberOfSubnets6
+  Subnet2: !Or
+    - !Condition NumberOfSubnets3
+    - !Condition NumberOfSubnets4
+    - !Condition NumberOfSubnets5
+    - !Condition NumberOfSubnets6
+  Subnet3: !Or
+    - !Condition NumberOfSubnets4
+    - !Condition NumberOfSubnets5
+    - !Condition NumberOfSubnets6
+  Subnet4: !Or
+    - !Condition NumberOfSubnets5
+    - !Condition NumberOfSubnets6
+  Subnet5: !Condition NumberOfSubnets6
 
 Resources:
 
@@ -97,17 +131,7 @@ Resources:
       ClusterName: !Ref ElastiCacheClusterName
       Engine: memcached
       NumCacheNodes:
-        !If [
-          MoreThan2AZ,
-          3,
-          2
-        ]
-      PreferredAvailabilityZones:
-        !If [
-          MoreThan2AZ,
-          [ !Select [ 0, !GetAZs '' ], !Select [ 1, !GetAZs '' ], !Select [ 2, !GetAZs '' ] ],
-          [ !Select [ 0, !GetAZs '' ], !Select [ 1, !GetAZs '' ] ]
-        ]
+        !Ref NumberOfSubnets
       Tags:
         - Key: Name
           Value: !Join [ '', [ 'WordPress / ', !Ref 'AWS::StackName' ] ]
@@ -119,11 +143,27 @@ Resources:
       CacheSubnetGroupName: !Join [ '', [ !Ref ElastiCacheClusterName, SubnetGroup ] ]
       Description: ElastiCache Subnet Group for WordPress
       SubnetIds: 
-        !If [
-          MoreThan2AZ,
-          [ !Ref DataSubnet0, !Ref DataSubnet1, !Ref DataSubnet2 ],
-          [ !Ref DataSubnet0, !Ref DataSubnet1 ]
-        ]
+        !If
+          [ NumberOfSubnets1,
+          [ !Select [ 0, !Ref Subnet ] ],
+          !If
+            [ NumberOfSubnets2,
+            [ !Select [ 0, !Ref Subnet ], !Select [ 1, !Ref Subnet ] ],
+            !If
+              [ NumberOfSubnets3,
+              [ !Select [ 0, !Ref Subnet ], !Select [ 1, !Ref Subnet ], !Select [ 2, !Ref Subnet ] ],
+              !If
+                [ NumberOfSubnets4,
+                [ !Select [ 0, !Ref Subnet ], !Select [ 1, !Ref Subnet ], !Select [ 2, !Ref Subnet ], !Select [ 3, !Ref Subnet ] ],
+                !If
+                  [ NumberOfSubnets5,
+                  [ !Select [ 0, !Ref Subnet ], !Select [ 1, !Ref Subnet ], !Select [ 2, !Ref Subnet ], !Select [ 3, !Ref Subnet ], !Select [ 4, !Ref Subnet ] ],
+                  [ !Select [ 0, !Ref Subnet ], !Select [ 1, !Ref Subnet ], !Select [ 2, !Ref Subnet ], !Select [ 3, !Ref Subnet ], !Select [ 4, !Ref Subnet ], !Select [ 5, !Ref Subnet ] ]
+                  ]
+                ]
+              ]
+            ]
+          ]
 Outputs:
   ElastiCacheClusterEndpointAddress:
     Value: !GetAtt ElastiCacheCluster.ConfigurationEndpoint.Address

@@ -8,47 +8,92 @@ Metadata:
   AWS::CloudFormation::Interface:
     ParameterGroups:
     - Label:
-        default: AWS Parameters
+        default: General AWS
       Parameters:
-        - KeyName
+        - EC2KeyName
         - SshAccessCidr
+        - AdminEmail
+        - WPDomainName
+        - UseRoute53Boolean
+        - UseCloudFrontBoolean
+        - CloudFrontAcmCertificate
     - Label:
-        default: File System Parameters
+        default: Network
       Parameters:
+        - NumberOfAZs
+        - AvailabilityZones
+        - VpcCidr
+        - VpcTenancy
+        - PublicSubnet0Cidr
+        - PublicSubnet1Cidr
+        - PublicSubnet2Cidr
+        - PublicSubnet3Cidr
+        - PublicSubnet4Cidr
+        - PublicSubnet5Cidr
+        - WebSubnet0Cidr
+        - WebSubnet1Cidr
+        - WebSubnet2Cidr
+        - WebSubnet3Cidr
+        - WebSubnet4Cidr
+        - WebSubnet5Cidr
+        - DataSubnet0Cidr
+        - DataSubnet1Cidr
+        - DataSubnet2Cidr
+        - DataSubnet3Cidr
+        - DataSubnet4Cidr
+        - DataSubnet5Cidr
+    - Label:
+        default: File System Tier
+      Parameters:
+        - EfsPerformanceMode
         - EfsEncrpytedBoolean
         - EfsCmk
+        - EfsGrowth
+        - EfsGrowthInstanceType
+        - EfsCreateAlarms
+        - EfsAlarmsInstanceType
+        - EfsWarningThreshold
+        - EfsCriticalThreshold
     - Label:
-        default: Database Parameters
+        default: Database Tier
       Parameters:
         - DatabaseInstanceType
+        - DatabaseEncrpytedBoolean
+        - DatabaseCmk
         - DatabaseMasterUsername
         - DatabaseMasterPassword
         - DatabaseName
         - UseElastiCacheBoolean
         - ElastiCacheNodeType
     - Label:
-        default: Web Tier Parameters
+        default: Bastion Tier
       Parameters:
-        - UseRoute53Boolean
-        - UseCloudFrontBoolean
-        - CloudFrontAcmCertificate
+        - BastionInstanceType
+    - Label:
+        default: Web Tier
+      Parameters:
         - PublicAlbAcmCertificate
+        - PHPVersion
         - WebInstanceType
         - WebAsgMax
         - WebAsgMin
     - Label:
-        default: WordPress Parameters
+        default: WordPress
       Parameters:
         - WPTitle
         - WPAdminUsername
         - WPAdminPassword
-        - WPAdminEmail
         - WPDirectory
-        - WPDomainName
         - WPLocale
     ParameterLabels:
+      BastionInstanceType:
+        default: Bastion Instance Type
       CloudFrontAcmCertificate:
         default: CloudFront Certificate ARN
+      DatabaseCmk:
+        default: AWS KMS CMK for RDS 
+      DatabaseEncrpytedBoolean:
+        default: Encrypted DB Cluster
       DatabaseInstanceType:
         default: DB Instance Class
       DatabaseMasterUsername:
@@ -57,24 +102,38 @@ Metadata:
         default: DB Master Password
       DatabaseName:
         default: DB Name
-      EfsEncrpytedBoolean:
-        default: Encrpyted EFS file system?
+      EfsAlarmsInstanceType:
+        default: Instance Type
       EfsCmk:
-        default: Existing AWS KMS CMK for EFS
+        default: AWS KMS CMK for EFS
+      EfsCreateAlarms:
+        default: Create EFS alarms
+      EfsEncrpytedBoolean:
+        default: Encrpyted EFS?
+      EfsGrowth:
+        default: Add dummy data (GiB)
+      EfsGrowthInstanceType:
+        default: Instance Type
+      EfsCriticalThreshold:
+        default: Critical Threshold (Minutes)
+      EfsWarningThreshold:
+        default: Warning Threshold (Minutes)
+      EfsPerformanceMode:
+        default: EFS Performance Mode
       ElastiCacheNodeType:
         default: Cache Cluster Node Type
+      EC2KeyName:
+        default: EC2 Key Pair
       PublicAlbAcmCertificate:
         default: ALB Certificate ARN
-      KeyName:
-        default: Existing Key Pair
       SshAccessCidr:
         default: SSH Access From
       UseElastiCacheBoolean:
-        default: Use a Cache Cluster?
+        default: Cache Cluster (ElastiCache)
       UseCloudFrontBoolean:
-        default: Use a CDN (CloudFront)?
+        default: CDN (CloudFront)
       UseRoute53Boolean:
-        default: Create record set (Route53)?
+        default: DNS record set (Route53)
       WebAsgMax:
         default: Web ASG Max
       WebAsgMin:
@@ -87,20 +146,171 @@ Metadata:
         default: Admin Username
       WPAdminPassword:
         default: Admin Password
-      WPAdminEmail:
-        default: Admin Email
+      AdminEmail:
+        default: Email Address
       WPDirectory:
         default: Site Directory
       WPDomainName:
         default: Site Domain
       WPLocale:
         default: Language Code
+      AvailabilityZones:
+        default: Availability Zones
+      NumberOfAZs:
+        default: Number of Availability Zones
+      VpcCidr:
+        default: VpcCidr
+      VpcTenancy:
+        default: VpcTenancy
+      PHPVersion:
+        default: PHP Version
+      PublicSubnet0Cidr:
+        default: Public Subnet 0
+      PublicSubnet1Cidr:
+        default: Public Subnet 1
+      PublicSubnet2Cidr:
+        default: Public Subnet 2
+      PublicSubnet3Cidr:
+        default: Public Subnet 3
+      PublicSubnet4Cidr:
+        default: Public Subnet 4
+      PublicSubnet5Cidr:
+        default: Public Subnet 5
+      WebSubnet0Cidr:
+        default: Web Subnet 0
+      WebSubnet1Cidr:
+        default: Web Subnet 1
+      WebSubnet2Cidr:
+        default: Web Subnet 2
+      WebSubnet3Cidr:
+        default: Web Subnet 3
+      WebSubnet4Cidr:
+        default: Web Subnet 4
+      WebSubnet5Cidr:
+        default: Web Subnet 5
+      DataSubnet0Cidr:
+        default: Data Subnet 0
+      DataSubnet1Cidr:
+        default: Data Subnet 1
+      DataSubnet2Cidr:
+        default: Data Subnet 2
+      DataSubnet3Cidr:
+        default: Data Subnet 3
+      DataSubnet4Cidr:
+        default: Data Subnet 4
+      DataSubnet5Cidr:
+        default: Data Subnet 5
 
 Parameters:
 
+  BastionInstanceType:
+    AllowedValues:
+    - t2.nano 
+    - t2.micro 
+    - t2.small 
+    - t2.medium 
+    - t2.large 
+    - t2.xlarge 
+    - t2.2xlarge 
+    - m3.medium 
+    - m3.large 
+    - m3.xlarge 
+    - m3.2xlarge 
+    - m4.large 
+    - m4.xlarge 
+    - m4.2xlarge 
+    - m4.4xlarge 
+    - m4.10xlarge 
+    - m4.16xlarge 
+    - m5.large 
+    - m5.xlarge 
+    - m5.2xlarge 
+    - m5.4xlarge 
+    - m5.12xlarge 
+    - m5.24xlarge 
+    - c3.large 
+    - c3.xlarge 
+    - c3.2xlarge 
+    - c3.4xlarge 
+    - c3.8xlarge 
+    - c4.large 
+    - c4.xlarge 
+    - c4.2xlarge 
+    - c4.4xlarge 
+    - c4.8xlarge 
+    - c5.large 
+    - c5.xlarge 
+    - c5.2xlarge 
+    - c5.4xlarge 
+    - c5.9xlarge 
+    - c5.18xlarge
+    - r3.large 
+    - r3.xlarge 
+    - r3.2xlarge 
+    - r3.4xlarge 
+    - r3.8xlarge 
+    - r4.large 
+    - r4.xlarge 
+    - r4.2xlarge 
+    - r4.4xlarge 
+    - r4.8xlarge 
+    - r4.16xlarge 
+    - x1.16xlarge 
+    - x1.32xlarge 
+    - x1e.xlarge 
+    - x1e.2xlarge 
+    - x1e.4xlarge 
+    - x1e.8xlarge 
+    - x1e.16xlarge 
+    - x1e.32xlarge
+    - d2.xlarge 
+    - d2.2xlarge 
+    - d2.4xlarge 
+    - d2.8xlarge 
+    - h1.2xlarge 
+    - h1.4xlarge 
+    - h1.8xlarge 
+    - h1.16xlarge 
+    - i2.xlarge 
+    - i2.2xlarge 
+    - i2.4xlarge 
+    - i2.8xlarge 
+    - i3.large 
+    - i3.xlarge 
+    - i3.2xlarge 
+    - i3.4xlarge 
+    - i3.8xlarge 
+    - i3.16xlarge
+    - f1.2xlarge 
+    - f1.16xlarge 
+    - g2.2xlarge 
+    - g2.8xlarge 
+    - g3.4xlarge 
+    - g3.8xlarge 
+    - g3.16xlarge 
+    - p2.xlarge 
+    - p2.8xlarge 
+    - p2.16xlarge 
+    - p3.2xlarge 
+    - p3.8xlarge 
+    - p3.16xlarge
+    ConstraintDescription: Must be a valid Amazon EC2 instance type.
+    Default: t2.nano
+    Description: Bastion EC2 instance type.
+    Type: String
   CloudFrontAcmCertificate:
     AllowedPattern: ^$|(arn:aws:acm:)([a-z0-9/:-])*([a-z0-9])$
     Description: '[ Optional ] The AWS Certification Manager certificate ARN for the CloudFront distribution certificate - this certificate should be created in the us-east-1 (N. Virginia) region and must reference the WordPress domain name you use below.'
+    Type: String
+  DatabaseCmk:
+    Description: AWS KMS Customer Master Key (CMK) to encrypt database cluster
+    Type: String
+  DatabaseEncrpytedBoolean:
+    AllowedValues:
+      - true
+      - false
+    Default: true
+    Description: Indicates whether the DB instances in the cluster are encrypted.
     Type: String
   DatabaseInstanceType:
     AllowedValues:
@@ -111,11 +321,18 @@ Parameters:
       - db.r3.2xlarge
       - db.r3.4xlarge
       - db.r3.8xlarge
+      - db.r4.large
+      - db.r4.xlarge
+      - db.r4.2xlarge
+      - db.r4.4xlarge
+      - db.r4.8xlarge
+      - db.r4.16xlarge
     ConstraintDescription: Must be a valid RDS instance class.
     Default: db.t2.medium
     Description: The Amazon RDS database instance class.
     Type: String
   DatabaseMasterUsername:
+    Default: administrator
     AllowedPattern: ^([a-zA-Z0-9]*)$
     Description: The Amazon RDS master username.
     ConstraintDescription: Must contain only alphanumeric characters and be at least 8 characters.
@@ -123,6 +340,7 @@ Parameters:
     MinLength: 1
     Type: String
   DatabaseMasterPassword:
+    Default: administrator
     AllowedPattern: ^([a-zA-Z0-9`~!#$%^&*()_+,\\-])*$
     ConstraintDescription: Must be letters (upper or lower), numbers, spaces, and these special characters `~!#$%^&*()_+,-
     Description: The Amazon RDS master password. Letters, numbers, spaces, and these special characters `~!#$%^&*()_+,-
@@ -131,20 +349,244 @@ Parameters:
     NoEcho: true
     Type: String
   DatabaseName:
+    Default: administrator
     AllowedPattern: ^([a-zA-Z0-9]*)$
     Description: The Amazon RDS master database name.
     Type: String
+  EfsAlarmsInstanceType:
+    AllowedValues:
+    - t2.nano 
+    - t2.micro 
+    - t2.small 
+    - t2.medium 
+    - t2.large 
+    - t2.xlarge 
+    - t2.2xlarge 
+    - m3.medium 
+    - m3.large 
+    - m3.xlarge 
+    - m3.2xlarge 
+    - m4.large 
+    - m4.xlarge 
+    - m4.2xlarge 
+    - m4.4xlarge 
+    - m4.10xlarge 
+    - m4.16xlarge 
+    - m5.large 
+    - m5.xlarge 
+    - m5.2xlarge 
+    - m5.4xlarge 
+    - m5.12xlarge 
+    - m5.24xlarge 
+    - c3.large 
+    - c3.xlarge 
+    - c3.2xlarge 
+    - c3.4xlarge 
+    - c3.8xlarge 
+    - c4.large 
+    - c4.xlarge 
+    - c4.2xlarge 
+    - c4.4xlarge 
+    - c4.8xlarge 
+    - c5.large 
+    - c5.xlarge 
+    - c5.2xlarge 
+    - c5.4xlarge 
+    - c5.9xlarge 
+    - c5.18xlarge
+    - r3.large 
+    - r3.xlarge 
+    - r3.2xlarge 
+    - r3.4xlarge 
+    - r3.8xlarge 
+    - r4.large 
+    - r4.xlarge 
+    - r4.2xlarge 
+    - r4.4xlarge 
+    - r4.8xlarge 
+    - r4.16xlarge 
+    - x1.16xlarge 
+    - x1.32xlarge 
+    - x1e.xlarge 
+    - x1e.2xlarge 
+    - x1e.4xlarge 
+    - x1e.8xlarge 
+    - x1e.16xlarge 
+    - x1e.32xlarge
+    - d2.xlarge 
+    - d2.2xlarge 
+    - d2.4xlarge 
+    - d2.8xlarge 
+    - h1.2xlarge 
+    - h1.4xlarge 
+    - h1.8xlarge 
+    - h1.16xlarge 
+    - i2.xlarge 
+    - i2.2xlarge 
+    - i2.4xlarge 
+    - i2.8xlarge 
+    - i3.large 
+    - i3.xlarge 
+    - i3.2xlarge 
+    - i3.4xlarge 
+    - i3.8xlarge 
+    - i3.16xlarge
+    - f1.2xlarge 
+    - f1.16xlarge 
+    - g2.2xlarge 
+    - g2.8xlarge 
+    - g3.4xlarge 
+    - g3.8xlarge 
+    - g3.16xlarge 
+    - p2.xlarge 
+    - p2.8xlarge 
+    - p2.16xlarge 
+    - p3.2xlarge 
+    - p3.8xlarge 
+    - p3.16xlarge
+    ConstraintDescription: Must be a valid Amazon EC2 instance type.
+    Default: t2.nano
+    Description: The Amazon EC2 instance type that dynamically adjusts alarm thresholds based on permitted throughput changes.
+    Type: String
   EfsEncrpytedBoolean:
     AllowedValues:
-      - True
-      - False
-    Default: True
+      - true
+      - false
+    Default: true
     Description: Create an encrypted Amazon EFS file system.
     Type: String
   EfsCmk:
     AllowedPattern: ^$|(arn:aws:kms:)([a-z0-9/:-])*([a-z0-9])$
     ConstraintDescription: Must be an existing ARN for an AWS KMS CMK.
     Description: '[ Optional ] The AWS KMS customer-managed CMK ARN to encrypt & decrypt the EFS file system.'
+    Type: String
+  EfsCreateAlarms:
+    AllowedValues:
+      - true
+      - false
+    Default: true
+    Description: Create Amazon EFS burst credit balance alarms.
+    Type: String
+  EfsCriticalThreshold:
+    AllowedPattern: ^[0-9]+$
+    ConstraintDescription: Must be an integer.
+    Default: 60
+    Description: Send critical alarm approx. this many minutes before Amazon EFS burst credit balance is zero.
+    Type: String
+  EfsGrowth:
+    Default: 0
+    ConstraintDescription: Must be an integer.
+    Description: Amount of dummy data (GiB) to add to the file system (max 6144 GiB). Amazon EFS storage charges apply.
+    MaxValue: 6144
+    MinValue: 0
+    Type: Number
+  EfsGrowthInstanceType:
+    AllowedValues:
+    - t2.nano 
+    - t2.micro 
+    - t2.small 
+    - t2.medium 
+    - t2.large 
+    - t2.xlarge 
+    - t2.2xlarge 
+    - m3.medium 
+    - m3.large 
+    - m3.xlarge 
+    - m3.2xlarge 
+    - m4.large 
+    - m4.xlarge 
+    - m4.2xlarge 
+    - m4.4xlarge 
+    - m4.10xlarge 
+    - m4.16xlarge 
+    - m5.large 
+    - m5.xlarge 
+    - m5.2xlarge 
+    - m5.4xlarge 
+    - m5.12xlarge 
+    - m5.24xlarge 
+    - c3.large 
+    - c3.xlarge 
+    - c3.2xlarge 
+    - c3.4xlarge 
+    - c3.8xlarge 
+    - c4.large 
+    - c4.xlarge 
+    - c4.2xlarge 
+    - c4.4xlarge 
+    - c4.8xlarge 
+    - c5.large 
+    - c5.xlarge 
+    - c5.2xlarge 
+    - c5.4xlarge 
+    - c5.9xlarge 
+    - c5.18xlarge
+    - r3.large 
+    - r3.xlarge 
+    - r3.2xlarge 
+    - r3.4xlarge 
+    - r3.8xlarge 
+    - r4.large 
+    - r4.xlarge 
+    - r4.2xlarge 
+    - r4.4xlarge 
+    - r4.8xlarge 
+    - r4.16xlarge 
+    - x1.16xlarge 
+    - x1.32xlarge 
+    - x1e.xlarge 
+    - x1e.2xlarge 
+    - x1e.4xlarge 
+    - x1e.8xlarge 
+    - x1e.16xlarge 
+    - x1e.32xlarge
+    - d2.xlarge 
+    - d2.2xlarge 
+    - d2.4xlarge 
+    - d2.8xlarge 
+    - h1.2xlarge 
+    - h1.4xlarge 
+    - h1.8xlarge 
+    - h1.16xlarge 
+    - i2.xlarge 
+    - i2.2xlarge 
+    - i2.4xlarge 
+    - i2.8xlarge 
+    - i3.large 
+    - i3.xlarge 
+    - i3.2xlarge 
+    - i3.4xlarge 
+    - i3.8xlarge 
+    - i3.16xlarge
+    - f1.2xlarge 
+    - f1.16xlarge 
+    - g2.2xlarge 
+    - g2.8xlarge 
+    - g3.4xlarge 
+    - g3.8xlarge 
+    - g3.16xlarge 
+    - p2.xlarge 
+    - p2.8xlarge 
+    - p2.16xlarge 
+    - p3.2xlarge 
+    - p3.8xlarge 
+    - p3.16xlarge
+    ConstraintDescription: Must be a valid Amazon EC2 instance type.
+    Default: r4.large
+    Description: The Amazon EC2 instance type that adds data to the file system.
+    Type: String
+  EfsPerformanceMode:
+    AllowedValues:
+      - generalPurpose
+      - maxIO
+    Default: generalPurpose
+    Description: Select the performance mode of the file system.
+    Type: String
+  EfsWarningThreshold:
+    AllowedPattern: ^[0-9]+$
+    ConstraintDescription: Must be an integer.
+    Default: 180
+    Description: Send warning alarm approx. this many minutes before Amazon EFS burst credit balance is zero.
     Type: String
   ElastiCacheNodeType:
     AllowedValues:
@@ -169,11 +611,18 @@ Parameters:
     Default: cache.t2.medium
     Description: The Amazon ElastiCache cluster node type.
     Type: String
-  KeyName:
-    AllowedPattern: ^([a-zA-Z0-9 @.`~!#$%^&*()_+,\\-])*$
+  EC2KeyName:
     ConstraintDescription: Must be letters (upper or lower), numbers, and special characters.
     Description: Name of an EC2 KeyPair. Your bastion & Web instances will launch with this KeyPair.
     Type: AWS::EC2::KeyPair::KeyName
+  PHPVersion:
+    AllowedValues:
+    - 5.5
+    - 5.6
+    - 7.0
+    Default: 7.0
+    Description: The version of PHP to install.
+    Type: String 
   PublicAlbAcmCertificate:
     AllowedPattern: ^$|(arn:aws:acm:)([a-z0-9/:-])*([a-z0-9])$
     Description: '[ Optional ] The AWS Certification Manager certificate ARN for the ALB certificate - this certificate should be created in the region you wish to run the ALB and must reference the WordPress domain name you use below.'
@@ -185,23 +634,23 @@ Parameters:
     Default: 0.0.0.0/0
   UseCloudFrontBoolean:
     AllowedValues:
-      - True
-      - False
-    Default: True
+      - true
+      - false
+    Default: false
     Description: Specifies whether a CloudFront Distribution should be created to serve the WordPress website content.
     Type: String
   UseElastiCacheBoolean:
     AllowedValues:
-      - True
-      - False
-    Default: True
+      - true
+      - false
+    Default: false
     Description: Specifies whether an ElastiCache Cache Cluster should be created to cache WordPress database content.
     Type: String
   UseRoute53Boolean:
     AllowedValues:
-      - True
-      - False
-    Default: True
+      - true
+      - false
+    Default: false
     Description: Specifies whether a record set should be created in Route 53 for your WordPress domain name.
     Type: String
   WebAsgMax:
@@ -218,43 +667,118 @@ Parameters:
     Type: String
   WebInstanceType:
     AllowedValues:
-      - t2.micro
-      - t2.small
-      - t2.medium
-      - t2.large
-      - m4.large
-      - m4.xlarge
-      - m4.2xlarge
-      - m4.4xlarge
-      - m4.10xlarge
-      - m3.medium
-      - m3.large
-      - m3.xlarge
-      - m3.2xlarge
-      - r3.large
-      - r3.xlarge
-      - r3.2xlarge
-      - r3.4xlarge
-      - r3.8xlarge
+      - t2.nano 
+      - t2.micro 
+      - t2.small 
+      - t2.medium 
+      - t2.large 
+      - t2.xlarge 
+      - t2.2xlarge 
+      - m3.medium 
+      - m3.large 
+      - m3.xlarge 
+      - m3.2xlarge 
+      - m4.large 
+      - m4.xlarge 
+      - m4.2xlarge 
+      - m4.4xlarge 
+      - m4.10xlarge 
+      - m4.16xlarge 
+      - m5.large 
+      - m5.xlarge 
+      - m5.2xlarge 
+      - m5.4xlarge 
+      - m5.12xlarge 
+      - m5.24xlarge 
+      - c3.large 
+      - c3.xlarge 
+      - c3.2xlarge 
+      - c3.4xlarge 
+      - c3.8xlarge 
+      - c4.large 
+      - c4.xlarge 
+      - c4.2xlarge 
+      - c4.4xlarge 
+      - c4.8xlarge 
+      - c5.large 
+      - c5.xlarge 
+      - c5.2xlarge 
+      - c5.4xlarge 
+      - c5.9xlarge 
+      - c5.18xlarge
+      - r3.large 
+      - r3.xlarge 
+      - r3.2xlarge 
+      - r3.4xlarge 
+      - r3.8xlarge 
+      - r4.large 
+      - r4.xlarge 
+      - r4.2xlarge 
+      - r4.4xlarge 
+      - r4.8xlarge 
+      - r4.16xlarge 
+      - x1.16xlarge 
+      - x1.32xlarge 
+      - x1e.xlarge 
+      - x1e.2xlarge 
+      - x1e.4xlarge 
+      - x1e.8xlarge 
+      - x1e.16xlarge 
+      - x1e.32xlarge
+      - d2.xlarge 
+      - d2.2xlarge 
+      - d2.4xlarge 
+      - d2.8xlarge 
+      - h1.2xlarge 
+      - h1.4xlarge 
+      - h1.8xlarge 
+      - h1.16xlarge 
+      - i2.xlarge 
+      - i2.2xlarge 
+      - i2.4xlarge 
+      - i2.8xlarge 
+      - i3.large 
+      - i3.xlarge 
+      - i3.2xlarge 
+      - i3.4xlarge 
+      - i3.8xlarge 
+      - i3.16xlarge
+      - f1.2xlarge 
+      - f1.16xlarge 
+      - g2.2xlarge 
+      - g2.8xlarge 
+      - g3.4xlarge 
+      - g3.8xlarge 
+      - g3.16xlarge 
+      - p2.xlarge 
+      - p2.8xlarge 
+      - p2.16xlarge 
+      - p3.2xlarge 
+      - p3.8xlarge 
+      - p3.16xlarge
     ConstraintDescription: Must be a valid Amazon EC2 instance type.
     Default: t2.large
     Description: The Amazon EC2 instance type for your web instances.
     Type: String
-  WPAdminEmail:
+  AdminEmail:
+    Default: darrylo@amazon.com
     AllowedPattern: ^(([^<>()\[\]\\.,;:\s@"]+(\.[^<>()\[\]\\.,;:\s@"]+)*)|(".+"))@((\[[0-9]{1,3}\.[0-9]{1,3}\.[0-9]{1,3}\.[0-9]{1,3}])|(([a-zA-Z\-0-9]+\.)+[a-zA-Z]{2,}))$
-    Description: The WordPress admin email address.
+    Description: The admin email address for WordPress and AWS notifications.
     Type: String
   WPAdminPassword:
+    Default: administrator
     AllowedPattern: ^([a-zA-Z0-9`~!#$%^&*()_+,\\-])*$
     ConstraintDescription: Must be letters (upper or lower), numbers, spaces, and these special characters `~!#$%^&*()_+,-    
     Description: The WordPress admin password. Letters, numbers, spaces, and these special characters `~!#$%^&*()_+,-
     Type: String
     NoEcho: true
   WPAdminUsername:
+    Default: administrator
     AllowedPattern: ^([a-zA-Z0-9])([a-zA-Z0-9_-])*([a-zA-Z0-9])$
     Description: The WordPress admin username.
     Type: String
   WPDirectory:
+    Default: administrator
     AllowedPattern: ^([a-zA-Z0-9])([a-zA-Z0-9_-])*([a-zA-Z0-9])$
     Description: The WordPress site directory.
     Type: String
@@ -271,6 +795,142 @@ Parameters:
     AllowedPattern: ^([a-zA-Z0-9])([a-zA-Z0-9 _-]*)([a-zA-Z0-9])$
     Description: The WordPress website title.
     Type: String
+  AvailabilityZones:
+    Description: 'List of Availability Zones to use for the subnets in the VPC. Note:
+      The logical order is preserved.'
+    Type: List<AWS::EC2::AvailabilityZone::Name>
+  NumberOfAZs:
+    AllowedValues:
+    - 2
+    - 3
+    - 4
+    - 5
+    - 6
+    Default: 3
+    Description: Number of Availability Zones to use in the VPC. This must match your
+      selections in the list of Availability Zones parameter.
+    Type: Number
+  VpcCidr:
+    AllowedPattern: "^(([0-9]|[1-9][0-9]|1[0-9]{2}|2[0-4][0-9]|25[0-5])\\.){3}([0-9]|[1-9][0-9]|1[0-9]{2}|2[0-4][0-9]|25[0-5])(\\/(1[6-9]|2[0-8]))$"
+    ConstraintDescription: CIDR block parameter must be in the form x.x.x.x/16-28
+    Default: 10.0.0.0/16
+    Description: CIDR block for the VPC
+    Type: String
+  VpcTenancy:
+    AllowedValues:
+    - default
+    - dedicated
+    Default: default
+    Description: The allowed tenancy of instances launched into the VPC
+    Type: String
+  DataSubnet0Cidr:
+    AllowedPattern: "^(([0-9]|[1-9][0-9]|1[0-9]{2}|2[0-4][0-9]|25[0-5])\\.){3}([0-9]|[1-9][0-9]|1[0-9]{2}|2[0-4][0-9]|25[0-5])(\\/(1[6-9]|2[0-8]))$"
+    ConstraintDescription: CIDR block parameter must be in the form x.x.x.x/16-28
+    Default: 10.0.100.0/24
+    Description: CIDR block for data subnet 0 located in Availability Zone 0
+    Type: String
+  DataSubnet1Cidr:
+    AllowedPattern: "^(([0-9]|[1-9][0-9]|1[0-9]{2}|2[0-4][0-9]|25[0-5])\\.){3}([0-9]|[1-9][0-9]|1[0-9]{2}|2[0-4][0-9]|25[0-5])(\\/(1[6-9]|2[0-8]))$"
+    ConstraintDescription: CIDR block parameter must be in the form x.x.x.x/16-28
+    Default: 10.0.101.0/24
+    Description: CIDR block for data subnet 1 located in Availability Zone 1
+    Type: String
+  DataSubnet2Cidr:
+    AllowedPattern: "^(([0-9]|[1-9][0-9]|1[0-9]{2}|2[0-4][0-9]|25[0-5])\\.){3}([0-9]|[1-9][0-9]|1[0-9]{2}|2[0-4][0-9]|25[0-5])(\\/(1[6-9]|2[0-8]))$"
+    ConstraintDescription: CIDR block parameter must be in the form x.x.x.x/16-28
+    Default: 10.0.102.0/24
+    Description: CIDR block for data subnet 2 located in Availability Zone 2
+    Type: String
+  DataSubnet3Cidr:
+    AllowedPattern: "^(([0-9]|[1-9][0-9]|1[0-9]{2}|2[0-4][0-9]|25[0-5])\\.){3}([0-9]|[1-9][0-9]|1[0-9]{2}|2[0-4][0-9]|25[0-5])(\\/(1[6-9]|2[0-8]))$"
+    ConstraintDescription: CIDR block parameter must be in the form x.x.x.x/16-28
+    Default: 10.0.103.0/24
+    Description: CIDR block for data subnet 3 located in Availability Zone 3
+    Type: String
+  DataSubnet4Cidr:
+    AllowedPattern: "^(([0-9]|[1-9][0-9]|1[0-9]{2}|2[0-4][0-9]|25[0-5])\\.){3}([0-9]|[1-9][0-9]|1[0-9]{2}|2[0-4][0-9]|25[0-5])(\\/(1[6-9]|2[0-8]))$"
+    ConstraintDescription: CIDR block parameter must be in the form x.x.x.x/16-28
+    Default: 10.0.104.0/24
+    Description: CIDR block for data subnet 4 located in Availability Zone 4
+    Type: String
+  DataSubnet5Cidr:
+    AllowedPattern: "^(([0-9]|[1-9][0-9]|1[0-9]{2}|2[0-4][0-9]|25[0-5])\\.){3}([0-9]|[1-9][0-9]|1[0-9]{2}|2[0-4][0-9]|25[0-5])(\\/(1[6-9]|2[0-8]))$"
+    ConstraintDescription: CIDR block parameter must be in the form x.x.x.x/16-28
+    Default: 10.0.105.0/24
+    Description: CIDR block for data subnet 5 located in Availability Zone 5
+    Type: String
+  PublicSubnet0Cidr:
+    AllowedPattern: "^(([0-9]|[1-9][0-9]|1[0-9]{2}|2[0-4][0-9]|25[0-5])\\.){3}([0-9]|[1-9][0-9]|1[0-9]{2}|2[0-4][0-9]|25[0-5])(\\/(1[6-9]|2[0-8]))$"
+    ConstraintDescription: CIDR block parameter must be in the form x.x.x.x/16-28
+    Default: 10.0.200.0/24
+    Description: CIDR block for Public subnet 0 located in Availability Zone 0
+    Type: String
+  PublicSubnet1Cidr:
+    AllowedPattern: "^(([0-9]|[1-9][0-9]|1[0-9]{2}|2[0-4][0-9]|25[0-5])\\.){3}([0-9]|[1-9][0-9]|1[0-9]{2}|2[0-4][0-9]|25[0-5])(\\/(1[6-9]|2[0-8]))$"
+    ConstraintDescription: CIDR block parameter must be in the form x.x.x.x/16-28
+    Default: 10.0.201.0/24
+    Description: CIDR block for Public subnet 1 located in Availability Zone 1
+    Type: String
+  PublicSubnet2Cidr:
+    AllowedPattern: "^(([0-9]|[1-9][0-9]|1[0-9]{2}|2[0-4][0-9]|25[0-5])\\.){3}([0-9]|[1-9][0-9]|1[0-9]{2}|2[0-4][0-9]|25[0-5])(\\/(1[6-9]|2[0-8]))$"
+    ConstraintDescription: CIDR block parameter must be in the form x.x.x.x/16-28
+    Default: 10.0.202.0/24
+    Description: CIDR block for Public subnet 2 located in Availability Zone 2
+    Type: String
+  PublicSubnet3Cidr:
+    AllowedPattern: "^(([0-9]|[1-9][0-9]|1[0-9]{2}|2[0-4][0-9]|25[0-5])\\.){3}([0-9]|[1-9][0-9]|1[0-9]{2}|2[0-4][0-9]|25[0-5])(\\/(1[6-9]|2[0-8]))$"
+    ConstraintDescription: CIDR block parameter must be in the form x.x.x.x/16-28
+    Default: 10.0.203.0/24
+    Description: CIDR block for Public subnet 3 located in Availability Zone 3
+    Type: String
+  PublicSubnet4Cidr:
+    AllowedPattern: "^(([0-9]|[1-9][0-9]|1[0-9]{2}|2[0-4][0-9]|25[0-5])\\.){3}([0-9]|[1-9][0-9]|1[0-9]{2}|2[0-4][0-9]|25[0-5])(\\/(1[6-9]|2[0-8]))$"
+    ConstraintDescription: CIDR block parameter must be in the form x.x.x.x/16-28
+    Default: 10.0.204.0/24
+    Description: CIDR block for Public subnet 4 located in Availability Zone 4
+    Type: String
+  PublicSubnet5Cidr:
+    AllowedPattern: "^(([0-9]|[1-9][0-9]|1[0-9]{2}|2[0-4][0-9]|25[0-5])\\.){3}([0-9]|[1-9][0-9]|1[0-9]{2}|2[0-4][0-9]|25[0-5])(\\/(1[6-9]|2[0-8]))$"
+    ConstraintDescription: CIDR block parameter must be in the form x.x.x.x/16-28
+    Default: 10.0.205.0/24
+    Description: CIDR block for Public subnet 5 located in Availability Zone 5
+    Type: String
+  WebSubnet0Cidr:
+    AllowedPattern: "^(([0-9]|[1-9][0-9]|1[0-9]{2}|2[0-4][0-9]|25[0-5])\\.){3}([0-9]|[1-9][0-9]|1[0-9]{2}|2[0-4][0-9]|25[0-5])(\\/(1[6-9]|2[0-8]))$"
+    ConstraintDescription: CIDR block parameter must be in the form x.x.x.x/16-28
+    Default: 10.0.0.0/22
+    Description: CIDR block for Web subnet 0 located in Availability Zone 0
+    Type: String
+  WebSubnet1Cidr:
+    AllowedPattern: "^(([0-9]|[1-9][0-9]|1[0-9]{2}|2[0-4][0-9]|25[0-5])\\.){3}([0-9]|[1-9][0-9]|1[0-9]{2}|2[0-4][0-9]|25[0-5])(\\/(1[6-9]|2[0-8]))$"
+    ConstraintDescription: CIDR block parameter must be in the form x.x.x.x/16-28
+    Default: 10.0.4.0/22
+    Description: CIDR block for Web subnet 1 located in Availability Zone 1
+    Type: String
+  WebSubnet2Cidr:
+    AllowedPattern: "^(([0-9]|[1-9][0-9]|1[0-9]{2}|2[0-4][0-9]|25[0-5])\\.){3}([0-9]|[1-9][0-9]|1[0-9]{2}|2[0-4][0-9]|25[0-5])(\\/(1[6-9]|2[0-8]))$"
+    ConstraintDescription: CIDR block parameter must be in the form x.x.x.x/16-28
+    Default: 10.0.8.0/22
+    Description: CIDR block for Web subnet 2 located in Availability Zone 2
+    Type: String
+  WebSubnet3Cidr:
+    AllowedPattern: "^(([0-9]|[1-9][0-9]|1[0-9]{2}|2[0-4][0-9]|25[0-5])\\.){3}([0-9]|[1-9][0-9]|1[0-9]{2}|2[0-4][0-9]|25[0-5])(\\/(1[6-9]|2[0-8]))$"
+    ConstraintDescription: CIDR block parameter must be in the form x.x.x.x/16-28
+    Default: 10.0.12.0/22
+    Description: CIDR block for Web subnet 3 located in Availability Zone 3
+    Type: String
+  WebSubnet4Cidr:
+    AllowedPattern: "^(([0-9]|[1-9][0-9]|1[0-9]{2}|2[0-4][0-9]|25[0-5])\\.){3}([0-9]|[1-9][0-9]|1[0-9]{2}|2[0-4][0-9]|25[0-5])(\\/(1[6-9]|2[0-8]))$"
+    ConstraintDescription: CIDR block parameter must be in the form x.x.x.x/16-28
+    Default: 10.0.16.0/22
+    Description: CIDR block for Web subnet 4 located in Availability Zone 4
+    Type: String
+  WebSubnet5Cidr:
+    AllowedPattern: "^(([0-9]|[1-9][0-9]|1[0-9]{2}|2[0-4][0-9]|25[0-5])\\.){3}([0-9]|[1-9][0-9]|1[0-9]{2}|2[0-4][0-9]|25[0-5])(\\/(1[6-9]|2[0-8]))$"
+    ConstraintDescription: CIDR block parameter must be in the form x.x.x.x/16-28
+    Default: 10.0.20.0/22
+    Description: CIDR block for Web subnet 5 located in Availability Zone 5
+    Type: String
 
 Conditions:
 
@@ -283,14 +943,18 @@ Conditions:
       !Equals [ !Ref 'AWS::Region', us-east-2 ],
       !Equals [ !Ref 'AWS::Region', us-west-2 ]
     ]
+  EfsCreateAlarms:
+    !Equals [ true, !Ref EfsCreateAlarms ]
+  EfsCreateNoAlarms:
+    !Equals [ false, !Ref EfsCreateAlarms ]
   CreateRecordSet: !And
-    - !Equals [ True, !Ref UseRoute53Boolean ]
+    - !Equals [ true, !Ref UseRoute53Boolean ]
     - !Condition AvailableAWSRegion
   DeployCloudFront: !And
-    - !Equals [ True, !Ref UseCloudFrontBoolean ]
+    - !Equals [ true, !Ref UseCloudFrontBoolean ]
     - !Condition AvailableAWSRegion   
   DeployElastiCache: !And
-    - !Equals [ True, !Ref UseElastiCacheBoolean ]
+    - !Equals [ true, !Ref UseElastiCacheBoolean ]
     - !Condition AvailableAWSRegion
 
 Resources:
@@ -301,16 +965,16 @@ Resources:
     Type: AWS::CloudFormation::Stack
     Properties:
       Parameters:
+        BastionInstanceType:
+          !Ref BastionInstanceType
         BastionSecurityGroup:
           !GetAtt [ securitygroups, Outputs.BastionSecurityGroup ]
-        KeyName:
-          !Ref KeyName
-        PublicSubnet0:
-          !GetAtt [ newvpc, Outputs.PublicSubnet0 ]
-        PublicSubnet1:
-          !GetAtt [ newvpc, Outputs.PublicSubnet1 ]
-        PublicSubnet2:
-          !GetAtt [ newvpc, Outputs.PublicSubnet2 ]
+        EC2KeyName:
+          !Ref EC2KeyName
+        NumberOfSubnets:
+          !Ref NumberOfAZs
+        Subnet:
+          !GetAtt [ newvpc, Outputs.PublicSubnet ]
       TemplateURL: https://s3.amazonaws.com/aws-refarch/wordpress/latest/templates/aws-refarch-wordpress-03-bastion.yaml
   cloudfront:
     Condition: DeployCloudFront
@@ -325,47 +989,160 @@ Resources:
         WPDomainName:
           !Ref WPDomainName
       TemplateURL: https://s3.amazonaws.com/aws-refarch/wordpress/latest/templates/aws-refarch-wordpress-04-cloudfront.yaml
-  efs:
-    Condition: AvailableAWSRegion
+  dashboardwithalarms:
+    Condition: EfsCreateAlarms
+    DependsOn: [ newvpc, securitygroups, publicalb, efsfilesystem, rds, efsalarms ]
+    Type: AWS::CloudFormation::Stack
+    Properties:
+      Parameters:
+        ElasticFileSystem:
+          !GetAtt [ efsfilesystem, Outputs.ElasticFileSystem ]
+        DatabaseCluster:
+          !GetAtt [ rds, Outputs.DatabaseCluster ]
+        BurstCreditBalanceDecreaseAlarmArn:
+          !GetAtt [ efsalarms, Outputs.BurstCreditBalanceDecreaseAlarmArn ]
+        BurstCreditBalanceIncreaseAlarmArn:
+          !GetAtt [ efsalarms, Outputs.BurstCreditBalanceIncreaseAlarmArn ]
+        CriticalAlarmArn:
+          !GetAtt [ efsalarms, Outputs.CriticalAlarmArn ]
+        WarningAlarmArn:
+          !GetAtt [ efsalarms, Outputs.WarningAlarmArn ]
+        PublicAlbFullName:
+          !GetAtt [ publicalb, Outputs.PublicAlbFullName ]
+        EfsCreateAlarms:
+          !Ref EfsCreateAlarms         
+      TemplateURL: https://s3.amazonaws.com/aws-refarch/wordpress/latest/templates/aws-refarch-wordpress-06-dashboard.yaml
+  dashboardwithnoalarms:
+    Condition: EfsCreateNoAlarms
+    DependsOn: [ newvpc, securitygroups, publicalb, efsfilesystem, rds ]
+    Type: AWS::CloudFormation::Stack
+    Properties:
+      Parameters:
+        ElasticFileSystem:
+          !GetAtt [ efsfilesystem, Outputs.ElasticFileSystem ]
+        DatabaseCluster:
+          !GetAtt [ rds, Outputs.DatabaseCluster ]
+        PublicAlbFullName:
+          !GetAtt [ publicalb, Outputs.PublicAlbFullName ]
+        EfsCreateAlarms:
+          !Ref EfsCreateAlarms         
+      TemplateURL: https://s3.amazonaws.com/aws-refarch/wordpress/latest/templates/aws-refarch-wordpress-06-dashboard.yaml
+  efsfilesystem:
     DependsOn: [ newvpc, securitygroups ]
     Type: AWS::CloudFormation::Stack
     Properties:
       Parameters:
-        EfsEncrpytedBoolean:
+        EncrpytedBoolean:
           !Ref EfsEncrpytedBoolean
-        EfsCmk:
+        Cmk:
           !Ref EfsCmk
-        EfsSecurityGroup:
+        EC2KeyName:
+          !Ref EC2KeyName
+        SecurityGroup:
           !GetAtt [ securitygroups, Outputs.EfsSecurityGroup ]
-        DataSubnet0:
-          !GetAtt [ newvpc, Outputs.DataSubnet0 ]
-        DataSubnet1:
-          !GetAtt [ newvpc, Outputs.DataSubnet1 ]
-        DataSubnet2:
-          !GetAtt [ newvpc, Outputs.DataSubnet2 ]
-      TemplateURL: https://s3.amazonaws.com/aws-refarch/wordpress/latest/templates/aws-refarch-wordpress-03-efs.yaml
+        Growth:
+          !Ref EfsGrowth
+        InstanceType:
+          !Ref EfsGrowthInstanceType
+        NumberOfSubnets:
+          !Ref NumberOfAZs  
+        PerformanceMode:
+          !Ref EfsPerformanceMode
+        Subnet:
+          !GetAtt [ newvpc, Outputs.DataSubnet ]
+      TemplateURL: https://s3.amazonaws.com/aws-refarch/wordpress/latest/templates/aws-refarch-wordpress-03-efsfilesystem.yaml
+  efsalarms:
+    Condition: EfsCreateAlarms
+    DependsOn: [ efsfilesystem ]
+    Type: AWS::CloudFormation::Stack
+    Properties:
+      Parameters:
+        CriticalThreshold:
+          !Ref EfsCriticalThreshold
+        EC2KeyName:
+          !Ref EC2KeyName
+        ElasticFileSystem:
+          !GetAtt [ efsfilesystem, Outputs.ElasticFileSystem ]
+        EmailAddress:
+          !Ref AdminEmail
+        SecurityGroup:
+          !GetAtt [ securitygroups, Outputs.EfsSecurityGroup ]
+        InstanceType:
+          !Ref EfsAlarmsInstanceType
+        NumberOfSubnets:
+          !Ref NumberOfAZs  
+        Subnet:
+          !GetAtt [ newvpc, Outputs.DataSubnet ]
+        WarningThreshold:
+          !Ref EfsWarningThreshold
+      TemplateURL: https://s3.amazonaws.com/aws-refarch/wordpress/latest/templates/aws-refarch-wordpress-03-efsalarms.yaml
   elasticache:
     Condition: DeployElastiCache
     DependsOn: [ newvpc, securitygroups ]
     Type: AWS::CloudFormation::Stack
     Properties:
       Parameters:
-        DataSubnet0:
-          !GetAtt [ newvpc, Outputs.DataSubnet0 ]
-        DataSubnet1:
-          !GetAtt [ newvpc, Outputs.DataSubnet1 ]
-        DataSubnet2:
-          !GetAtt [ newvpc, Outputs.DataSubnet2 ]
+        Subnet:
+          !GetAtt [ newvpc, Outputs.DataSubnet ]
         ElastiCacheClusterName:
           !Ref DatabaseName
         ElastiCacheNodeType:
           !Ref ElastiCacheNodeType
         ElastiCacheSecurityGroup:
           !GetAtt [ securitygroups, Outputs.ElastiCacheSecurityGroup ]
+        NumberOfSubnets:
+          !Ref NumberOfAZs
       TemplateURL: https://s3.amazonaws.com/aws-refarch/wordpress/latest/templates/aws-refarch-wordpress-03-elasticache.yaml
   newvpc:
     Type: AWS::CloudFormation::Stack
     Properties:
+      Parameters:
+        NumberOfAZs:
+          !Ref NumberOfAZs
+        AvailabilityZones:
+          !Join
+            - ','
+            - !Ref AvailabilityZones
+        VpcCidr:
+          !Ref VpcCidr
+        VpcTenancy:
+          !Ref VpcTenancy
+        PublicSubnet0Cidr:
+          !Ref PublicSubnet0Cidr
+        PublicSubnet1Cidr:
+          !Ref PublicSubnet1Cidr
+        PublicSubnet2Cidr:
+          !Ref PublicSubnet2Cidr
+        PublicSubnet3Cidr:
+          !Ref PublicSubnet3Cidr
+        PublicSubnet4Cidr:
+          !Ref PublicSubnet4Cidr
+        PublicSubnet5Cidr:
+          !Ref PublicSubnet5Cidr
+        WebSubnet0Cidr:
+          !Ref WebSubnet0Cidr
+        WebSubnet1Cidr:
+          !Ref WebSubnet1Cidr
+        WebSubnet2Cidr:
+          !Ref WebSubnet2Cidr
+        WebSubnet3Cidr:
+          !Ref WebSubnet3Cidr
+        WebSubnet4Cidr:
+          !Ref WebSubnet4Cidr
+        WebSubnet5Cidr:
+          !Ref WebSubnet5Cidr
+        DataSubnet0Cidr:
+          !Ref DataSubnet0Cidr
+        DataSubnet1Cidr:
+          !Ref DataSubnet1Cidr
+        DataSubnet2Cidr:
+          !Ref DataSubnet2Cidr
+        DataSubnet3Cidr:
+          !Ref DataSubnet3Cidr
+        DataSubnet4Cidr:
+          !Ref DataSubnet4Cidr
+        DataSubnet5Cidr:
+          !Ref DataSubnet5Cidr
       TemplateURL: https://s3.amazonaws.com/aws-refarch/wordpress/latest/templates/aws-refarch-wordpress-01-newvpc.yaml
   publicalb:
     Condition: AvailableAWSRegion
@@ -373,12 +1150,10 @@ Resources:
     Type: AWS::CloudFormation::Stack
     Properties:
       Parameters:
-        PublicSubnet0:
-          !GetAtt [ newvpc, Outputs.PublicSubnet0 ]
-        PublicSubnet1:
-          !GetAtt [ newvpc, Outputs.PublicSubnet1 ]
-        PublicSubnet2:
-          !GetAtt [ newvpc, Outputs.PublicSubnet2 ]
+        NumberOfSubnets:
+          !Ref NumberOfAZs
+        Subnet:
+          !GetAtt [ newvpc, Outputs.PublicSubnet ]
         PublicAlbAcmCertificate:
           !Ref PublicAlbAcmCertificate
         PublicAlbSecurityGroup:
@@ -400,14 +1175,16 @@ Resources:
           !Ref DatabaseMasterPassword
         DatabaseName:
           !Ref DatabaseName
+        DatabaseEncrpytedBoolean:
+          !Ref DatabaseEncrpytedBoolean
+        DatabaseCmk:
+          !Ref DatabaseCmk
         DatabaseSecurityGroup:
           !GetAtt [ securitygroups, Outputs.DatabaseSecurityGroup ]
-        DataSubnet0:
-          !GetAtt [ newvpc, Outputs.DataSubnet0 ]
-        DataSubnet1:
-          !GetAtt [ newvpc, Outputs.DataSubnet1 ]
-        DataSubnet2:
-          !GetAtt [ newvpc, Outputs.DataSubnet2 ]
+        Subnet:
+          !GetAtt [ newvpc, Outputs.DataSubnet ]
+        NumberOfSubnets:
+          !Ref NumberOfAZs
       TemplateURL: https://s3.amazonaws.com/aws-refarch/wordpress/latest/templates/aws-refarch-wordpress-03-rds.yaml
   route53:
     Condition: CreateRecordSet
@@ -435,7 +1212,7 @@ Resources:
       TemplateURL: https://s3.amazonaws.com/aws-refarch/wordpress/latest/templates/aws-refarch-wordpress-02-securitygroups.yaml
   web:
     Condition: AvailableAWSRegion
-    DependsOn: [ efs, newvpc, publicalb, securitygroups ]
+    DependsOn: [ efsfilesystem, newvpc, publicalb, securitygroups ]
     Type: AWS::CloudFormation::Stack
     Properties:
       Parameters:
@@ -448,9 +1225,13 @@ Resources:
         DatabaseName:
           !Ref DatabaseName
         ElasticFileSystem:
-          !GetAtt [ efs, Outputs.ElasticFileSystem ]
-        KeyName:
-          !Ref KeyName
+          !GetAtt [ efsfilesystem, Outputs.ElasticFileSystem ]
+        EC2KeyName:
+          !Ref EC2KeyName
+        NumberOfSubnets:
+          !Ref NumberOfAZs
+        PHPVersion:
+          !Ref PHPVersion
         PublicAlbTargetGroupArn:
           !GetAtt [ publicalb, Outputs.PublicAlbTargetGroupArn ]
         PublicAlbHostname:
@@ -465,14 +1246,10 @@ Resources:
           !Ref WebInstanceType
         WebSecurityGroup:
           !GetAtt [ securitygroups, Outputs.WebSecurityGroup ]
-        WebSubnet0:
-          !GetAtt [ newvpc, Outputs.WebSubnet0 ]
-        WebSubnet1:
-          !GetAtt [ newvpc, Outputs.WebSubnet1 ]
-        WebSubnet2:
-          !GetAtt [ newvpc, Outputs.WebSubnet2 ]
+        Subnet:
+          !GetAtt [ newvpc, Outputs.WebSubnet ]
         WPAdminEmail:
-          !Ref WPAdminEmail
+          !Ref AdminEmail
         WPAdminPassword:
           !Ref WPAdminPassword
         WPAdminUsername:

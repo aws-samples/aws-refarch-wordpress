@@ -13,9 +13,8 @@ Metadata:
         - Vpc
         - PublicAlbAcmCertificate
         - PublicAlbSecurityGroup
-        - PublicSubnet0
-        - PublicSubnet1
-        - PublicSubnet2
+        - NumberOfSubnets
+        - Subnet
     ParameterLabels:
       Vpc:
         default: Vpc Id
@@ -23,15 +22,23 @@ Metadata:
         default: ALB Certificate ARN
       PublicAlbSecurityGroup:
         default: Public ALB Security Group
-      PublicSubnet0:
-        default: Public Subnet for AZ 0
-      PublicSubnet1:
-        default: Public Subnet for AZ 1
-      PublicSubnet2:
-        default: Public Subnet for AZ 2
+      NumberOfSubnets:
+        default: Number of subnets
+      Subnet:
+        default: Subnets
 
 Parameters:
 
+  NumberOfSubnets:
+    AllowedValues:
+    - 2
+    - 3
+    - 4
+    - 5
+    - 6
+    Default: 3
+    Description: Number of subnets. This must match your selections in the list of subnets below.
+    Type: String 
   PublicAlbAcmCertificate:
     AllowedPattern: ^$|(arn:aws:acm:)([a-z0-9/:-])*([a-z0-9])$
     Description: '[ Optional ] The AWS Certification Manager certificate ARN for the ALB certificate - this certificate should be created in the region you wish to run the ALB and must reference the WordPress domain name you use below.'
@@ -39,15 +46,9 @@ Parameters:
   PublicAlbSecurityGroup:
     Description: Select the ALB security group.
     Type: AWS::EC2::SecurityGroup::Id
-  PublicSubnet0:
-    Description: Select an existing public subnet for AZ 0.
-    Type: AWS::EC2::Subnet::Id
-  PublicSubnet1:
-    Description: Select an existing public subnet for AZ 1.
-    Type: AWS::EC2::Subnet::Id
-  PublicSubnet2:
-    Description: Select an existing public subnet for AZ 2.
-    Type: AWS::EC2::Subnet::Id
+  Subnet:
+    Description: Select existing subnets. The number selected must match the number of subnets above. Subnets selected must be in separate AZs.
+    Type: List<AWS::EC2::Subnet::Id>
   Vpc:
     Description: Select an existing Vpc
     Type: AWS::EC2::VPC::Id
@@ -58,17 +59,44 @@ Conditions:
     !Not [!Equals [ '', !Ref PublicAlbAcmCertificate ] ]
   NoSslCertificate:
     !Equals [ '', !Ref PublicAlbAcmCertificate ]
-  MoreThan2AZ:
-    !Or [
-      !Equals [ !Ref 'AWS::Region', us-east-1 ],
-      !Equals [ !Ref 'AWS::Region', us-east-2 ],
-      !Equals [ !Ref 'AWS::Region', us-west-2 ],
-      !Equals [ !Ref 'AWS::Region', eu-central-1 ],
-      !Equals [ !Ref 'AWS::Region', eu-west-1 ],
-      !Equals [ !Ref 'AWS::Region', sa-east-1 ],
-      !Equals [ !Ref 'AWS::Region', ap-northeast-1 ],
-      !Equals [ !Ref 'AWS::Region', ap-southeast-2 ]
-    ]
+  NumberOfSubnets1:
+      !Equals [ 1, !Ref NumberOfSubnets ]
+  NumberOfSubnets2:
+      !Equals [ 2, !Ref NumberOfSubnets ]
+  NumberOfSubnets3:
+      !Equals [ 3, !Ref NumberOfSubnets ]
+  NumberOfSubnets4:
+      !Equals [ 4, !Ref NumberOfSubnets ]
+  NumberOfSubnets5:
+      !Equals [ 5, !Ref NumberOfSubnets ]
+  NumberOfSubnets6:
+      !Equals [ 6, !Ref NumberOfSubnets ]
+  Subnet0: !Or
+    - !Condition NumberOfSubnets1
+    - !Condition NumberOfSubnets2
+    - !Condition NumberOfSubnets3
+    - !Condition NumberOfSubnets4
+    - !Condition NumberOfSubnets5
+    - !Condition NumberOfSubnets6
+  Subnet1: !Or
+    - !Condition NumberOfSubnets2
+    - !Condition NumberOfSubnets3
+    - !Condition NumberOfSubnets4
+    - !Condition NumberOfSubnets5
+    - !Condition NumberOfSubnets6
+  Subnet2: !Or
+    - !Condition NumberOfSubnets3
+    - !Condition NumberOfSubnets4
+    - !Condition NumberOfSubnets5
+    - !Condition NumberOfSubnets6
+  Subnet3: !Or
+    - !Condition NumberOfSubnets4
+    - !Condition NumberOfSubnets5
+    - !Condition NumberOfSubnets6
+  Subnet4: !Or
+    - !Condition NumberOfSubnets5
+    - !Condition NumberOfSubnets6
+  Subnet5: !Condition NumberOfSubnets6
 
 Resources:
   
@@ -98,11 +126,27 @@ Resources:
     Properties:
       Scheme: internet-facing
       Subnets:
-        !If [
-          MoreThan2AZ,
-          [ !Ref PublicSubnet0, !Ref PublicSubnet1, !Ref PublicSubnet2 ],
-          [ !Ref PublicSubnet0, !Ref PublicSubnet1 ]
-        ]
+        !If
+          [ NumberOfSubnets1,
+          [ !Select [ 0, !Ref Subnet ] ],
+          !If
+            [ NumberOfSubnets2,
+            [ !Select [ 0, !Ref Subnet ], !Select [ 1, !Ref Subnet ] ],
+            !If
+              [ NumberOfSubnets3,
+              [ !Select [ 0, !Ref Subnet ], !Select [ 1, !Ref Subnet ], !Select [ 2, !Ref Subnet ] ],
+              !If
+                [ NumberOfSubnets4,
+                [ !Select [ 0, !Ref Subnet ], !Select [ 1, !Ref Subnet ], !Select [ 2, !Ref Subnet ], !Select [ 3, !Ref Subnet ] ],
+                !If
+                  [ NumberOfSubnets5,
+                  [ !Select [ 0, !Ref Subnet ], !Select [ 1, !Ref Subnet ], !Select [ 2, !Ref Subnet ], !Select [ 3, !Ref Subnet ], !Select [ 4, !Ref Subnet ] ],
+                  [ !Select [ 0, !Ref Subnet ], !Select [ 1, !Ref Subnet ], !Select [ 2, !Ref Subnet ], !Select [ 3, !Ref Subnet ], !Select [ 4, !Ref Subnet ], !Select [ 5, !Ref Subnet ] ]
+                  ]
+                ]
+              ]
+            ]
+          ]
       LoadBalancerAttributes:
       - Key: idle_timeout.timeout_seconds
         Value: 60
@@ -117,7 +161,7 @@ Resources:
       HealthCheckIntervalSeconds: 30
       HealthCheckPath: /wp-login.php
       HealthCheckTimeoutSeconds: 5
-      Name: 'WordPressPublicAlb'
+      Name: !Join [ '', [ 'PublicALB-', !Ref Vpc ] ]
       Port: 80
       Protocol: HTTP
       Tags:
@@ -137,6 +181,9 @@ Outputs:
   PublicAlbDnsName:
     Value:
       !GetAtt PublicApplicationLoadBalancer.DNSName
+  PublicAlbFullName:
+    Value:
+      !GetAtt PublicApplicationLoadBalancer.LoadBalancerFullName
   PublicAlbHostname:
     Value:
       !If [ NoSslCertificate, !Join [ '', [ 'http://', !GetAtt PublicApplicationLoadBalancer.DNSName ] ], !Join [ '', [ 'https://', !GetAtt PublicApplicationLoadBalancer.DNSName ] ] ]

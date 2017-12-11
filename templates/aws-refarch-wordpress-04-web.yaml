@@ -10,14 +10,14 @@ Metadata:
     - Label:
         default: Web Parameters
       Parameters:
-        - KeyName
+        - PHPVersion
+        - EC2KeyName
         - WebInstanceType
         - WebAsgMax
         - WebAsgMin
         - WebSecurityGroup
-        - WebSubnet0
-        - WebSubnet1
-        - WebSubnet2
+        - NumberOfSubnets
+        - Subnet
         - PublicAlbTargetGroupArn
         - PublicAlbHostname
         - SslCertificate
@@ -53,14 +53,20 @@ Metadata:
         default: DB Name
       ElasticFileSystem:
         default: EFS File System
-      KeyName:
+      EC2KeyName:
         default: Existing Key Pair
+      NumberOfSubnets:
+        default: Number of subnets
+      PHPVersion:
+        default: PHP Version
       PublicAlbTargetGroupArn:
         default: Public Alb Target Group Arn
       PublicAlbHostname:
         default: Public Alb Hostname
       SslCertificate:
         default: ACM Cert attached to Public Alb
+      Subnet:
+        default: Subnets
       WebAsgMax:
         default: Web ASG Max
       WebAsgMin:
@@ -69,12 +75,6 @@ Metadata:
         default: Web Instance Type
       WebSecurityGroup:
         default: Web Security Group
-      WebSubnet0:
-        default: Web Subnet for AZ 0
-      WebSubnet1:
-        default: Web Subnet for AZ 1
-      WebSubnet2:
-        default: Web Subnet for AZ 2
       WPAdminEmail:
         default: Admin Email
       WPAdminPassword:
@@ -118,11 +118,29 @@ Parameters:
     AllowedPattern: ^(fs-)([a-z0-9]{8})$
     Description: The Amazon EFS file system id.
     Type: String
-  KeyName:
+  EC2KeyName:
     AllowedPattern: ^([a-zA-Z0-9 @.`~!#$%^&*()_+,\\-])*$
     ConstraintDescription: Must be letters (upper or lower), numbers, and special characters.
     Description: Name of an EC2 KeyPair. Your bastion & Web instances will launch with this KeyPair.
     Type: AWS::EC2::KeyPair::KeyName
+  NumberOfSubnets:
+    AllowedValues:
+    - 2
+    - 3
+    - 4
+    - 5
+    - 6
+    Default: 3
+    Description: Number of subnets. This must match your selections in the list of subnets below.
+    Type: String 
+  PHPVersion:
+    AllowedValues:
+    - 5.5
+    - 5.6
+    - 7.0
+    Default: 7.0
+    Description: The version of PHP to install.
+    Type: String 
   PublicAlbTargetGroupArn:
     Description: The public application load balancer target group arn.
     Type: String
@@ -137,6 +155,9 @@ Parameters:
     Description: Is there an ACM SSL Certificate attached to the Public Alb?
     Type:
       String
+  Subnet:
+    Description: Select existing subnets. The number selected must match the number of subnets above. Subnets selected must be in separate AZs.
+    Type: List<AWS::EC2::Subnet::Id>
   WebAsgMax:
     AllowedPattern: ^((?!0$)[1-2]?[0-9]|30)$
     ConstraintDescription: Must be a number between 1 and 30.
@@ -151,24 +172,95 @@ Parameters:
     Type: String
   WebInstanceType:
     AllowedValues:
-      - t2.micro
-      - t2.small
-      - t2.medium
-      - t2.large
-      - m4.large
-      - m4.xlarge
-      - m4.2xlarge
-      - m4.4xlarge
-      - m4.10xlarge
-      - m3.medium
-      - m3.large
-      - m3.xlarge
-      - m3.2xlarge
-      - r3.large
-      - r3.xlarge
-      - r3.2xlarge
-      - r3.4xlarge
-      - r3.8xlarge
+    - t2.nano 
+    - t2.micro 
+    - t2.small 
+    - t2.medium 
+    - t2.large 
+    - t2.xlarge 
+    - t2.2xlarge 
+    - m3.medium 
+    - m3.large 
+    - m3.xlarge 
+    - m3.2xlarge 
+    - m4.large 
+    - m4.xlarge 
+    - m4.2xlarge 
+    - m4.4xlarge 
+    - m4.10xlarge 
+    - m4.16xlarge 
+    - m5.large 
+    - m5.xlarge 
+    - m5.2xlarge 
+    - m5.4xlarge 
+    - m5.12xlarge 
+    - m5.24xlarge 
+    - c3.large 
+    - c3.xlarge 
+    - c3.2xlarge 
+    - c3.4xlarge 
+    - c3.8xlarge 
+    - c4.large 
+    - c4.xlarge 
+    - c4.2xlarge 
+    - c4.4xlarge 
+    - c4.8xlarge 
+    - c5.large 
+    - c5.xlarge 
+    - c5.2xlarge 
+    - c5.4xlarge 
+    - c5.9xlarge 
+    - c5.18xlarge
+    - r3.large 
+    - r3.xlarge 
+    - r3.2xlarge 
+    - r3.4xlarge 
+    - r3.8xlarge 
+    - r4.large 
+    - r4.xlarge 
+    - r4.2xlarge 
+    - r4.4xlarge 
+    - r4.8xlarge 
+    - r4.16xlarge 
+    - x1.16xlarge 
+    - x1.32xlarge 
+    - x1e.xlarge 
+    - x1e.2xlarge 
+    - x1e.4xlarge 
+    - x1e.8xlarge 
+    - x1e.16xlarge 
+    - x1e.32xlarge
+    - d2.xlarge 
+    - d2.2xlarge 
+    - d2.4xlarge 
+    - d2.8xlarge 
+    - h1.2xlarge 
+    - h1.4xlarge 
+    - h1.8xlarge 
+    - h1.16xlarge 
+    - i2.xlarge 
+    - i2.2xlarge 
+    - i2.4xlarge 
+    - i2.8xlarge 
+    - i3.large 
+    - i3.xlarge 
+    - i3.2xlarge 
+    - i3.4xlarge 
+    - i3.8xlarge 
+    - i3.16xlarge
+    - f1.2xlarge 
+    - f1.16xlarge 
+    - g2.2xlarge 
+    - g2.8xlarge 
+    - g3.4xlarge 
+    - g3.8xlarge 
+    - g3.16xlarge 
+    - p2.xlarge 
+    - p2.8xlarge 
+    - p2.16xlarge 
+    - p3.2xlarge 
+    - p3.8xlarge 
+    - p3.16xlarge
     ConstraintDescription: Must be a valid Amazon EC2 instance type.
     Default: t2.large
     Description: The Amazon EC2 instance type for your web instances.
@@ -176,15 +268,6 @@ Parameters:
   WebSecurityGroup:
     Description: Select the web security group.
     Type: AWS::EC2::SecurityGroup::Id
-  WebSubnet0:
-    Description: Select an existing web subnet for AZ 0.
-    Type: AWS::EC2::Subnet::Id
-  WebSubnet1:
-    Description: Select an existing web subnet for AZ 1.
-    Type: AWS::EC2::Subnet::Id 
-  WebSubnet2:
-    Description: Select an existing web subnet for AZ 2.
-    Type: AWS::EC2::Subnet::Id
   WPAdminEmail:
     AllowedPattern: ^(([^<>()\[\]\\.,;:\s@"]+(\.[^<>()\[\]\\.,;:\s@"]+)*)|(".+"))@((\[[0-9]{1,3}\.[0-9]{1,3}\.[0-9]{1,3}\.[0-9]{1,3}])|(([a-zA-Z\-0-9]+\.)+[a-zA-Z]{2,}))$
     Description: The WordPress admin email address.
@@ -220,17 +303,50 @@ Conditions:
 
   NoSslCertificate:
     !Equals [ False, !Ref SslCertificate ]
-  MoreThan2AZ:
-    !Or [
-      !Equals [ !Ref 'AWS::Region', us-east-1 ],
-      !Equals [ !Ref 'AWS::Region', us-east-2 ],
-      !Equals [ !Ref 'AWS::Region', us-west-2 ],
-      !Equals [ !Ref 'AWS::Region', eu-central-1 ],
-      !Equals [ !Ref 'AWS::Region', eu-west-1 ],
-      !Equals [ !Ref 'AWS::Region', sa-east-1 ],
-      !Equals [ !Ref 'AWS::Region', ap-northeast-1 ],
-      !Equals [ !Ref 'AWS::Region', ap-southeast-2 ]
-    ]
+  NumberOfSubnets1:
+    !Equals [ 1, !Ref NumberOfSubnets ]
+  NumberOfSubnets2:
+    !Equals [ 2, !Ref NumberOfSubnets ]
+  NumberOfSubnets3:
+    !Equals [ 3, !Ref NumberOfSubnets ]
+  NumberOfSubnets4:
+    !Equals [ 4, !Ref NumberOfSubnets ]
+  NumberOfSubnets5:
+    !Equals [ 5, !Ref NumberOfSubnets ]
+  NumberOfSubnets6:
+    !Equals [ 6, !Ref NumberOfSubnets ]
+  PHP55:
+    !Equals [ 5.5, !Ref PHPVersion ]
+  PHP56:
+    !Equals [ 5.6, !Ref PHPVersion ]
+  PHP70:
+    !Equals [ 7.0, !Ref PHPVersion ]
+  Subnet0: !Or
+    - !Condition NumberOfSubnets1
+    - !Condition NumberOfSubnets2
+    - !Condition NumberOfSubnets3
+    - !Condition NumberOfSubnets4
+    - !Condition NumberOfSubnets5
+    - !Condition NumberOfSubnets6
+  Subnet1: !Or
+    - !Condition NumberOfSubnets2
+    - !Condition NumberOfSubnets3
+    - !Condition NumberOfSubnets4
+    - !Condition NumberOfSubnets5
+    - !Condition NumberOfSubnets6
+  Subnet2: !Or
+    - !Condition NumberOfSubnets3
+    - !Condition NumberOfSubnets4
+    - !Condition NumberOfSubnets5
+    - !Condition NumberOfSubnets6
+  Subnet3: !Or
+    - !Condition NumberOfSubnets4
+    - !Condition NumberOfSubnets5
+    - !Condition NumberOfSubnets6
+  Subnet4: !Or
+    - !Condition NumberOfSubnets5
+    - !Condition NumberOfSubnets6
+  Subnet5: !Condition NumberOfSubnets6
   NoWPDomainName:
     !Equals [ '', !Ref WPDomainName ]
 
@@ -238,33 +354,33 @@ Mappings:
 
   RegionMap:
     ap-northeast-1:
-      AMI: ami-3bd3c45c
+      AMI: ami-da9e2cbc
     ap-northeast-2:
-      AMI: ami-e21cc38c
+      AMI: ami-1196317f
     ap-south-1:
-      AMI: ami-47205e28
+      AMI: ami-d5c18eba
     ap-southeast-1:
-      AMI: ami-77af2014
+      AMI: ami-c63d6aa5
     ap-southeast-2:
-      AMI: ami-10918173
+      AMI: ami-ff4ea59d
     ca-central-1:
-      AMI: ami-a7aa15c3
+      AMI: ami-d29e25b6
     eu-central-1:
-      AMI: ami-82be18ed
+      AMI: ami-bf2ba8d0
     eu-west-1:
-      AMI: ami-d7b9a2b1
+      AMI: ami-1a962263
     eu-west-2:
-      AMI: ami-ed100689
+      AMI: ami-e7d6c983
     sa-east-1:
-      AMI: ami-87dab1eb
+      AMI: ami-286f2a44
     us-east-1:
-      AMI: ami-a4c7edb2
+      AMI: ami-55ef662f
     us-east-2:
-      AMI: ami-8a7859ef
+      AMI: ami-15e9c770
     us-west-1:
-      AMI: ami-327f5352
+      AMI: ami-a51f27c5
     us-west-2:
-      AMI: ami-6df1e514
+      AMI: ami-bf4193c7
 
 Resources:
 
@@ -306,7 +422,16 @@ Resources:
       Cooldown: 60
       HealthCheckGracePeriod: 120
       HealthCheckType: ELB
-      LaunchConfigurationName: !Ref WebLaunchConfiguration
+      LaunchConfigurationName:
+        !If
+          [ PHP55,
+          !Ref WebLaunchConfiguration55,
+          !If
+            [ PHP56,
+            !Ref WebLaunchConfiguration56,
+            !Ref WebLaunchConfiguration70
+            ]          
+          ]
       MaxSize: !Ref WebAsgMax
       MinSize: !Ref WebAsgMin
       Tags:
@@ -316,16 +441,397 @@ Resources:
       TargetGroupARNs:
         - !Ref PublicAlbTargetGroupArn
       VPCZoneIdentifier:
-        !If [
-          MoreThan2AZ,
-          [ !Ref WebSubnet0, !Ref WebSubnet1, !Ref WebSubnet2 ],
-          [ !Ref WebSubnet0, !Ref WebSubnet1 ]
-        ]
+        !If
+          [ NumberOfSubnets1,
+          [ !Select [ 0, !Ref Subnet ] ],
+          !If
+            [ NumberOfSubnets2,
+            [ !Select [ 0, !Ref Subnet ], !Select [ 1, !Ref Subnet ] ],
+            !If
+              [ NumberOfSubnets3,
+              [ !Select [ 0, !Ref Subnet ], !Select [ 1, !Ref Subnet ], !Select [ 2, !Ref Subnet ] ],
+              !If
+                [ NumberOfSubnets4,
+                [ !Select [ 0, !Ref Subnet ], !Select [ 1, !Ref Subnet ], !Select [ 2, !Ref Subnet ], !Select [ 3, !Ref Subnet ] ],
+                !If
+                  [ NumberOfSubnets5,
+                  [ !Select [ 0, !Ref Subnet ], !Select [ 1, !Ref Subnet ], !Select [ 2, !Ref Subnet ], !Select [ 3, !Ref Subnet ], !Select [ 4, !Ref Subnet ] ],
+                  [ !Select [ 0, !Ref Subnet ], !Select [ 1, !Ref Subnet ], !Select [ 2, !Ref Subnet ], !Select [ 3, !Ref Subnet ], !Select [ 4, !Ref Subnet ], !Select [ 5, !Ref Subnet ] ]
+                  ]
+                ]
+              ]
+            ]
+          ]
     CreationPolicy:
       ResourceSignal:
         Count: !Ref WebAsgMin
         Timeout: PT5M
-  WebLaunchConfiguration:
+  WebLaunchConfiguration55:
+    Condition: PHP55
+    Type: AWS::AutoScaling::LaunchConfiguration
+    Metadata:
+      AWS::CloudFormation::Init:
+        configSets:
+          deploy_webserver:
+            - install_webserver
+            - build_cacheclient
+            - build_wordpress
+            - build_opcache
+            - install_cacheclient
+            - install_wordpress
+            - install_opcache
+            - start_webserver
+        install_webserver:
+          packages:
+            yum:
+              awslogs: []
+              httpd24: []
+              mysql56: []
+              php55: []
+              php55-mysqlnd: []
+          files:
+            /tmp/create_site_conf.sh:
+              content:
+                !Join [
+                  "",[
+                    "#!/bin/bash -xe\n",
+                    "if [ ! -f /etc/httpd/conf.d/", !Ref WPDirectory, ".conf ]; then\n",                    
+                    "   touch /etc/httpd/conf.d/", !Ref WPDirectory, ".conf\n",
+                    "   echo 'ServerName 127.0.0.1:80' >> /etc/httpd/conf.d/", !Ref WPDirectory, ".conf\n",
+                    "   echo 'DocumentRoot /var/www/wordpress/", !Ref WPDirectory, "' >> /etc/httpd/conf.d/", !Ref WPDirectory, ".conf\n",
+                    "   echo '<Directory /var/www/wordpress/", !Ref WPDirectory, ">' >> /etc/httpd/conf.d/", !Ref WPDirectory, ".conf\n",
+                    "   echo '  Options Indexes FollowSymLinks' >> /etc/httpd/conf.d/", !Ref WPDirectory, ".conf\n",
+                    "   echo '  AllowOverride All' >> /etc/httpd/conf.d/", !Ref WPDirectory, ".conf\n",
+                    "   echo '  Require all granted' >> /etc/httpd/conf.d/", !Ref WPDirectory, ".conf\n",
+                    "   echo '</Directory>' >> /etc/httpd/conf.d/", !Ref WPDirectory, ".conf\n",
+                    "fi\n"
+                  ]
+                ]
+              mode: 000500
+              owner: root
+              group: root
+          commands:
+            create_site_conf:
+              command: ./create_site_conf.sh
+              cwd: /tmp
+              ignoreErrors: false
+        build_cacheclient:
+          packages:
+            yum:
+              gcc-c++: []  
+          files:
+            /tmp/install_cacheclient.sh:
+              content:
+                !Sub |
+                  #!/bin/bash -xe
+                  wget -P /tmp/ https://s3.amazonaws.com/aws-refarch/wordpress/latest/bits/AmazonElastiCacheClusterClient-1.0.1-PHP55-64bit.tgz
+                  tar -xf '/tmp/AmazonElastiCacheClusterClient-1.0.1-PHP55-64bit.tgz'
+                  cp '/tmp/AmazonElastiCacheClusterClient-1.0.0/amazon-elasticache-cluster-client.so' /usr/lib64/php/5.5/modules/
+                  if [ ! -f /etc/php-5.5.d/50-memcached.ini ]; then
+                      touch /etc/php-5.5.d/50-memcached.ini
+                  fi
+                  sed -i '3i extension=/usr/lib64/php/5.5/modules/amazon-elasticache-cluster-client.so;' /etc/php-5.5.d/50-memcached.ini
+                  sed -i '3i extension=igbinary.so;' /etc/php-5.5.d/50-memcached.ini
+              mode: 000500
+              owner: root
+              group: root
+        build_opcache:
+          packages:
+            yum:
+              php55-opcache: []
+          files:
+            /tmp/install_opcache.sh:
+              content:
+                !Sub |
+                  #!/bin/bash -xe
+                  # create hidden opcache directory locally & change owner to apache
+                  if [ ! -d /var/www/.opcache ]; then                    
+                      mkdir -p /var/www/.opcache
+                  fi
+                  # enable opcache in /etc/php-5.5.d/opcache.ini
+                  sed -i 's/;opcache.file_cache=.*/opcache.file_cache=\/var\/www\/.opcache/' /etc/php-5.5.d/opcache.ini
+                  sed -i 's/opcache.memory_consumption=.*/opcache.memory_consumption=512/' /etc/php-5.5.d/opcache.ini
+                  # download opcache-instance.php to verify opcache status
+                  if [ ! -f /var/www/wordpress/${WPDirectory}/opcache-instanceid.php ]; then
+                      wget -P /var/www/wordpress/${WPDirectory}/ https://s3.amazonaws.com/aws-refarch/wordpress/latest/bits/opcache-instanceid.php
+                  fi
+              mode: 000500
+              owner: root
+              group: root
+        build_wordpress:
+          files:
+            /tmp/install_wordpress.sh:
+              content:
+                !Join [
+                  "",[
+                    "#!/bin/bash -xe\n",
+                    "\n",
+                    "# install wp-cli\n",
+                    "if [ ! -f /bin/wp/wp-cli.phar ]; then\n",
+                    "   curl -o /bin/wp https://raw.githubusercontent.com/wp-cli/builds/gh-pages/phar/wp-cli.phar\n",
+                    "   chmod +x /bin/wp\n",
+                    "fi\n",
+                    "\n",
+                    "# make site directory\n",
+                    "if [ ! -d /var/www/wordpress/", !Ref WPDirectory, " ]; then\n",                    
+                    "   mkdir -p /var/www/wordpress/", !Ref WPDirectory, "\n",
+                    "\n",
+                    "   cd /var/www/wordpress/", !Ref WPDirectory, "\n",
+                    "   # install wordpress if not installed\n",
+                    "   # use public alb host name if wp domain name was empty\n",
+                    "   if ! $(wp core is-installed --allow-root); then\n",
+                    "       wp core download --locale='", !Ref WPLocale, "' --allow-root\n",  
+                    "       wp core config --dbname='", !Ref DatabaseName, "' --dbuser='", !Ref DatabaseMasterUsername, "' --dbpass='", !Ref DatabaseMasterPassword, "' --dbhost='", !Ref DatabaseClusterEndpointAddress, "' --dbprefix=wp_ --allow-root\n",
+                    "       wp core install --url=", !If [ NoWPDomainName, !Ref PublicAlbHostname, !Join [ "", [ "'http://www.", !Ref WPDomainName, "'" ] ] ], " --title='", !Ref WPTitle, "' --admin_user='", !Ref WPAdminUsername, "' --admin_password='", !Ref WPAdminPassword, "' --admin_email='", !Ref WPAdminEmail, "' --skip-email --allow-root\n",
+                    "       sed -i \"/$table_prefix = 'wp_';/ a \\define('WP_HOME', 'http://' . \\$_SERVER['HTTP_HOST']); \" /var/www/wordpress/", !Ref WPDirectory, "/wp-config.php\n",
+                    "       sed -i \"/$table_prefix = 'wp_';/ a \\define('WP_SITEURL', 'http://' . \\$_SERVER['HTTP_HOST']); \" /var/www/wordpress/", !Ref WPDirectory, "/wp-config.php\n",
+                    "       # enable HTTPS in wp-config.php if ACM Public SSL Certificate parameter was not empty\n",
+                            !If [ NoSslCertificate, !Join [ '', [ "       sed -i \"/$table_prefix = 'wp_';/ a \\# No ACM Public SSL Certificate \" /var/www/wordpress/", !Ref WPDirectory, "/wp-config.php\n" ] ] , !Join [ '', [ "       sed -i \"/$table_prefix = 'wp_';/ a \\$_SERVER['HTTPS'] = 'on';\" /var/www/wordpress/", !Ref WPDirectory, "/wp-config.php\n" ] ] ],
+                    "\n",
+                    "       # set permissions of wordpress site directories\n", 
+                    "       chown -R apache:apache /var/www/wordpress/", !Ref WPDirectory, "\n",
+                    "       chmod u+wrx /var/www/wordpress/", !Ref WPDirectory, "/wp-content/*\n",
+                    "       if [ ! -f /var/www/wordpress/", !Ref WPDirectory, "/opcache-instanceid.php ]; then\n",
+                    "         wget -P /var/www/wordpress/", !Ref WPDirectory, "/ https://s3.amazonaws.com/aws-refarch/wordpress/latest/bits/opcache-instanceid.php\n",
+                    "       fi\n",
+                    "   fi\n",
+                    "   RESULT=$?\n",
+                    "   if [ $RESULT -eq 0 ]; then\n",
+                    "       touch /var/www/wordpress/", !Ref WPDirectory, "/wordpress.initialized\n",
+                    "         else\n",
+                    "       touch /var/www/wordpress/", !Ref WPDirectory, "/wordpress.failed\n",
+                    "   fi\n",
+                    "fi\n"
+                  ]
+                ]
+              mode: 000500
+              owner: root
+              group: root
+        install_wordpress:
+          commands:
+            install_wordpress:
+              command: ./install_wordpress.sh
+              cwd: /tmp
+              ignoreErrors: false          
+        install_cacheclient:
+          commands:
+            install_cacheclient:
+              command: ./install_cacheclient.sh
+              cwd: /tmp
+              ignoreErrors: false
+        install_opcache:
+          commands:
+            install_opcache:
+              command: ./install_opcache.sh
+              cwd: /tmp
+              ignoreErrors: false
+        start_webserver:
+          services:
+            sysvinit:
+              httpd:
+                enabled: true
+                ensureRunning: true
+    Properties:
+      IamInstanceProfile: !Ref WebInstanceProfile
+      ImageId: !FindInMap [ RegionMap, !Ref 'AWS::Region', AMI ]
+      InstanceMonitoring: true
+      InstanceType: !Ref WebInstanceType
+      KeyName: !Ref EC2KeyName
+      SecurityGroups:
+      - !Ref WebSecurityGroup
+      UserData:
+        "Fn::Base64":
+          !Sub |
+            #!/bin/bash -xe
+            yum update -y
+            mkdir -p /var/www/wordpress
+            mount -t nfs4 -o nfsvers=4.1,rsize=1048576,wsize=1048576,hard,timeo=600,retrans=2 ${ElasticFileSystem}.efs.${AWS::Region}.amazonaws.com:/ /var/www/wordpress
+            /opt/aws/bin/cfn-init --configsets deploy_webserver --verbose --stack ${AWS::StackName} --resource WebLaunchConfiguration55 --region ${AWS::Region}
+            /opt/aws/bin/cfn-signal --exit-code $? --stack ${AWS::StackName} --resource WebAutoScalingGroup --region ${AWS::Region}
+  WebLaunchConfiguration56:
+    Condition: PHP56
+    Type: AWS::AutoScaling::LaunchConfiguration
+    Metadata:
+      AWS::CloudFormation::Init:
+        configSets:
+          deploy_webserver:
+            - install_webserver
+            - build_cacheclient
+            - build_wordpress
+            - build_opcache
+            - install_cacheclient
+            - install_wordpress
+            - install_opcache
+            - start_webserver
+        install_webserver:
+          packages:
+            yum:
+              awslogs: []
+              httpd24: []
+              mysql56: []
+              php56: []
+              php56-mysqlnd: []
+          files:
+            /tmp/create_site_conf.sh:
+              content:
+                !Join [
+                  "",[
+                    "#!/bin/bash -xe\n",
+                    "if [ ! -f /etc/httpd/conf.d/", !Ref WPDirectory, ".conf ]; then\n",                    
+                    "   touch /etc/httpd/conf.d/", !Ref WPDirectory, ".conf\n",
+                    "   echo 'ServerName 127.0.0.1:80' >> /etc/httpd/conf.d/", !Ref WPDirectory, ".conf\n",
+                    "   echo 'DocumentRoot /var/www/wordpress/", !Ref WPDirectory, "' >> /etc/httpd/conf.d/", !Ref WPDirectory, ".conf\n",
+                    "   echo '<Directory /var/www/wordpress/", !Ref WPDirectory, ">' >> /etc/httpd/conf.d/", !Ref WPDirectory, ".conf\n",
+                    "   echo '  Options Indexes FollowSymLinks' >> /etc/httpd/conf.d/", !Ref WPDirectory, ".conf\n",
+                    "   echo '  AllowOverride All' >> /etc/httpd/conf.d/", !Ref WPDirectory, ".conf\n",
+                    "   echo '  Require all granted' >> /etc/httpd/conf.d/", !Ref WPDirectory, ".conf\n",
+                    "   echo '</Directory>' >> /etc/httpd/conf.d/", !Ref WPDirectory, ".conf\n",
+                    "fi\n"
+                  ]
+                ]
+              mode: 000500
+              owner: root
+              group: root
+          commands:
+            create_site_conf:
+              command: ./create_site_conf.sh
+              cwd: /tmp
+              ignoreErrors: false
+        build_cacheclient:
+          packages:
+            yum:
+              gcc-c++: []  
+          files:
+            /tmp/install_cacheclient.sh:
+              content:
+                !Sub |
+                  #!/bin/bash -xe
+                  wget -P /tmp/ https://s3.amazonaws.com/aws-refarch/wordpress/latest/bits/AmazonElastiCacheClusterClient-1.0.0-PHP56-64bit.tgz
+                  tar -xf '/tmp/AmazonElastiCacheClusterClient-1.0.0-PHP56-64bit.tgz'
+                  cp '/tmp/AmazonElastiCacheClusterClient-1.0.0/amazon-elasticache-cluster-client.so' /usr/lib64/php/5.6/modules/
+                  if [ ! -f /etc/php-5.6.d/50-memcached.ini ]; then
+                      touch /etc/php-5.6.d/50-memcached.ini
+                  fi
+                  sed -i '3i extension=/usr/lib64/php/5.6/modules/amazon-elasticache-cluster-client.so;' /etc/php-5.6.d/50-memcached.ini
+                  sed -i '3i extension=igbinary.so;' /etc/php-5.6.d/50-memcached.ini
+              mode: 000500
+              owner: root
+              group: root
+        build_opcache:
+          packages:
+            yum:
+              php56-opcache: []
+          files:
+            /tmp/install_opcache.sh:
+              content:
+                !Sub |
+                  #!/bin/bash -xe
+                  # create hidden opcache directory locally & change owner to apache
+                  if [ ! -d /var/www/.opcache ]; then                    
+                      mkdir -p /var/www/.opcache
+                  fi
+                  # enable opcache in /etc/php-5.6.d/opcache.ini
+                  sed -i 's/;opcache.file_cache=.*/opcache.file_cache=\/var\/www\/.opcache/' /etc/php-5.6.d/10-opcache.ini
+                  sed -i 's/opcache.memory_consumption=.*/opcache.memory_consumption=512/' /etc/php-5.6.d/10-opcache.ini
+                  # download opcache-instance.php to verify opcache status
+                  if [ ! -f /var/www/wordpress/${WPDirectory}/opcache-instanceid.php ]; then
+                      wget -P /var/www/wordpress/${WPDirectory}/ https://s3.amazonaws.com/aws-refarch/wordpress/latest/bits/opcache-instanceid.php
+                  fi
+              mode: 000500
+              owner: root
+              group: root
+        build_wordpress:
+          files:
+            /tmp/install_wordpress.sh:
+              content:
+                !Join [
+                  "",[
+                    "#!/bin/bash -xe\n",
+                    "\n",
+                    "# install wp-cli\n",
+                    "if [ ! -f /bin/wp/wp-cli.phar ]; then\n",
+                    "   curl -o /bin/wp https://raw.githubusercontent.com/wp-cli/builds/gh-pages/phar/wp-cli.phar\n",
+                    "   chmod +x /bin/wp\n",
+                    "fi\n",
+                    "\n",
+                    "# make site directory\n",
+                    "if [ ! -d /var/www/wordpress/", !Ref WPDirectory, " ]; then\n",                    
+                    "   mkdir -p /var/www/wordpress/", !Ref WPDirectory, "\n",
+                    "\n",
+                    "   cd /var/www/wordpress/", !Ref WPDirectory, "\n",
+                    "   # install wordpress if not installed\n",
+                    "   # use public alb host name if wp domain name was empty\n",
+                    "   if ! $(wp core is-installed --allow-root); then\n",
+                    "       wp core download --locale='", !Ref WPLocale, "' --allow-root\n",  
+                    "       wp core config --dbname='", !Ref DatabaseName, "' --dbuser='", !Ref DatabaseMasterUsername, "' --dbpass='", !Ref DatabaseMasterPassword, "' --dbhost='", !Ref DatabaseClusterEndpointAddress, "' --dbprefix=wp_ --allow-root\n",
+                    "       wp core install --url=", !If [ NoWPDomainName, !Ref PublicAlbHostname, !Join [ "", [ "'http://www.", !Ref WPDomainName, "'" ] ] ], " --title='", !Ref WPTitle, "' --admin_user='", !Ref WPAdminUsername, "' --admin_password='", !Ref WPAdminPassword, "' --admin_email='", !Ref WPAdminEmail, "' --skip-email --allow-root\n",
+                    "       sed -i \"/$table_prefix = 'wp_';/ a \\define('WP_HOME', 'http://' . \\$_SERVER['HTTP_HOST']); \" /var/www/wordpress/", !Ref WPDirectory, "/wp-config.php\n",
+                    "       sed -i \"/$table_prefix = 'wp_';/ a \\define('WP_SITEURL', 'http://' . \\$_SERVER['HTTP_HOST']); \" /var/www/wordpress/", !Ref WPDirectory, "/wp-config.php\n",
+                    "       # enable HTTPS in wp-config.php if ACM Public SSL Certificate parameter was not empty\n",
+                            !If [ NoSslCertificate, !Join [ '', [ "       sed -i \"/$table_prefix = 'wp_';/ a \\# No ACM Public SSL Certificate \" /var/www/wordpress/", !Ref WPDirectory, "/wp-config.php\n" ] ] , !Join [ '', [ "       sed -i \"/$table_prefix = 'wp_';/ a \\$_SERVER['HTTPS'] = 'on';\" /var/www/wordpress/", !Ref WPDirectory, "/wp-config.php\n" ] ] ],
+                    "\n",
+                    "       # set permissions of wordpress site directories\n", 
+                    "       chown -R apache:apache /var/www/wordpress/", !Ref WPDirectory, "\n",
+                    "       chmod u+wrx /var/www/wordpress/", !Ref WPDirectory, "/wp-content/*\n",
+                    "       if [ ! -f /var/www/wordpress/", !Ref WPDirectory, "/opcache-instanceid.php ]; then\n",
+                    "         wget -P /var/www/wordpress/", !Ref WPDirectory, "/ https://s3.amazonaws.com/aws-refarch/wordpress/latest/bits/opcache-instanceid.php\n",
+                    "       fi\n",
+                    "   fi\n",
+                    "   RESULT=$?\n",
+                    "   if [ $RESULT -eq 0 ]; then\n",
+                    "       touch /var/www/wordpress/", !Ref WPDirectory, "/wordpress.initialized\n",
+                    "         else\n",
+                    "       touch /var/www/wordpress/", !Ref WPDirectory, "/wordpress.failed\n",
+                    "   fi\n",
+                    "fi\n"
+                  ]
+                ]
+              mode: 000500
+              owner: root
+              group: root
+        install_wordpress:
+          commands:
+            install_wordpress:
+              command: ./install_wordpress.sh
+              cwd: /tmp
+              ignoreErrors: false          
+        install_cacheclient:
+          commands:
+            install_cacheclient:
+              command: ./install_cacheclient.sh
+              cwd: /tmp
+              ignoreErrors: false
+        install_opcache:
+          commands:
+            install_opcache:
+              command: ./install_opcache.sh
+              cwd: /tmp
+              ignoreErrors: false
+        start_webserver:
+          services:
+            sysvinit:
+              httpd:
+                enabled: true
+                ensureRunning: true
+    Properties:
+      IamInstanceProfile: !Ref WebInstanceProfile
+      ImageId: !FindInMap [ RegionMap, !Ref 'AWS::Region', AMI ]
+      InstanceMonitoring: true
+      InstanceType: !Ref WebInstanceType
+      KeyName: !Ref EC2KeyName
+      SecurityGroups:
+      - !Ref WebSecurityGroup
+      UserData:
+        "Fn::Base64":
+          !Sub |
+            #!/bin/bash -xe
+            yum update -y
+            mkdir -p /var/www/wordpress
+            mount -t nfs4 -o nfsvers=4.1,rsize=1048576,wsize=1048576,hard,timeo=600,retrans=2 ${ElasticFileSystem}.efs.${AWS::Region}.amazonaws.com:/ /var/www/wordpress
+            /opt/aws/bin/cfn-init --configsets deploy_webserver --verbose --stack ${AWS::StackName} --resource WebLaunchConfiguration56 --region ${AWS::Region}
+            /opt/aws/bin/cfn-signal --exit-code $? --stack ${AWS::StackName} --resource WebAutoScalingGroup --region ${AWS::Region}
+  WebLaunchConfiguration70:
+    Condition: PHP70
     Type: AWS::AutoScaling::LaunchConfiguration
     Metadata:
       AWS::CloudFormation::Init:
@@ -494,7 +1000,7 @@ Resources:
       ImageId: !FindInMap [ RegionMap, !Ref 'AWS::Region', AMI ]
       InstanceMonitoring: true
       InstanceType: !Ref WebInstanceType
-      KeyName: !Ref KeyName
+      KeyName: !Ref EC2KeyName
       SecurityGroups:
       - !Ref WebSecurityGroup
       UserData:
@@ -504,8 +1010,9 @@ Resources:
             yum update -y
             mkdir -p /var/www/wordpress
             mount -t nfs4 -o nfsvers=4.1,rsize=1048576,wsize=1048576,hard,timeo=600,retrans=2 ${ElasticFileSystem}.efs.${AWS::Region}.amazonaws.com:/ /var/www/wordpress
-            /opt/aws/bin/cfn-init --configsets deploy_webserver --verbose --stack ${AWS::StackName} --resource WebLaunchConfiguration --region ${AWS::Region}
+            /opt/aws/bin/cfn-init --configsets deploy_webserver --verbose --stack ${AWS::StackName} --resource WebLaunchConfiguration70 --region ${AWS::Region}
             /opt/aws/bin/cfn-signal --exit-code $? --stack ${AWS::StackName} --resource WebAutoScalingGroup --region ${AWS::Region}
+
 
 Outputs:
 
