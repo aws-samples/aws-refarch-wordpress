@@ -27,7 +27,7 @@ The repository consists of a set of nested templates which are run in order from
 
 ## Update
 
-Please refer to [history.md](history.md)for a detailed list of changes in 2.0.1.
+Please refer to [history.md](/HISTORY.md) for a detailed list of changes in 2.0.1.
 
 ## Parameters
 
