@@ -58,9 +58,13 @@ Create a custom .ini file that includes PHP overrides and make it publically ava
 ; Enable php.ini overrides for hosting WordPress on AWS - https://github.com/awslabs/aws-refarch-wordpress
 
 memory_limit = 128M
+
 post_max_size = 0
+
 upload_max_filesize = 64M
+
 max_input_time = 60
+
 max_execution_time = 30
 
 #### New EFS resources & dashboard
