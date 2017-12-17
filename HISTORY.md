@@ -18,6 +18,7 @@ Published Date: 2017-12-16
   - 4.7
   - 4.8
   - 4.9
+
 - Added a string field to an S3 object php.ini overrides file. Use the full https path of the object (e.g. https://s3.amazonaws.com/aws-refarch/wordpress/latest/bits/20-aws.ini).
 - updated samples parameter file
 - added sample 20-aws.ini to the samples directory
@@ -25,7 +26,8 @@ Published Date: 2017-12-16
 ## WordPress Web Template
 Review the template here [aws-refarch-wordpress-04-web.yaml](templates/aws-refarch-wordpress-04-web.yaml)
 
-- Added WordPress version selection (latest, nightly, 4.5, 4.6, 4.7, 4.8, 4.9) - Added field to enter full https path of php.ini overrides file (e.g. https://s3.amazonaws.com/aws-refarch/wordpress/latest/bits/20-aws.ini).
+- Added WordPress version selection (latest, nightly, 4.5, 4.6, 4.7, 4.8, 4.9)
+- Added field to enter full https path of php.ini overrides file (e.g. https://s3.amazonaws.com/aws-refarch/wordpress/latest/bits/20-aws.ini).
 
 ---
 Version: 2.0.0
