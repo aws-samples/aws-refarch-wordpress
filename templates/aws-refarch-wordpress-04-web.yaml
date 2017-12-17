@@ -11,6 +11,7 @@ Metadata:
         default: Web Parameters
       Parameters:
         - PHPVersion
+        - PHPIniOverride
         - EC2KeyName
         - WebInstanceType
         - WebAsgMax
@@ -24,6 +25,7 @@ Metadata:
     - Label:
         default: WordPress Parameters
       Parameters:
+        - WPVersion
         - WPTitle
         - WPDomainName
         - WPDirectory
@@ -43,6 +45,8 @@ Metadata:
       Parameters:
         - ElasticFileSystem
     ParameterLabels:
+      PHPIniOverride:
+        default: AWS php.ini Overrides
       DatabaseClusterEndpointAddress:
         default: DB Cluster Endpoint Address
       DatabaseMasterUsername:
@@ -89,6 +93,8 @@ Metadata:
         default: Language Code
       WPTitle:
         default: Site Title
+      WPVersion:
+        default: WordPress Version
 
 Parameters:
 
@@ -133,6 +139,9 @@ Parameters:
     Default: 3
     Description: Number of subnets. This must match your selections in the list of subnets below.
     Type: String 
+  PHPIniOverride:
+    Description: Full Amazon S3 https path to a php.ini override file (e.g. https://s3.amazonaws.com/aws-refarch/wordpress/latest/bits/20-aws.ini)
+    Type: String
   PHPVersion:
     AllowedValues:
     - 5.5
@@ -297,6 +306,18 @@ Parameters:
   WPTitle:
     AllowedPattern: ^([a-zA-Z0-9])([a-zA-Z0-9 _-]*)([a-zA-Z0-9])$
     Description: The WordPress website title.
+    Type: String
+  WPVersion:
+    AllowedValues:
+      - latest
+      - nightly
+      - 4.5
+      - 4.6
+      - 4.7
+      - 4.8
+      - 4.9
+    Default: latest
+    Description: The WordPress version (make sure this version is compatible with the PHP version selected above).
     Type: String
 
 Conditions:
@@ -477,6 +498,8 @@ Resources:
             - build_cacheclient
             - build_wordpress
             - build_opcache
+            - download_aws_ini
+            - install_aws_ini
             - install_cacheclient
             - install_wordpress
             - install_opcache
@@ -607,6 +630,26 @@ Resources:
               mode: 000500
               owner: root
               group: root
+        download_aws_ini: 
+          files:
+            /tmp/download_aws_ini.sh:
+              content:
+                !Join [
+                  "",[
+                    "#!/bin/bash -x\n",
+                    "\n",
+                    "wget -P /etc/php-5.5.d/ ", !Ref PHPIniOverride, "\n"
+                  ]
+                ]
+              mode: 000500
+              owner: root
+              group: root
+        install_aws_ini:
+          commands:
+            install_aws_ini:
+              command: ./download_aws_ini.sh
+              cwd: /tmp
+              ignoreErrors: true
         install_wordpress:
           commands:
             install_wordpress:
@@ -659,6 +702,8 @@ Resources:
             - build_cacheclient
             - build_wordpress
             - build_opcache
+            - download_aws_ini
+            - install_aws_ini
             - install_cacheclient
             - install_wordpress
             - install_opcache
@@ -789,6 +834,26 @@ Resources:
               mode: 000500
               owner: root
               group: root
+        download_aws_ini: 
+          files:
+            /tmp/download_aws_ini.sh:
+              content:
+                !Join [
+                  "",[
+                    "#!/bin/bash -x\n",
+                    "\n",
+                    "wget -P /etc/php-5.6.d/ ", !Ref PHPIniOverride, "\n"
+                  ]
+                ]
+              mode: 000500
+              owner: root
+              group: root
+        install_aws_ini:
+          commands:
+            install_aws_ini:
+              command: ./download_aws_ini.sh
+              cwd: /tmp
+              ignoreErrors: true
         install_wordpress:
           commands:
             install_wordpress:
@@ -841,6 +906,8 @@ Resources:
             - build_cacheclient
             - build_wordpress
             - build_opcache
+            - download_aws_ini
+            - install_aws_ini
             - install_cacheclient
             - install_wordpress
             - install_opcache
@@ -971,6 +1038,26 @@ Resources:
               mode: 000500
               owner: root
               group: root
+        download_aws_ini: 
+          files:
+            /tmp/download_aws_ini.sh:
+              content:
+                !Join [
+                  "",[
+                    "#!/bin/bash -x\n",
+                    "\n",
+                    "wget -P /etc/php-7.0.d/ ", !Ref PHPIniOverride, "\n"
+                  ]
+                ]
+              mode: 000500
+              owner: root
+              group: root
+        install_aws_ini:
+          commands:
+            install_aws_ini:
+              command: ./download_aws_ini.sh
+              cwd: /tmp
+              ignoreErrors: true
         install_wordpress:
           commands:
             install_wordpress:

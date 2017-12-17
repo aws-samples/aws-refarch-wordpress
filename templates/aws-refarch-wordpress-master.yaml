@@ -74,12 +74,14 @@ Metadata:
       Parameters:
         - PublicAlbAcmCertificate
         - PHPVersion
+        - PHPIniOverride
         - WebInstanceType
         - WebAsgMax
         - WebAsgMin
     - Label:
         default: WordPress
       Parameters:
+        - WPVersion
         - WPTitle
         - WPAdminUsername
         - WPAdminPassword
@@ -124,6 +126,8 @@ Metadata:
         default: Cache Cluster Node Type
       EC2KeyName:
         default: EC2 Key Pair
+      PHPIniOverride:
+        default: AWS php.ini Overrides
       PublicAlbAcmCertificate:
         default: ALB Certificate ARN
       SshAccessCidr:
@@ -154,6 +158,8 @@ Metadata:
         default: Site Domain
       WPLocale:
         default: Language Code
+      WPVersion:
+        default: WordPress Version
       AvailabilityZones:
         default: Availability Zones
       NumberOfAZs:
@@ -612,6 +618,9 @@ Parameters:
     ConstraintDescription: Must be letters (upper or lower), numbers, and special characters.
     Description: Name of an EC2 KeyPair. Your bastion & Web instances will launch with this KeyPair.
     Type: AWS::EC2::KeyPair::KeyName
+  PHPIniOverride:
+    Description: Full Amazon S3 https path to a php.ini override file (e.g. https://s3.amazonaws.com/aws-refarch/wordpress/latest/bits/20-aws.ini)
+    Type: String
   PHPVersion:
     AllowedValues:
     - 5.5
@@ -924,6 +933,18 @@ Parameters:
     Default: 10.0.20.0/22
     Description: CIDR block for Web subnet 5 located in Availability Zone 5
     Type: String
+  WPVersion:
+    AllowedValues:
+      - latest
+      - nightly
+      - 4.5
+      - 4.6
+      - 4.7
+      - 4.8
+      - 4.9
+    Default: latest
+    Description: The WordPress version (make sure this version is compatible with the PHP version selected above).
+    Type: String
 
 Conditions:
 
@@ -1223,6 +1244,8 @@ Resources:
           !Ref EC2KeyName
         NumberOfSubnets:
           !Ref NumberOfAZs
+        PHPIniOverride:
+          !Ref PHPIniOverride
         PHPVersion:
           !Ref PHPVersion
         PublicAlbTargetGroupArn:
@@ -1255,6 +1278,8 @@ Resources:
           !Ref WPLocale
         WPTitle:
           !Ref WPTitle
+        WPVersion:
+          !Ref WPVersion
       TemplateURL: https://s3.amazonaws.com/aws-refarch/wordpress/latest/templates/aws-refarch-wordpress-04-web.yaml
 
 Outputs:

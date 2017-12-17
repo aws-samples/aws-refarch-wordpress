@@ -4,9 +4,9 @@
 
 # **Hosting WordPress on AWS**
 
-### Version 2.0.0
+### Version 2.0.1
 
-ara-wp-2.0.0
+ara-wp-2.0.1
 
 ---
 
@@ -27,7 +27,7 @@ The repository consists of a set of nested templates which are run in order from
 
 ## Update
 
-Please refer to history.md for a detailed list of changes in 2.0.0.
+Please refer to history.md for a detailed list of changes in 2.0.1.
 
 ## Parameters
 
@@ -46,6 +46,22 @@ You can launch this CloudFormation stack, using your account, in the following A
 | eu-west-1 |EU (Ireland)| [![cloudformation-launch-stack](images/cloudformation-launch-stack.png)](https://console.aws.amazon.com/cloudformation/home?region=eu-west-1#/stacks/new?stackName=WordPress&templateURL=https://s3.amazonaws.com/aws-refarch/wordpress/latest/templates/aws-refarch-wordpress-master.yaml) |
 | eu-central-1 |EU (Frankfurt)| [![cloudformation-launch-stack](images/cloudformation-launch-stack.png)](https://console.aws.amazon.com/cloudformation/home?region=eu-central-1#/stacks/new?stackName=WordPress&templateURL=https://s3.amazonaws.com/aws-refarch/wordpress/latest/templates/aws-refarch-wordpress-master.yaml) |
 | ap-southeast-2 |AP (Sydney)| [![cloudformation-launch-stack](images/cloudformation-launch-stack.png)](https://console.aws.amazon.com/cloudformation/home?region=ap-southeast-2#/stacks/new?stackName=WordPress&templateURL=https://s3.amazonaws.com/aws-refarch/wordpress/latest/templates/aws-refarch-wordpress-master.yaml) |
+
+#### Select WordPress version
+
+The version of WordPress can be selected. Possible values are latest, nightly, 4.5, 4.6, 4.7, 4.8, 4.9.
+
+#### Override PHP.ini defaults by downloading an overrides ini file from Amazon S3
+
+Create a custom .ini file that includes PHP overrides and make it publically available in an S3 bucket. These could be common overrides like **memory_limit**, **post_max_size**, **upload_max_filesize**, **max_input_time**, **max_execution_time**, etc. Amazon S3 object path should use https format (e.g.https://s3.amazonaws.com/aws-us-east-1/reference-architecture/wordpress/latest/bits/20-aws.ini). Sample PHP overrides are below and in the [samples/20-aws.ini](samples/20-aws.ini) directory.
+
+; Enable php.ini overrides for hosting WordPress on AWS - https://github.com/awslabs/aws-refarch-wordpress
+
+memory_limit = 128M
+post_max_size = 0
+upload_max_filesize = 64M
+max_input_time = 60
+max_execution_time = 30
 
 #### New EFS resources & dashboard
 
