@@ -1,5 +1,47 @@
 ## History
 ---
+Version: 2.0.2
+
+Published Date: 2018-03-06
+
+### Changes
+
+Added functionality to allow multiple WordPress stacks to be launched and running concurrently.
+
+Changed name of sample cli script from aws-refarch-wordpress-sample-cli.sh to aws-refarch-wordpress-sample-cli-newvpc.sh and changed the parameter file and master template referenced in the create-stack command from aws-refarch-wordpress-parameters.json to aws-refarch-wordpress-parameters-newvpc.json and aws-refarch-wordpress-master.yaml to aws-refarch-wordpress-master-newvpc.yaml respectively.
+
+Hint: Will soon be adding a new master template to launch this stack into an existing vpc.
+
+Added more sample values to the aws-refarch-wordpress-parameters-newvpc.json sample parameter file.
+
+Added Author and License metadata to each template.
+
+#### Master Template
+Changed name of master template. Added "-newvpc" suffix.
+[aws-refarch-wordpress-master-newvpc.yaml](templates/aws-refarch-wordpress-master-newvpc.yaml)
+
+- Changed DatabaseMasterUsername MinLength constraint to 8, to align with the minimum length for Amazon RDS. Added "(minimum 8; maximum 16)" to the constraint description.
+
+- Dropped passing the "ElastiCacheClusterName" parameter "!Ref DatabaseName" to the ElastiCache stack. ClusterName attribute is no longer provided when creating AWS::ElastiCache::CacheCluster. This will allow a unique identifier to be generated as the ClusterName.
+
+## RDS Template
+Review the template here [aws-refarch-wordpress-04-web.yaml](templates/aws-refarch-wordpress-04-web.yaml)
+
+- Changed DatabaseMasterUsername MinLength constraint to 8, to align with the minimum length for Amazon RDS. Added "(minimum 8; maximum 16)" to the constraint description.
+
+## ElastiCache Template
+Review the template here [aws-refarch-wordpress-03-elasticache.yaml](templates/aws-refarch-wordpress-03-elasticache.yaml)
+
+- Dropped passing the "ElastiCacheClusterName" parameter "!Ref DatabaseName" to the ElastiCache stack. ClusterName attribute is no longer provided when creating AWS::ElastiCache::CacheCluster. This will allow a unique identifier to be generated as the ClusterName. This will help allow for multiple WordPress stacks to be launched and running concurrently.
+
+- CacheSubnetGroupName attributed is no longer provided when creating AWS::ElastiCache::SubnetGroup. This will allow a unique identifier to be generated as the CacheSubnetGroupName. This will help allow for multiple WordPress stacks to be launched and running concurrently.
+
+## EFS Alarms Template
+Review the template here [aws-refarch-wordpress-03-efsalarms.yaml](templates/aws-refarch-wordpress-03-efsalarms.yaml)
+
+- Added alarm dependencies so alarms will be created serially and not in parallel.
+
+---
 Version: 2.0.1
 
 Published Date: 2017-12-16
