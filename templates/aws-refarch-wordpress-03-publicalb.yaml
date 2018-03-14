@@ -172,7 +172,6 @@ Resources:
       HealthCheckIntervalSeconds: 30
       HealthCheckPath: /wp-login.php
       HealthCheckTimeoutSeconds: 5
-      Name: !Join [ '', [ 'PublicALB-', !Ref Vpc ] ]
       Port: 80
       Protocol: HTTP
       Tags:
