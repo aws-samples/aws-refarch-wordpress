@@ -44,6 +44,7 @@ Metadata:
         - EfsPerformanceMode
         - EfsEncrpytedBoolean
         - EfsCmk
+        - EfsCopyDataFrom
         - EfsGrowth
         - EfsGrowthInstanceType
         - EfsCreateAlarms
@@ -58,6 +59,7 @@ Metadata:
         - DatabaseCmk
         - DatabaseMasterUsername
         - DatabaseMasterPassword
+        - DatabaseRestoreSnapshot
         - DatabaseName
         - UseElastiCacheBoolean
         - ElastiCacheNodeType
@@ -104,6 +106,9 @@ Metadata:
         default: DB Master Password
       DatabaseName:
         default: DB Name
+      DatabaseRestoreSnapshot:
+        Description: The snapshot name to restore from.
+        Type: String
       EfsAlarmsInstanceType:
         default: Instance Type
       EfsCmk:
@@ -114,6 +119,9 @@ Metadata:
         default: Encrpyted EFS?
       EfsGrowth:
         default: Add dummy data (GiB)
+      EfsCopyDataFrom:
+        Description: Clone EFS files from existing EFS (Enter existing EFS file system ID)
+        Type: String
       EfsGrowthInstanceType:
         default: Instance Type
       EfsCriticalThreshold:
@@ -978,6 +986,8 @@ Resources:
           !GetAtt [ securitygroups, Outputs.EfsSecurityGroup ]
         Growth:
           !Ref EfsGrowth
+        EfsCopyDataFrom:
+          !Ref EfsCopyDataFrom
         InstanceType:
           !Ref EfsGrowthInstanceType
         NumberOfSubnets:
@@ -1136,6 +1146,8 @@ Resources:
           !Ref DatabaseMasterUsername
         DatabaseMasterPassword:
           !Ref DatabaseMasterPassword
+        DatabaseRestoreSnapshot:
+          !Ref DatabaseRestoreSnapshot
         DatabaseName:
           !Ref DatabaseName
         DatabaseEncrpytedBoolean:
