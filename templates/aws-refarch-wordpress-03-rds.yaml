@@ -41,6 +41,8 @@ Metadata:
         default: DB Master Username
       DatabaseMasterPassword:
         default: DB Master Password
+      DatabaseRestoreSnapshot:
+        default: Snapshot to restore from
       DatabaseName:
         default: DB Name
       DatabaseSecurityGroup:
@@ -99,6 +101,9 @@ Parameters:
   DatabaseName:
     AllowedPattern: ^([a-zA-Z0-9]*)$
     Description: The Amazon RDS master database name.
+    Type: String
+  DatabaseRestoreSnapshot:
+    Description: The snapshot name to restore from.
     Type: String
   DatabaseSecurityGroup:
     Description: Select the database security group.
@@ -159,6 +164,8 @@ Conditions:
   Subnet5: !Condition NumberOfSubnets6
   UseAWS-ManagedCMK:
     !Equals ['', !Ref DatabaseCmk]
+  NoSnapshot:
+    !Equals ['', !Ref DatabaseRestoreSnapshot]
 
 Resources:
 
@@ -171,10 +178,11 @@ Resources:
       Engine: aurora
       KmsKeyId:
         !If [ UseAWS-ManagedCMK, !Ref 'AWS::NoValue', !Ref DatabaseCmk ]
-      MasterUsername: !Ref DatabaseMasterUsername
-      MasterUserPassword: !Ref DatabaseMasterPassword
+      MasterUsername: !If [ NoSnapshot, !Ref DatabaseMasterUsername, !Ref 'AWS::NoValue']
+      MasterUserPassword: !If [ NoSnapshot, !Ref DatabaseMasterPassword, !Ref 'AWS::NoValue']
       Port: 3306
       StorageEncrypted: !Ref DatabaseEncrpytedBoolean
+      SnapshotIdentifier: !Ref DatabaseRestoreSnapshot
       Tags:
         - Key: Name
           Value: !Join [ '', [ 'WordPress / ', !Ref 'AWS::StackName' ] ]
