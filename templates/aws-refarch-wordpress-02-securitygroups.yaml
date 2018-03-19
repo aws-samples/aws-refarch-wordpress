@@ -133,7 +133,7 @@ Resources:
         - IpProtocol: tcp
           FromPort: 22
           ToPort: 22
-          CidrIp: !Ref SshAccessCidr
+          SourceSecurityGroupId: !Ref BastionSecurityGroup
       VpcId:
         !Ref Vpc
 
