@@ -522,6 +522,8 @@ Resources:
               httpd24: []
               mysql56: []
               php55: []
+              php55-devel: []
+              php55-pear: []
               php55-mysqlnd: []
           files:
             /tmp/create_site_conf.sh:
@@ -558,14 +560,15 @@ Resources:
               content:
                 !Sub |
                   #!/bin/bash -xe
+                  pecl install igbinary
                   wget -P /tmp/ https://s3.amazonaws.com/aws-refarch/wordpress/latest/bits/AmazonElastiCacheClusterClient-1.0.1-PHP55-64bit.tgz
                   tar -xf '/tmp/AmazonElastiCacheClusterClient-1.0.1-PHP55-64bit.tgz'
                   cp '/tmp/AmazonElastiCacheClusterClient-1.0.0/amazon-elasticache-cluster-client.so' /usr/lib64/php/5.5/modules/
                   if [ ! -f /etc/php-5.5.d/50-memcached.ini ]; then
                       touch /etc/php-5.5.d/50-memcached.ini
                   fi
-                  sed -i '3i extension=/usr/lib64/php/5.5/modules/amazon-elasticache-cluster-client.so;' /etc/php-5.5.d/50-memcached.ini
-                  sed -i '3i extension=igbinary.so;' /etc/php-5.5.d/50-memcached.ini
+                  echo 'extension=igbinary.so;' >> /etc/php-5.5.d/50-memcached.ini
+                  echo 'extension=/usr/lib64/php/5.5/modules/amazon-elasticache-cluster-client.so;' >> /etc/php-5.5.d/50-memcached.ini
               mode: 000500
               owner: root
               group: root
@@ -726,6 +729,8 @@ Resources:
               httpd24: []
               mysql56: []
               php56: []
+              php56-devel: []
+              php56-pear: []
               php56-mysqlnd: []
           files:
             /tmp/create_site_conf.sh:
@@ -762,14 +767,15 @@ Resources:
               content:
                 !Sub |
                   #!/bin/bash -xe
+                  pecl install igbinary
                   wget -P /tmp/ https://s3.amazonaws.com/aws-refarch/wordpress/latest/bits/AmazonElastiCacheClusterClient-1.0.0-PHP56-64bit.tgz
                   tar -xf '/tmp/AmazonElastiCacheClusterClient-1.0.0-PHP56-64bit.tgz'
                   cp '/tmp/AmazonElastiCacheClusterClient-1.0.0/amazon-elasticache-cluster-client.so' /usr/lib64/php/5.6/modules/
                   if [ ! -f /etc/php-5.6.d/50-memcached.ini ]; then
                       touch /etc/php-5.6.d/50-memcached.ini
                   fi
-                  sed -i '3i extension=/usr/lib64/php/5.6/modules/amazon-elasticache-cluster-client.so;' /etc/php-5.6.d/50-memcached.ini
-                  sed -i '3i extension=igbinary.so;' /etc/php-5.6.d/50-memcached.ini
+                  echo 'extension=igbinary.so;' >> /etc/php-5.6.d/50-memcached.ini
+                  echo 'extension=/usr/lib64/php/5.6/modules/amazon-elasticache-cluster-client.so;' >> /etc/php-5.6.d/50-memcached.ini
               mode: 000500
               owner: root
               group: root
@@ -930,6 +936,8 @@ Resources:
               httpd24: []
               mysql56: []
               php70: []
+              php70-devel: []
+              php7-pear: []
               php70-mysqlnd: []
           files:
             /tmp/create_site_conf.sh:
@@ -966,14 +974,16 @@ Resources:
               content:
                 !Sub |
                   #!/bin/bash -xe
+                  ln -s /usr/bin/pecl7 /usr/bin/pecl #just so pecl is available easily
+                  pecl7 install igbinary
                   wget -P /tmp/ https://s3.amazonaws.com/aws-refarch/wordpress/latest/bits/AmazonElastiCacheClusterClient-2.0.1-PHP70-64bit.tar.gz
                   tar -xf '/tmp/AmazonElastiCacheClusterClient-2.0.1-PHP70-64bit.tar.gz'
                   cp '/tmp/artifact/amazon-elasticache-cluster-client.so' /usr/lib64/php/7.0/modules/
                   if [ ! -f /etc/php-7.0.d/50-memcached.ini ]; then
                       touch /etc/php-7.0.d/50-memcached.ini
                   fi
-                  sed -i '3i extension=/usr/lib64/php/7.0/modules/amazon-elasticache-cluster-client.so;' /etc/php-7.0.d/50-memcached.ini
-                  sed -i '3i extension=igbinary.so;' /etc/php-7.0.d/50-memcached.ini
+                  echo 'extension=igbinary.so;' >> /etc/php-7.0.d/50-memcached.ini
+                  echo 'extension=/usr/lib64/php/7.0/modules/amazon-elasticache-cluster-client.so;' >> /etc/php-7.0.d/50-memcached.ini
               mode: 000500
               owner: root
               group: root
