@@ -195,7 +195,7 @@ Review the template here [aws-refarch-wordpress-master.yaml](templates/aws-refar
 - Database Name
 - Database Master Username
 - Database Master Password
-- DB Restore from Snapshot, find the cluster Snapshot name in the RDS console. (formatted rds:wordpress-stack-name-rds-xxxxxxxx-databasecluster-apzdbrozmzcn-2018-03-16-06-59)
+- DB Restore from Snapshot, find the cluster Snapshot name in the RDS console. (formatted rds:wordpress-stack-name-rds-xxxxxxxx-databasecluster-apzdbrozmzcn-snapshot-date)
 - Database Size
 - Database Instance Class Type
 - Encrypted database storage (boolean)
