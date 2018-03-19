@@ -182,7 +182,7 @@ Resources:
       MasterUserPassword: !If [ NoSnapshot, !Ref DatabaseMasterPassword, !Ref 'AWS::NoValue']
       Port: 3306
       StorageEncrypted: !Ref DatabaseEncrpytedBoolean
-      SnapshotIdentifier: !Ref DatabaseRestoreSnapshot
+      SnapshotIdentifier: !If [ NoSnapshot, !Ref 'AWS::NoValue', !Ref DatabaseRestoreSnapshot]
       Tags:
         - Key: Name
           Value: !Join [ '', [ 'WordPress / ', !Ref 'AWS::StackName' ] ]
