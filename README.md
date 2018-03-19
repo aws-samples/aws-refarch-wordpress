@@ -67,6 +67,12 @@ max_input_time = 60
 
 max_execution_time = 30
 
+#### Using Bastion to access Wordpress instances
+
+From the EC2 console, navigate to Auto Scaling groups and find the Bastion launch configuration for your stack. Edit the launch configuration and set the desired instances to 1. Press Save and the Bastion instance will be created. Bastion is a gateway to your instances for enhanced security. 
+
+The Wordpress CLI is enabled on each instance, SSH into Bastion, then SSH into an instance. From the wordpress install directory `/var/www/wordpress/<site directory>` use the `wp` command to interact with your wordpress install.
+
 #### Amazon EFS resources & dashboard
 
 This AWS Cloudformation template, and nested templates, will create an Amazon EFS file system and other AWS resources to monitor and send notifications if the burst credit balance of the file system drops below predefined thresholds. These alarms and other AWS CloudWatch metrics, including a file system size custom metric are added as widgets to a CloudWatch dashboard.
@@ -177,6 +183,7 @@ Review the template here [aws-refarch-wordpress-master.yaml](templates/aws-refar
 - Amazon EFS performance mode
 - Encrypted file system (boolean)
 - AWS KMS Customer Master Key ARN (if enabling encryption and using customer-managed CMK)
+- Clone EFS, use the System ID of an existing EFS Filesystem. The data is copied to the Site Directory. If the Site Directory exists on the source filesystem, only the contents of the site directory are copied. So make sure if you are copying from an existing Wordpress Cloudformation template, that the site directory is the same.
 - Add dummy data to the file system to achieve higher throughput & IOPS beyond the amount of data your WordPress environment will use. This value is in GiB.
 - The instance type that will be used to dd dummy data into the file system
 - Select if you want to create alarms that send SNS notifications when the file system's burst credit balance drops below certain thresholds.
@@ -188,6 +195,7 @@ Review the template here [aws-refarch-wordpress-master.yaml](templates/aws-refar
 - Database Name
 - Database Master Username
 - Database Master Password
+- DB Restore from Snapshot, find the cluster Snapshot name in the RDS console. 
 - Database Size
 - Database Instance Class Type
 - Encrypted database storage (boolean)
@@ -211,6 +219,7 @@ Review the template here [aws-refarch-wordpress-master.yaml](templates/aws-refar
 - WordPress Administrator Username
 - WordPress Administrator Username Password
 - WordPress Main Language of the site
+- Wordpress Site Directory
 
 ## Master Template
 The master template receives all input parameters and passes them to the appropriate nested template which are executed in order based on dependencies.
