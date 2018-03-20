@@ -131,7 +131,30 @@ To learn more about OPcache, please read http://php.net/manual/en/book.opcache.p
 
 #### Offloading Static Assets
 
-WordPress has a large partner ecosystem to further enhance the usability, performance, and ease of maintenance of WordPress deployments. Plugins, like W3TotalCache, allow you to leverage other AWS services like Amazon S3 and Amazon CloudFront to offload and store static content. Others may like the simplicity of storing all content on Amazon EFS and avoid installing and managing 3rd party plugins. 
+WordPress has a large partner ecosystem to further enhance the usability, performance, and ease of maintenance of WordPress deployments. Plugins, like W3-Total-Cache, allow you to leverage other AWS services like Amazon S3 and Amazon CloudFront to offload and store static content. Others may like the simplicity of storing all content on Amazon EFS and avoid installing and managing 3rd party plugins. 
+
+#### Setup W3-Total-Cache
+The W3-Total-Cache plugin is required for the reference architecutre to have the best performance. W3 allows Offloading of static assets, and impliments memcached to cache Objects, Database Queries, ect.
+
+To setup W3-Total-Cache, activate it in plugins (Will be installed automatically on fresh CloudFormation launch). Navigate to ElasticCache -> Memcached in AWS, find the cluster created for the stack. Copy the **Configuration Endpoint** (formated: wor-el-1d6494yen6xl1.xxxxxx.cfg.usw2.cache.amazonaws.com:11211). Now under performance -> General, find the following options:
+
+- Page Cache - enable, select Memcached
+- Minify - enable, select Disk (Minified files will be offloaded)
+- Database Cache - enable, select Memcached
+- Object Cache - enable, select Memcached
+- CDN - enable, select Amazon Cloudfront - Or Amazon Simple Storage Service
+- Fragment Cache - enable, select Memcached
+
+Press Save All & Purge Cache
+
+You will see errors saying 127.0.0.1:11211 not accessible. 
+Now Inside each menu in the sidebar navigation, scroll to Memcached server option (Advanced), and paste the ElasticCache Configuration Endpoint. Press test and ensure it passes.
+
+Under Browser Cache, enable both **Set expires header** and **Set cache control header** (When testing this may be combersome)
+
+Under CDN, paste in a valid and uniquely created IAM Key and Secret that has access to S3 or an S3 bucket. Paste in the Cloudfront prefix that was created with the stack. Also scroll to Advanced and select **Export changed files automatically**
+
+Since files will be offloaded to S3, ensure to add the S3 bucket as an origin on your CloudFront Distribution. Simply navigate to the distribution, select the Origin tab, Create Origin, Click on the Origin Domain Name text field and find the S3 bucket used for CDN. **Note:** This will take some time, the Distribution will be In Progress until CDN replication is complete. 
 
 ## Master Template
 The master template receives all input parameters and passes them to the appropriate nested template which are executed in order based on conditions and dependencies.
@@ -195,7 +218,7 @@ Review the template here [aws-refarch-wordpress-master.yaml](templates/aws-refar
 - Database Name
 - Database Master Username
 - Database Master Password
-- DB Restore from Snapshot, find the cluster Snapshot name in the RDS console. (formatted rds:wordpress-stack-name-rds-xxxxxxxx-databasecluster-apzdbrozmzcn-snapshot-date)
+- DB Restore from Snapshot, enter the cluster Snapshot name from the RDS console. (formatted rds:wordpress-stack-name-rds-xxxxxxxx-databasecluster-apzdbrozmzcn-snapshot-date)
 - Database Size
 - Database Instance Class Type
 - Encrypted database storage (boolean)
@@ -209,7 +232,7 @@ Review the template here [aws-refarch-wordpress-master.yaml](templates/aws-refar
 #### Web Parameters
 - Create CloudFront distribution (boolean)
 - Create Route 53 record set (boolean)
-- PHP Version (5.5, 5.6, or 7.0)
+- PHP Version (5.5, 5.6, or 7.0 - recomended)
 - Web Instance Type
 - The maximum number of instances in the web tier auto scaling group
 - The minimum (and desired) number of instances in the web tier auto scaling group
