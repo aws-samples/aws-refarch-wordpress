@@ -37,7 +37,7 @@ Parameters:
     Type: String
     Default: 0.0.0.0/0
   Vpc:
-    AllowedPattern: ^(vpc-)([a-z0-9]{8})$
+    AllowedPattern: ^(vpc-)([a-z0-9]{8}|[a-z0-9]{17})$
     Description: The Vpc Id of an existing Vpc.
     Type: AWS::EC2::VPC::Id
 
