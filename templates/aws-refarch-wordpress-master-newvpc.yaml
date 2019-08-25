@@ -99,7 +99,7 @@ Metadata:
       CloudFrontAcmCertificate:
         default: CloudFront Certificate ARN
       DatabaseCmk:
-        default: AWS KMS CMK for RDS 
+        default: AWS KMS CMK for RDS
       DatabaseEncrpytedBoolean:
         default: Encrypted DB Cluster
       DatabaseInstanceType:
@@ -217,97 +217,198 @@ Parameters:
 
   BastionInstanceType:
     AllowedValues:
-    - t2.nano 
-    - t2.micro 
-    - t2.small 
-    - t2.medium 
-    - t2.large 
-    - t2.xlarge 
-    - t2.2xlarge 
-    - m3.medium 
-    - m3.large 
-    - m3.xlarge 
-    - m3.2xlarge 
-    - m4.large 
-    - m4.xlarge 
-    - m4.2xlarge 
-    - m4.4xlarge 
-    - m4.10xlarge 
-    - m4.16xlarge 
-    - m5.large 
-    - m5.xlarge 
-    - m5.2xlarge 
-    - m5.4xlarge 
-    - m5.12xlarge 
-    - m5.24xlarge 
-    - c3.large 
-    - c3.xlarge 
-    - c3.2xlarge 
-    - c3.4xlarge 
-    - c3.8xlarge 
-    - c4.large 
-    - c4.xlarge 
-    - c4.2xlarge 
-    - c4.4xlarge 
-    - c4.8xlarge 
-    - c5.large 
-    - c5.xlarge 
-    - c5.2xlarge 
-    - c5.4xlarge 
-    - c5.9xlarge 
+    - a1.2xlarge
+    - a1.4xlarge
+    - a1.large
+    - a1.medium
+    - a1.xlarge
+    - c4.2xlarge
+    - c4.4xlarge
+    - c4.8xlarge
+    - c4.large
+    - c4.xlarge
+    - c5.12xlarge
     - c5.18xlarge
-    - r3.large 
-    - r3.xlarge 
-    - r3.2xlarge 
-    - r3.4xlarge 
-    - r3.8xlarge 
-    - r4.large 
-    - r4.xlarge 
-    - r4.2xlarge 
-    - r4.4xlarge 
-    - r4.8xlarge 
-    - r4.16xlarge 
-    - x1.16xlarge 
-    - x1.32xlarge 
-    - x1e.xlarge 
-    - x1e.2xlarge 
-    - x1e.4xlarge 
-    - x1e.8xlarge 
-    - x1e.16xlarge 
-    - x1e.32xlarge
-    - d2.xlarge 
-    - d2.2xlarge 
-    - d2.4xlarge 
-    - d2.8xlarge 
-    - h1.2xlarge 
-    - h1.4xlarge 
-    - h1.8xlarge 
-    - h1.16xlarge 
-    - i2.xlarge 
-    - i2.2xlarge 
-    - i2.4xlarge 
-    - i2.8xlarge 
-    - i3.large 
-    - i3.xlarge 
-    - i3.2xlarge 
-    - i3.4xlarge 
-    - i3.8xlarge 
+    - c5.24xlarge
+    - c5.2xlarge
+    - c5.4xlarge
+    - c5.9xlarge
+    - c5.large
+    - c5.metal
+    - c5.xlarge
+    - c5d.18xlarge
+    - c5d.2xlarge
+    - c5d.4xlarge
+    - c5d.9xlarge
+    - c5d.large
+    - c5d.xlarge
+    - c5n.18xlarge
+    - c5n.2xlarge
+    - c5n.4xlarge
+    - c5n.9xlarge
+    - c5n.large
+    - c5n.xlarge
+    - cc1.4xlarge
+    - cc2.8xlarge
+    - cg1.4xlarge
+    - d2.2xlarge
+    - d2.4xlarge
+    - d2.8xlarge
+    - d2.xlarge
+    - f1.16xlarge
+    - f1.2xlarge
+    - f1.4xlarge
+    - g3.16xlarge
+    - g3.4xlarge
+    - g3.8xlarge
+    - g3s.xlarge
+    - h1.16xlarge
+    - h1.2xlarge
+    - h1.4xlarge
+    - h1.8xlarge
+    - hi1.4xlarge
     - i3.16xlarge
-    - f1.2xlarge 
-    - f1.16xlarge 
-    - g2.2xlarge 
-    - g2.8xlarge 
-    - g3.4xlarge 
-    - g3.8xlarge 
-    - g3.16xlarge 
-    - p2.xlarge 
-    - p2.8xlarge 
-    - p2.16xlarge 
-    - p3.2xlarge 
-    - p3.8xlarge 
+    - i3.2xlarge
+    - i3.4xlarge
+    - i3.8xlarge
+    - i3.large
+    - i3.metal
+    - i3.xlarge
+    - i3en.12xlarge
+    - i3en.24xlarge
+    - i3en.2xlarge
+    - i3en.3xlarge
+    - i3en.6xlarge
+    - i3en.large
+    - i3en.xlarge
+    - m4.10xlarge
+    - m4.16xlarge
+    - m4.2xlarge
+    - m4.4xlarge
+    - m4.large
+    - m4.xlarge
+    - m5.12xlarge
+    - m5.16xlarge
+    - m5.24xlarge
+    - m5.2xlarge
+    - m5.4xlarge
+    - m5.8xlarge
+    - m5.large
+    - m5.metal
+    - m5.xlarge
+    - m5a.12xlarge
+    - m5a.16xlarge
+    - m5a.24xlarge
+    - m5a.2xlarge
+    - m5a.4xlarge
+    - m5a.8xlarge
+    - m5a.large
+    - m5a.xlarge
+    - m5ad.12xlarge
+    - m5ad.16xlarge
+    - m5ad.24xlarge
+    - m5ad.2xlarge
+    - m5ad.4xlarge
+    - m5ad.8xlarge
+    - m5ad.large
+    - m5ad.xlarge
+    - m5d.12xlarge
+    - m5d.16xlarge
+    - m5d.24xlarge
+    - m5d.2xlarge
+    - m5d.4xlarge
+    - m5d.8xlarge
+    - m5d.large
+    - m5d.metal
+    - m5d.xlarge
+    - p2.16xlarge
+    - p2.8xlarge
+    - p2.xlarge
     - p3.16xlarge
+    - p3.2xlarge
+    - p3.8xlarge
+    - p3dn.24xlarge
+    - r4.16xlarge
+    - r4.2xlarge
+    - r4.4xlarge
+    - r4.8xlarge
+    - r4.large
+    - r4.xlarge
+    - r5.12xlarge
+    - r5.16xlarge
+    - r5.24xlarge
+    - r5.2xlarge
+    - r5.4xlarge
+    - r5.8xlarge
+    - r5.large
+    - r5.metal
+    - r5.xlarge
+    - r5a.12xlarge
+    - r5a.16xlarge
+    - r5a.24xlarge
+    - r5a.2xlarge
+    - r5a.4xlarge
+    - r5a.8xlarge
+    - r5a.large
+    - r5a.xlarge
+    - r5ad.12xlarge
+    - r5ad.16xlarge
+    - r5ad.24xlarge
+    - r5ad.2xlarge
+    - r5ad.4xlarge
+    - r5ad.8xlarge
+    - r5ad.large
+    - r5ad.xlarge
+    - r5d.12xlarge
+    - r5d.16xlarge
+    - r5d.24xlarge
+    - r5d.2xlarge
+    - r5d.4xlarge
+    - r5d.8xlarge
+    - r5d.large
+    - r5d.metal
+    - r5d.xlarge
+    - t2.2xlarge
+    - t2.large
+    - t2.medium
+    - t2.micro
+    - t2.nano
+    - t2.small
+    - t2.xlarge
+    - t3.2xlarge
+    - t3.large
+    - t3.medium
+    - t3.micro
+    - t3.nano
+    - t3.small
+    - t3.xlarge
+    - t3a.2xlarge
+    - t3a.large
+    - t3a.medium
+    - t3a.micro
+    - t3a.nano
+    - t3a.small
+    - t3a.xlarge
+    - u-12tb1.metal
+    - u-6tb1.metal
+    - u-9tb1.metal
+    - x1.16xlarge
+    - x1.32xlarge
+    - x1e.16xlarge
+    - x1e.2xlarge
+    - x1e.32xlarge
+    - x1e.4xlarge
+    - x1e.8xlarge
+    - x1e.xlarge
+    - z1d.12xlarge
+    - z1d.2xlarge
+    - z1d.3xlarge
+    - z1d.6xlarge
+    - z1d.large
+    - z1d.metal
+    - z1d.xlarge
     ConstraintDescription: Must be a valid Amazon EC2 instance type.
-    Default: t2.nano
+    Default: t3a.nano
     Description: Bastion EC2 instance type.
     Type: String
   CloudFrontAcmCertificate:
@@ -326,21 +427,34 @@ Parameters:
     Type: String
   DatabaseInstanceType:
     AllowedValues:
+      - db.t2.micro
       - db.t2.small
       - db.t2.medium
-      - db.r3.large
-      - db.r3.xlarge
-      - db.r3.2xlarge
-      - db.r3.4xlarge
-      - db.r3.8xlarge
+      - db.t2.large
+      - db.t2.xlarge
+      - db.t2.2xlarge
+      - db.t3.micro
+      - db.t3.small
+      - db.t3.medium
+      - db.t3.large
+      - db.t3.xlarge
+      - db.t3.2xlarge
       - db.r4.large
       - db.r4.xlarge
       - db.r4.2xlarge
       - db.r4.4xlarge
       - db.r4.8xlarge
       - db.r4.16xlarge
+      - db.r5.large
+      - db.r5.xlarge
+      - db.r5.2xlarge
+      - db.r5.4xlarge
+      - db.r5.8xlarge
+      - db.r5.12xlarge
+      - db.r5.16xlarge
+      - db.r5.24xlarge
     ConstraintDescription: Must be a valid RDS instance class.
-    Default: db.t2.medium
+    Default: db.t3.medium
     Description: The Amazon RDS database instance class.
     Type: String
   DatabaseMasterUsername:
@@ -364,97 +478,198 @@ Parameters:
     Type: String
   EfsAlarmsInstanceType:
     AllowedValues:
-    - t2.nano 
-    - t2.micro 
-    - t2.small 
-    - t2.medium 
-    - t2.large 
-    - t2.xlarge 
-    - t2.2xlarge 
-    - m3.medium 
-    - m3.large 
-    - m3.xlarge 
-    - m3.2xlarge 
-    - m4.large 
-    - m4.xlarge 
-    - m4.2xlarge 
-    - m4.4xlarge 
-    - m4.10xlarge 
-    - m4.16xlarge 
-    - m5.large 
-    - m5.xlarge 
-    - m5.2xlarge 
-    - m5.4xlarge 
-    - m5.12xlarge 
-    - m5.24xlarge 
-    - c3.large 
-    - c3.xlarge 
-    - c3.2xlarge 
-    - c3.4xlarge 
-    - c3.8xlarge 
-    - c4.large 
-    - c4.xlarge 
-    - c4.2xlarge 
-    - c4.4xlarge 
-    - c4.8xlarge 
-    - c5.large 
-    - c5.xlarge 
-    - c5.2xlarge 
-    - c5.4xlarge 
-    - c5.9xlarge 
+    - a1.2xlarge
+    - a1.4xlarge
+    - a1.large
+    - a1.medium
+    - a1.xlarge
+    - c4.2xlarge
+    - c4.4xlarge
+    - c4.8xlarge
+    - c4.large
+    - c4.xlarge
+    - c5.12xlarge
     - c5.18xlarge
-    - r3.large 
-    - r3.xlarge 
-    - r3.2xlarge 
-    - r3.4xlarge 
-    - r3.8xlarge 
-    - r4.large 
-    - r4.xlarge 
-    - r4.2xlarge 
-    - r4.4xlarge 
-    - r4.8xlarge 
-    - r4.16xlarge 
-    - x1.16xlarge 
-    - x1.32xlarge 
-    - x1e.xlarge 
-    - x1e.2xlarge 
-    - x1e.4xlarge 
-    - x1e.8xlarge 
-    - x1e.16xlarge 
-    - x1e.32xlarge
-    - d2.xlarge 
-    - d2.2xlarge 
-    - d2.4xlarge 
-    - d2.8xlarge 
-    - h1.2xlarge 
-    - h1.4xlarge 
-    - h1.8xlarge 
-    - h1.16xlarge 
-    - i2.xlarge 
-    - i2.2xlarge 
-    - i2.4xlarge 
-    - i2.8xlarge 
-    - i3.large 
-    - i3.xlarge 
-    - i3.2xlarge 
-    - i3.4xlarge 
-    - i3.8xlarge 
+    - c5.24xlarge
+    - c5.2xlarge
+    - c5.4xlarge
+    - c5.9xlarge
+    - c5.large
+    - c5.metal
+    - c5.xlarge
+    - c5d.18xlarge
+    - c5d.2xlarge
+    - c5d.4xlarge
+    - c5d.9xlarge
+    - c5d.large
+    - c5d.xlarge
+    - c5n.18xlarge
+    - c5n.2xlarge
+    - c5n.4xlarge
+    - c5n.9xlarge
+    - c5n.large
+    - c5n.xlarge
+    - cc1.4xlarge
+    - cc2.8xlarge
+    - cg1.4xlarge
+    - d2.2xlarge
+    - d2.4xlarge
+    - d2.8xlarge
+    - d2.xlarge
+    - f1.16xlarge
+    - f1.2xlarge
+    - f1.4xlarge
+    - g3.16xlarge
+    - g3.4xlarge
+    - g3.8xlarge
+    - g3s.xlarge
+    - h1.16xlarge
+    - h1.2xlarge
+    - h1.4xlarge
+    - h1.8xlarge
+    - hi1.4xlarge
     - i3.16xlarge
-    - f1.2xlarge 
-    - f1.16xlarge 
-    - g2.2xlarge 
-    - g2.8xlarge 
-    - g3.4xlarge 
-    - g3.8xlarge 
-    - g3.16xlarge 
-    - p2.xlarge 
-    - p2.8xlarge 
-    - p2.16xlarge 
-    - p3.2xlarge 
-    - p3.8xlarge 
+    - i3.2xlarge
+    - i3.4xlarge
+    - i3.8xlarge
+    - i3.large
+    - i3.metal
+    - i3.xlarge
+    - i3en.12xlarge
+    - i3en.24xlarge
+    - i3en.2xlarge
+    - i3en.3xlarge
+    - i3en.6xlarge
+    - i3en.large
+    - i3en.xlarge
+    - m4.10xlarge
+    - m4.16xlarge
+    - m4.2xlarge
+    - m4.4xlarge
+    - m4.large
+    - m4.xlarge
+    - m5.12xlarge
+    - m5.16xlarge
+    - m5.24xlarge
+    - m5.2xlarge
+    - m5.4xlarge
+    - m5.8xlarge
+    - m5.large
+    - m5.metal
+    - m5.xlarge
+    - m5a.12xlarge
+    - m5a.16xlarge
+    - m5a.24xlarge
+    - m5a.2xlarge
+    - m5a.4xlarge
+    - m5a.8xlarge
+    - m5a.large
+    - m5a.xlarge
+    - m5ad.12xlarge
+    - m5ad.16xlarge
+    - m5ad.24xlarge
+    - m5ad.2xlarge
+    - m5ad.4xlarge
+    - m5ad.8xlarge
+    - m5ad.large
+    - m5ad.xlarge
+    - m5d.12xlarge
+    - m5d.16xlarge
+    - m5d.24xlarge
+    - m5d.2xlarge
+    - m5d.4xlarge
+    - m5d.8xlarge
+    - m5d.large
+    - m5d.metal
+    - m5d.xlarge
+    - p2.16xlarge
+    - p2.8xlarge
+    - p2.xlarge
     - p3.16xlarge
+    - p3.2xlarge
+    - p3.8xlarge
+    - p3dn.24xlarge
+    - r4.16xlarge
+    - r4.2xlarge
+    - r4.4xlarge
+    - r4.8xlarge
+    - r4.large
+    - r4.xlarge
+    - r5.12xlarge
+    - r5.16xlarge
+    - r5.24xlarge
+    - r5.2xlarge
+    - r5.4xlarge
+    - r5.8xlarge
+    - r5.large
+    - r5.metal
+    - r5.xlarge
+    - r5a.12xlarge
+    - r5a.16xlarge
+    - r5a.24xlarge
+    - r5a.2xlarge
+    - r5a.4xlarge
+    - r5a.8xlarge
+    - r5a.large
+    - r5a.xlarge
+    - r5ad.12xlarge
+    - r5ad.16xlarge
+    - r5ad.24xlarge
+    - r5ad.2xlarge
+    - r5ad.4xlarge
+    - r5ad.8xlarge
+    - r5ad.large
+    - r5ad.xlarge
+    - r5d.12xlarge
+    - r5d.16xlarge
+    - r5d.24xlarge
+    - r5d.2xlarge
+    - r5d.4xlarge
+    - r5d.8xlarge
+    - r5d.large
+    - r5d.metal
+    - r5d.xlarge
+    - t2.2xlarge
+    - t2.large
+    - t2.medium
+    - t2.micro
+    - t2.nano
+    - t2.small
+    - t2.xlarge
+    - t3.2xlarge
+    - t3.large
+    - t3.medium
+    - t3.micro
+    - t3.nano
+    - t3.small
+    - t3.xlarge
+    - t3a.2xlarge
+    - t3a.large
+    - t3a.medium
+    - t3a.micro
+    - t3a.nano
+    - t3a.small
+    - t3a.xlarge
+    - u-12tb1.metal
+    - u-6tb1.metal
+    - u-9tb1.metal
+    - x1.16xlarge
+    - x1.32xlarge
+    - x1e.16xlarge
+    - x1e.2xlarge
+    - x1e.32xlarge
+    - x1e.4xlarge
+    - x1e.8xlarge
+    - x1e.xlarge
+    - z1d.12xlarge
+    - z1d.2xlarge
+    - z1d.3xlarge
+    - z1d.6xlarge
+    - z1d.large
+    - z1d.metal
+    - z1d.xlarge
     ConstraintDescription: Must be a valid Amazon EC2 instance type.
-    Default: t2.nano
+    Default: t3a.nano
     Description: The Amazon EC2 instance type that dynamically adjusts alarm thresholds based on permitted throughput changes.
     Type: String
   EfsEncrpytedBoolean:
@@ -491,97 +706,198 @@ Parameters:
     Type: Number
   EfsGrowthInstanceType:
     AllowedValues:
-    - t2.nano 
-    - t2.micro 
-    - t2.small 
-    - t2.medium 
-    - t2.large 
-    - t2.xlarge 
-    - t2.2xlarge 
-    - m3.medium 
-    - m3.large 
-    - m3.xlarge 
-    - m3.2xlarge 
-    - m4.large 
-    - m4.xlarge 
-    - m4.2xlarge 
-    - m4.4xlarge 
-    - m4.10xlarge 
-    - m4.16xlarge 
-    - m5.large 
-    - m5.xlarge 
-    - m5.2xlarge 
-    - m5.4xlarge 
-    - m5.12xlarge 
-    - m5.24xlarge 
-    - c3.large 
-    - c3.xlarge 
-    - c3.2xlarge 
-    - c3.4xlarge 
-    - c3.8xlarge 
-    - c4.large 
-    - c4.xlarge 
-    - c4.2xlarge 
-    - c4.4xlarge 
-    - c4.8xlarge 
-    - c5.large 
-    - c5.xlarge 
-    - c5.2xlarge 
-    - c5.4xlarge 
-    - c5.9xlarge 
+    - a1.2xlarge
+    - a1.4xlarge
+    - a1.large
+    - a1.medium
+    - a1.xlarge
+    - c4.2xlarge
+    - c4.4xlarge
+    - c4.8xlarge
+    - c4.large
+    - c4.xlarge
+    - c5.12xlarge
     - c5.18xlarge
-    - r3.large 
-    - r3.xlarge 
-    - r3.2xlarge 
-    - r3.4xlarge 
-    - r3.8xlarge 
-    - r4.large 
-    - r4.xlarge 
-    - r4.2xlarge 
-    - r4.4xlarge 
-    - r4.8xlarge 
-    - r4.16xlarge 
-    - x1.16xlarge 
-    - x1.32xlarge 
-    - x1e.xlarge 
-    - x1e.2xlarge 
-    - x1e.4xlarge 
-    - x1e.8xlarge 
-    - x1e.16xlarge 
-    - x1e.32xlarge
-    - d2.xlarge 
-    - d2.2xlarge 
-    - d2.4xlarge 
-    - d2.8xlarge 
-    - h1.2xlarge 
-    - h1.4xlarge 
-    - h1.8xlarge 
-    - h1.16xlarge 
-    - i2.xlarge 
-    - i2.2xlarge 
-    - i2.4xlarge 
-    - i2.8xlarge 
-    - i3.large 
-    - i3.xlarge 
-    - i3.2xlarge 
-    - i3.4xlarge 
-    - i3.8xlarge 
+    - c5.24xlarge
+    - c5.2xlarge
+    - c5.4xlarge
+    - c5.9xlarge
+    - c5.large
+    - c5.metal
+    - c5.xlarge
+    - c5d.18xlarge
+    - c5d.2xlarge
+    - c5d.4xlarge
+    - c5d.9xlarge
+    - c5d.large
+    - c5d.xlarge
+    - c5n.18xlarge
+    - c5n.2xlarge
+    - c5n.4xlarge
+    - c5n.9xlarge
+    - c5n.large
+    - c5n.xlarge
+    - cc1.4xlarge
+    - cc2.8xlarge
+    - cg1.4xlarge
+    - d2.2xlarge
+    - d2.4xlarge
+    - d2.8xlarge
+    - d2.xlarge
+    - f1.16xlarge
+    - f1.2xlarge
+    - f1.4xlarge
+    - g3.16xlarge
+    - g3.4xlarge
+    - g3.8xlarge
+    - g3s.xlarge
+    - h1.16xlarge
+    - h1.2xlarge
+    - h1.4xlarge
+    - h1.8xlarge
+    - hi1.4xlarge
     - i3.16xlarge
-    - f1.2xlarge 
-    - f1.16xlarge 
-    - g2.2xlarge 
-    - g2.8xlarge 
-    - g3.4xlarge 
-    - g3.8xlarge 
-    - g3.16xlarge 
-    - p2.xlarge 
-    - p2.8xlarge 
-    - p2.16xlarge 
-    - p3.2xlarge 
-    - p3.8xlarge 
+    - i3.2xlarge
+    - i3.4xlarge
+    - i3.8xlarge
+    - i3.large
+    - i3.metal
+    - i3.xlarge
+    - i3en.12xlarge
+    - i3en.24xlarge
+    - i3en.2xlarge
+    - i3en.3xlarge
+    - i3en.6xlarge
+    - i3en.large
+    - i3en.xlarge
+    - m4.10xlarge
+    - m4.16xlarge
+    - m4.2xlarge
+    - m4.4xlarge
+    - m4.large
+    - m4.xlarge
+    - m5.12xlarge
+    - m5.16xlarge
+    - m5.24xlarge
+    - m5.2xlarge
+    - m5.4xlarge
+    - m5.8xlarge
+    - m5.large
+    - m5.metal
+    - m5.xlarge
+    - m5a.12xlarge
+    - m5a.16xlarge
+    - m5a.24xlarge
+    - m5a.2xlarge
+    - m5a.4xlarge
+    - m5a.8xlarge
+    - m5a.large
+    - m5a.xlarge
+    - m5ad.12xlarge
+    - m5ad.16xlarge
+    - m5ad.24xlarge
+    - m5ad.2xlarge
+    - m5ad.4xlarge
+    - m5ad.8xlarge
+    - m5ad.large
+    - m5ad.xlarge
+    - m5d.12xlarge
+    - m5d.16xlarge
+    - m5d.24xlarge
+    - m5d.2xlarge
+    - m5d.4xlarge
+    - m5d.8xlarge
+    - m5d.large
+    - m5d.metal
+    - m5d.xlarge
+    - p2.16xlarge
+    - p2.8xlarge
+    - p2.xlarge
     - p3.16xlarge
+    - p3.2xlarge
+    - p3.8xlarge
+    - p3dn.24xlarge
+    - r4.16xlarge
+    - r4.2xlarge
+    - r4.4xlarge
+    - r4.8xlarge
+    - r4.large
+    - r4.xlarge
+    - r5.12xlarge
+    - r5.16xlarge
+    - r5.24xlarge
+    - r5.2xlarge
+    - r5.4xlarge
+    - r5.8xlarge
+    - r5.large
+    - r5.metal
+    - r5.xlarge
+    - r5a.12xlarge
+    - r5a.16xlarge
+    - r5a.24xlarge
+    - r5a.2xlarge
+    - r5a.4xlarge
+    - r5a.8xlarge
+    - r5a.large
+    - r5a.xlarge
+    - r5ad.12xlarge
+    - r5ad.16xlarge
+    - r5ad.24xlarge
+    - r5ad.2xlarge
+    - r5ad.4xlarge
+    - r5ad.8xlarge
+    - r5ad.large
+    - r5ad.xlarge
+    - r5d.12xlarge
+    - r5d.16xlarge
+    - r5d.24xlarge
+    - r5d.2xlarge
+    - r5d.4xlarge
+    - r5d.8xlarge
+    - r5d.large
+    - r5d.metal
+    - r5d.xlarge
+    - t2.2xlarge
+    - t2.large
+    - t2.medium
+    - t2.micro
+    - t2.nano
+    - t2.small
+    - t2.xlarge
+    - t3.2xlarge
+    - t3.large
+    - t3.medium
+    - t3.micro
+    - t3.nano
+    - t3.small
+    - t3.xlarge
+    - t3a.2xlarge
+    - t3a.large
+    - t3a.medium
+    - t3a.micro
+    - t3a.nano
+    - t3a.small
+    - t3a.xlarge
+    - u-12tb1.metal
+    - u-6tb1.metal
+    - u-9tb1.metal
+    - x1.16xlarge
+    - x1.32xlarge
+    - x1e.16xlarge
+    - x1e.2xlarge
+    - x1e.32xlarge
+    - x1e.4xlarge
+    - x1e.8xlarge
+    - x1e.xlarge
+    - z1d.12xlarge
+    - z1d.2xlarge
+    - z1d.3xlarge
+    - z1d.6xlarge
+    - z1d.large
+    - z1d.metal
+    - z1d.xlarge
     ConstraintDescription: Must be a valid Amazon EC2 instance type.
-    Default: r4.large
+    Default: r5.large
     Description: The Amazon EC2 instance type that adds data to the file system.
     Type: String
   EfsPerformanceMode:
@@ -607,15 +923,24 @@ Parameters:
       - cache.m4.2xlarge
       - cache.m4.4xlarge
       - cache.m4.10xlarge
-      - cache.m3.medium
-      - cache.m3.large
-      - cache.m3.xlarge
-      - cache.m3.2xlarge
-      - cache.r3.large
-      - cache.r3.xlarge
-      - cache.r3.2xlarge
-      - cache.r3.4xlarge
-      - cache.r3.8xlarge
+      - cache.m5.large
+      - cache.m5.xlarge
+      - cache.m5.2xlarge
+      - cache.m5.4xlarge
+      - cache.m5.12xlarge
+      - cache.m5.24xlarge
+      - cache.r4.large
+      - cache.r4.xlarge
+      - cache.r4.2xlarge
+      - cache.r4.4xlarge
+      - cache.r4.8xlarge
+      - cache.r4.16xlarge
+      - cache.r5.large
+      - cache.r5.xlarge
+      - cache.r5.2xlarge
+      - cache.r5.4xlarge
+      - cache.r5.12xlarge
+      - cache.r5.24xlarge
     ConstraintDescription: Must be a valid Amazon ElastiCache node type.
     Default: cache.t2.medium
     Description: The Amazon ElastiCache cluster node type.
@@ -634,7 +959,7 @@ Parameters:
     - 7.0
     Default: 7.0
     Description: The version of PHP to install.
-    Type: String 
+    Type: String
   PublicAlbAcmCertificate:
     AllowedPattern: ^$|(arn:aws:acm:)([a-z0-9/:-])*([a-z0-9])$
     Description: '[ Optional ] The AWS Certification Manager certificate ARN for the ALB certificate - this certificate should be created in the region you wish to run the ALB and must reference the WordPress domain name you use below.'
@@ -679,97 +1004,198 @@ Parameters:
     Type: String
   WebInstanceType:
     AllowedValues:
-      - t2.nano 
-      - t2.micro 
-      - t2.small 
-      - t2.medium 
-      - t2.large 
-      - t2.xlarge 
-      - t2.2xlarge 
-      - m3.medium 
-      - m3.large 
-      - m3.xlarge 
-      - m3.2xlarge 
-      - m4.large 
-      - m4.xlarge 
-      - m4.2xlarge 
-      - m4.4xlarge 
-      - m4.10xlarge 
-      - m4.16xlarge 
-      - m5.large 
-      - m5.xlarge 
-      - m5.2xlarge 
-      - m5.4xlarge 
-      - m5.12xlarge 
-      - m5.24xlarge 
-      - c3.large 
-      - c3.xlarge 
-      - c3.2xlarge 
-      - c3.4xlarge 
-      - c3.8xlarge 
-      - c4.large 
-      - c4.xlarge 
-      - c4.2xlarge 
-      - c4.4xlarge 
-      - c4.8xlarge 
-      - c5.large 
-      - c5.xlarge 
-      - c5.2xlarge 
-      - c5.4xlarge 
-      - c5.9xlarge 
+      - a1.2xlarge
+      - a1.4xlarge
+      - a1.large
+      - a1.medium
+      - a1.xlarge
+      - c4.2xlarge
+      - c4.4xlarge
+      - c4.8xlarge
+      - c4.large
+      - c4.xlarge
+      - c5.12xlarge
       - c5.18xlarge
-      - r3.large 
-      - r3.xlarge 
-      - r3.2xlarge 
-      - r3.4xlarge 
-      - r3.8xlarge 
-      - r4.large 
-      - r4.xlarge 
-      - r4.2xlarge 
-      - r4.4xlarge 
-      - r4.8xlarge 
-      - r4.16xlarge 
-      - x1.16xlarge 
-      - x1.32xlarge 
-      - x1e.xlarge 
-      - x1e.2xlarge 
-      - x1e.4xlarge 
-      - x1e.8xlarge 
-      - x1e.16xlarge 
-      - x1e.32xlarge
-      - d2.xlarge 
-      - d2.2xlarge 
-      - d2.4xlarge 
-      - d2.8xlarge 
-      - h1.2xlarge 
-      - h1.4xlarge 
-      - h1.8xlarge 
-      - h1.16xlarge 
-      - i2.xlarge 
-      - i2.2xlarge 
-      - i2.4xlarge 
-      - i2.8xlarge 
-      - i3.large 
-      - i3.xlarge 
-      - i3.2xlarge 
-      - i3.4xlarge 
-      - i3.8xlarge 
+      - c5.24xlarge
+      - c5.2xlarge
+      - c5.4xlarge
+      - c5.9xlarge
+      - c5.large
+      - c5.metal
+      - c5.xlarge
+      - c5d.18xlarge
+      - c5d.2xlarge
+      - c5d.4xlarge
+      - c5d.9xlarge
+      - c5d.large
+      - c5d.xlarge
+      - c5n.18xlarge
+      - c5n.2xlarge
+      - c5n.4xlarge
+      - c5n.9xlarge
+      - c5n.large
+      - c5n.xlarge
+      - cc1.4xlarge
+      - cc2.8xlarge
+      - cg1.4xlarge
+      - d2.2xlarge
+      - d2.4xlarge
+      - d2.8xlarge
+      - d2.xlarge
+      - f1.16xlarge
+      - f1.2xlarge
+      - f1.4xlarge
+      - g3.16xlarge
+      - g3.4xlarge
+      - g3.8xlarge
+      - g3s.xlarge
+      - h1.16xlarge
+      - h1.2xlarge
+      - h1.4xlarge
+      - h1.8xlarge
+      - hi1.4xlarge
       - i3.16xlarge
-      - f1.2xlarge 
-      - f1.16xlarge 
-      - g2.2xlarge 
-      - g2.8xlarge 
-      - g3.4xlarge 
-      - g3.8xlarge 
-      - g3.16xlarge 
-      - p2.xlarge 
-      - p2.8xlarge 
-      - p2.16xlarge 
-      - p3.2xlarge 
-      - p3.8xlarge 
+      - i3.2xlarge
+      - i3.4xlarge
+      - i3.8xlarge
+      - i3.large
+      - i3.metal
+      - i3.xlarge
+      - i3en.12xlarge
+      - i3en.24xlarge
+      - i3en.2xlarge
+      - i3en.3xlarge
+      - i3en.6xlarge
+      - i3en.large
+      - i3en.xlarge
+      - m4.10xlarge
+      - m4.16xlarge
+      - m4.2xlarge
+      - m4.4xlarge
+      - m4.large
+      - m4.xlarge
+      - m5.12xlarge
+      - m5.16xlarge
+      - m5.24xlarge
+      - m5.2xlarge
+      - m5.4xlarge
+      - m5.8xlarge
+      - m5.large
+      - m5.metal
+      - m5.xlarge
+      - m5a.12xlarge
+      - m5a.16xlarge
+      - m5a.24xlarge
+      - m5a.2xlarge
+      - m5a.4xlarge
+      - m5a.8xlarge
+      - m5a.large
+      - m5a.xlarge
+      - m5ad.12xlarge
+      - m5ad.16xlarge
+      - m5ad.24xlarge
+      - m5ad.2xlarge
+      - m5ad.4xlarge
+      - m5ad.8xlarge
+      - m5ad.large
+      - m5ad.xlarge
+      - m5d.12xlarge
+      - m5d.16xlarge
+      - m5d.24xlarge
+      - m5d.2xlarge
+      - m5d.4xlarge
+      - m5d.8xlarge
+      - m5d.large
+      - m5d.metal
+      - m5d.xlarge
+      - p2.16xlarge
+      - p2.8xlarge
+      - p2.xlarge
       - p3.16xlarge
+      - p3.2xlarge
+      - p3.8xlarge
+      - p3dn.24xlarge
+      - r4.16xlarge
+      - r4.2xlarge
+      - r4.4xlarge
+      - r4.8xlarge
+      - r4.large
+      - r4.xlarge
+      - r5.12xlarge
+      - r5.16xlarge
+      - r5.24xlarge
+      - r5.2xlarge
+      - r5.4xlarge
+      - r5.8xlarge
+      - r5.large
+      - r5.metal
+      - r5.xlarge
+      - r5a.12xlarge
+      - r5a.16xlarge
+      - r5a.24xlarge
+      - r5a.2xlarge
+      - r5a.4xlarge
+      - r5a.8xlarge
+      - r5a.large
+      - r5a.xlarge
+      - r5ad.12xlarge
+      - r5ad.16xlarge
+      - r5ad.24xlarge
+      - r5ad.2xlarge
+      - r5ad.4xlarge
+      - r5ad.8xlarge
+      - r5ad.large
+      - r5ad.xlarge
+      - r5d.12xlarge
+      - r5d.16xlarge
+      - r5d.24xlarge
+      - r5d.2xlarge
+      - r5d.4xlarge
+      - r5d.8xlarge
+      - r5d.large
+      - r5d.metal
+      - r5d.xlarge
+      - t2.2xlarge
+      - t2.large
+      - t2.medium
+      - t2.micro
+      - t2.nano
+      - t2.small
+      - t2.xlarge
+      - t3.2xlarge
+      - t3.large
+      - t3.medium
+      - t3.micro
+      - t3.nano
+      - t3.small
+      - t3.xlarge
+      - t3a.2xlarge
+      - t3a.large
+      - t3a.medium
+      - t3a.micro
+      - t3a.nano
+      - t3a.small
+      - t3a.xlarge
+      - u-12tb1.metal
+      - u-6tb1.metal
+      - u-9tb1.metal
+      - x1.16xlarge
+      - x1.32xlarge
+      - x1e.16xlarge
+      - x1e.2xlarge
+      - x1e.32xlarge
+      - x1e.4xlarge
+      - x1e.8xlarge
+      - x1e.xlarge
+      - z1d.12xlarge
+      - z1d.2xlarge
+      - z1d.3xlarge
+      - z1d.6xlarge
+      - z1d.large
+      - z1d.metal
+      - z1d.xlarge
     ConstraintDescription: Must be a valid Amazon EC2 instance type.
-    Default: t2.large
+    Default: t3.large
     Description: The Amazon EC2 instance type for your web instances.
     Type: String
   AdminEmail:
@@ -778,7 +1204,7 @@ Parameters:
     Type: String
   WPAdminPassword:
     AllowedPattern: ^([a-zA-Z0-9`~!#$%^&*()_+,\\-])*$
-    ConstraintDescription: Must be letters (upper or lower), numbers, spaces, and these special characters `~!#$%^&*()_+,-    
+    ConstraintDescription: Must be letters (upper or lower), numbers, spaces, and these special characters `~!#$%^&*()_+,-
     Description: The WordPress admin password. Letters, numbers, spaces, and these special characters `~!#$%^&*()_+,-
     Type: String
     NoEcho: true
@@ -972,7 +1398,7 @@ Conditions:
     - !Condition AvailableAWSRegion
   DeployCloudFront: !And
     - !Equals [ true, !Ref UseCloudFrontBoolean ]
-    - !Condition AvailableAWSRegion   
+    - !Condition AvailableAWSRegion
   DeployElastiCache: !And
     - !Equals [ true, !Ref UseElastiCacheBoolean ]
     - !Condition AvailableAWSRegion
@@ -1030,7 +1456,7 @@ Resources:
         PublicAlbFullName:
           !GetAtt [ publicalb, Outputs.PublicAlbFullName ]
         EfsCreateAlarms:
-          !Ref EfsCreateAlarms         
+          !Ref EfsCreateAlarms
       TemplateURL: https://s3.amazonaws.com/aws-refarch/wordpress/latest/templates/aws-refarch-wordpress-06-dashboard.yaml
   dashboardwithnoalarms:
     Condition: EfsCreateNoAlarms
@@ -1045,7 +1471,7 @@ Resources:
         PublicAlbFullName:
           !GetAtt [ publicalb, Outputs.PublicAlbFullName ]
         EfsCreateAlarms:
-          !Ref EfsCreateAlarms         
+          !Ref EfsCreateAlarms
       TemplateURL: https://s3.amazonaws.com/aws-refarch/wordpress/latest/templates/aws-refarch-wordpress-06-dashboard.yaml
   efsfilesystem:
     DependsOn: [ newvpc, securitygroups ]
@@ -1065,7 +1491,7 @@ Resources:
         InstanceType:
           !Ref EfsGrowthInstanceType
         NumberOfSubnets:
-          !Ref NumberOfAZs  
+          !Ref NumberOfAZs
         PerformanceMode:
           !Ref EfsPerformanceMode
         Subnet:
@@ -1090,7 +1516,7 @@ Resources:
         InstanceType:
           !Ref EfsAlarmsInstanceType
         NumberOfSubnets:
-          !Ref NumberOfAZs  
+          !Ref NumberOfAZs
         Subnet:
           !GetAtt [ newvpc, Outputs.DataSubnet ]
         WarningThreshold:
@@ -1297,5 +1723,3 @@ Outputs:
   OpCacheValidationUrl:
     Description: A page to validate OpCache has been enabled for each instance in the ASG. Refresh the page to see the status of each instance in the ASG.
     Value: !Join [ '', [ !If [ CreateRecordSet, !Join [ '', [ 'http://www.', !Ref WPDomainName ] ], !If [ DeployCloudFront, !GetAtt [ cloudfront, Outputs.DnsHostname ], !GetAtt [ publicalb, Outputs.PublicAlbHostname ] ] ], '/opcache-instanceid.php' ] ]
-
-    
