@@ -954,10 +954,12 @@ Parameters:
     Type: String
   PHPVersion:
     AllowedValues:
-    - 5.5
     - 5.6
     - 7.0
-    Default: 7.0
+    - 7.1
+    - 7.2
+    - 7.3
+    Default: 7.3
     Description: The version of PHP to install.
     Type: String
   PublicAlbAcmCertificate:
