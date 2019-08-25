@@ -56,7 +56,7 @@ Metadata:
       DatabaseClusterEndpointAddress:
         default: DB Cluster Endpoint Address
       DatabaseMasterUsername:
-        default: DB Master Username  
+        default: DB Master Username
       DatabaseMasterPassword:
         default: DB Master Password
       DatabaseName:
@@ -144,18 +144,20 @@ Parameters:
     - 6
     Default: 3
     Description: Number of subnets. This must match your selections in the list of subnets below.
-    Type: String 
+    Type: String
   PHPIniOverride:
     Description: Full Amazon S3 https path to a php.ini override file (e.g. https://s3.amazonaws.com/aws-refarch/wordpress/latest/bits/20-aws.ini)
     Type: String
   PHPVersion:
     AllowedValues:
-    - 5.5
     - 5.6
     - 7.0
-    Default: 7.0
+    - 7.1
+    - 7.2
+    - 7.3
+    Default: 7.3
     Description: The version of PHP to install.
-    Type: String 
+    Type: String
   PublicAlbTargetGroupArn:
     Description: The public application load balancer target group arn.
     Type: String
@@ -187,95 +189,196 @@ Parameters:
     Type: String
   WebInstanceType:
     AllowedValues:
-    - t2.nano 
-    - t2.micro 
-    - t2.small 
-    - t2.medium 
-    - t2.large 
-    - t2.xlarge 
-    - t2.2xlarge 
-    - m3.medium 
-    - m3.large 
-    - m3.xlarge 
-    - m3.2xlarge 
-    - m4.large 
-    - m4.xlarge 
-    - m4.2xlarge 
-    - m4.4xlarge 
-    - m4.10xlarge 
-    - m4.16xlarge 
-    - m5.large 
-    - m5.xlarge 
-    - m5.2xlarge 
-    - m5.4xlarge 
-    - m5.12xlarge 
-    - m5.24xlarge 
-    - c3.large 
-    - c3.xlarge 
-    - c3.2xlarge 
-    - c3.4xlarge 
-    - c3.8xlarge 
-    - c4.large 
-    - c4.xlarge 
-    - c4.2xlarge 
-    - c4.4xlarge 
-    - c4.8xlarge 
-    - c5.large 
-    - c5.xlarge 
-    - c5.2xlarge 
-    - c5.4xlarge 
-    - c5.9xlarge 
+    - a1.2xlarge
+    - a1.4xlarge
+    - a1.large
+    - a1.medium
+    - a1.xlarge
+    - c4.2xlarge
+    - c4.4xlarge
+    - c4.8xlarge
+    - c4.large
+    - c4.xlarge
+    - c5.12xlarge
     - c5.18xlarge
-    - r3.large 
-    - r3.xlarge 
-    - r3.2xlarge 
-    - r3.4xlarge 
-    - r3.8xlarge 
-    - r4.large 
-    - r4.xlarge 
-    - r4.2xlarge 
-    - r4.4xlarge 
-    - r4.8xlarge 
-    - r4.16xlarge 
-    - x1.16xlarge 
-    - x1.32xlarge 
-    - x1e.xlarge 
-    - x1e.2xlarge 
-    - x1e.4xlarge 
-    - x1e.8xlarge 
-    - x1e.16xlarge 
-    - x1e.32xlarge
-    - d2.xlarge 
-    - d2.2xlarge 
-    - d2.4xlarge 
-    - d2.8xlarge 
-    - h1.2xlarge 
-    - h1.4xlarge 
-    - h1.8xlarge 
-    - h1.16xlarge 
-    - i2.xlarge 
-    - i2.2xlarge 
-    - i2.4xlarge 
-    - i2.8xlarge 
-    - i3.large 
-    - i3.xlarge 
-    - i3.2xlarge 
-    - i3.4xlarge 
-    - i3.8xlarge 
+    - c5.24xlarge
+    - c5.2xlarge
+    - c5.4xlarge
+    - c5.9xlarge
+    - c5.large
+    - c5.metal
+    - c5.xlarge
+    - c5d.18xlarge
+    - c5d.2xlarge
+    - c5d.4xlarge
+    - c5d.9xlarge
+    - c5d.large
+    - c5d.xlarge
+    - c5n.18xlarge
+    - c5n.2xlarge
+    - c5n.4xlarge
+    - c5n.9xlarge
+    - c5n.large
+    - c5n.xlarge
+    - cc1.4xlarge
+    - cc2.8xlarge
+    - cg1.4xlarge
+    - d2.2xlarge
+    - d2.4xlarge
+    - d2.8xlarge
+    - d2.xlarge
+    - f1.16xlarge
+    - f1.2xlarge
+    - f1.4xlarge
+    - g3.16xlarge
+    - g3.4xlarge
+    - g3.8xlarge
+    - g3s.xlarge
+    - h1.16xlarge
+    - h1.2xlarge
+    - h1.4xlarge
+    - h1.8xlarge
+    - hi1.4xlarge
     - i3.16xlarge
-    - f1.2xlarge 
-    - f1.16xlarge 
-    - g2.2xlarge 
-    - g2.8xlarge 
-    - g3.4xlarge 
-    - g3.8xlarge 
-    - g3.16xlarge 
-    - p2.xlarge 
-    - p2.8xlarge 
-    - p2.16xlarge 
-    - p3.2xlarge 
-    - p3.8xlarge 
+    - i3.2xlarge
+    - i3.4xlarge
+    - i3.8xlarge
+    - i3.large
+    - i3.metal
+    - i3.xlarge
+    - i3en.12xlarge
+    - i3en.24xlarge
+    - i3en.2xlarge
+    - i3en.3xlarge
+    - i3en.6xlarge
+    - i3en.large
+    - i3en.xlarge
+    - m4.10xlarge
+    - m4.16xlarge
+    - m4.2xlarge
+    - m4.4xlarge
+    - m4.large
+    - m4.xlarge
+    - m5.12xlarge
+    - m5.16xlarge
+    - m5.24xlarge
+    - m5.2xlarge
+    - m5.4xlarge
+    - m5.8xlarge
+    - m5.large
+    - m5.metal
+    - m5.xlarge
+    - m5a.12xlarge
+    - m5a.16xlarge
+    - m5a.24xlarge
+    - m5a.2xlarge
+    - m5a.4xlarge
+    - m5a.8xlarge
+    - m5a.large
+    - m5a.xlarge
+    - m5ad.12xlarge
+    - m5ad.16xlarge
+    - m5ad.24xlarge
+    - m5ad.2xlarge
+    - m5ad.4xlarge
+    - m5ad.8xlarge
+    - m5ad.large
+    - m5ad.xlarge
+    - m5d.12xlarge
+    - m5d.16xlarge
+    - m5d.24xlarge
+    - m5d.2xlarge
+    - m5d.4xlarge
+    - m5d.8xlarge
+    - m5d.large
+    - m5d.metal
+    - m5d.xlarge
+    - p2.16xlarge
+    - p2.8xlarge
+    - p2.xlarge
     - p3.16xlarge
+    - p3.2xlarge
+    - p3.8xlarge
+    - p3dn.24xlarge
+    - r4.16xlarge
+    - r4.2xlarge
+    - r4.4xlarge
+    - r4.8xlarge
+    - r4.large
+    - r4.xlarge
+    - r5.12xlarge
+    - r5.16xlarge
+    - r5.24xlarge
+    - r5.2xlarge
+    - r5.4xlarge
+    - r5.8xlarge
+    - r5.large
+    - r5.metal
+    - r5.xlarge
+    - r5a.12xlarge
+    - r5a.16xlarge
+    - r5a.24xlarge
+    - r5a.2xlarge
+    - r5a.4xlarge
+    - r5a.8xlarge
+    - r5a.large
+    - r5a.xlarge
+    - r5ad.12xlarge
+    - r5ad.16xlarge
+    - r5ad.24xlarge
+    - r5ad.2xlarge
+    - r5ad.4xlarge
+    - r5ad.8xlarge
+    - r5ad.large
+    - r5ad.xlarge
+    - r5d.12xlarge
+    - r5d.16xlarge
+    - r5d.24xlarge
+    - r5d.2xlarge
+    - r5d.4xlarge
+    - r5d.8xlarge
+    - r5d.large
+    - r5d.metal
+    - r5d.xlarge
+    - t2.2xlarge
+    - t2.large
+    - t2.medium
+    - t2.micro
+    - t2.nano
+    - t2.small
+    - t2.xlarge
+    - t3.2xlarge
+    - t3.large
+    - t3.medium
+    - t3.micro
+    - t3.nano
+    - t3.small
+    - t3.xlarge
+    - t3a.2xlarge
+    - t3a.large
+    - t3a.medium
+    - t3a.micro
+    - t3a.nano
+    - t3a.small
+    - t3a.xlarge
+    - u-12tb1.metal
+    - u-6tb1.metal
+    - u-9tb1.metal
+    - x1.16xlarge
+    - x1.32xlarge
+    - x1e.16xlarge
+    - x1e.2xlarge
+    - x1e.32xlarge
+    - x1e.4xlarge
+    - x1e.8xlarge
+    - x1e.xlarge
+    - z1d.12xlarge
+    - z1d.2xlarge
+    - z1d.3xlarge
+    - z1d.6xlarge
+    - z1d.large
+    - z1d.metal
+    - z1d.xlarge
     ConstraintDescription: Must be a valid Amazon EC2 instance type.
     Default: t2.large
     Description: The Amazon EC2 instance type for your web instances.
@@ -289,7 +392,7 @@ Parameters:
     Type: String
   WPAdminPassword:
     AllowedPattern: ^([a-zA-Z0-9`~!#$%^&*()_+,\\-])*$
-    ConstraintDescription: Must be letters (upper or lower), numbers, and these special characters '_'`~!#$%^&*()_+,-   
+    ConstraintDescription: Must be letters (upper or lower), numbers, and these special characters '_'`~!#$%^&*()_+,-
     Description: The WordPress admin password.
     Type: String
     NoEcho: true
@@ -457,7 +560,7 @@ Resources:
             [ PHP56,
             !Ref WebLaunchConfiguration56,
             !Ref WebLaunchConfiguration70
-            ]          
+            ]
           ]
       MaxSize: !Ref WebAsgMax
       MinSize: !Ref WebAsgMin
@@ -526,7 +629,7 @@ Resources:
                 !Join [
                   "",[
                     "#!/bin/bash -xe\n",
-                    "if [ ! -f /etc/httpd/conf.d/", !Ref WPDirectory, ".conf ]; then\n",                    
+                    "if [ ! -f /etc/httpd/conf.d/", !Ref WPDirectory, ".conf ]; then\n",
                     "   touch /etc/httpd/conf.d/", !Ref WPDirectory, ".conf\n",
                     "   echo 'ServerName 127.0.0.1:80' >> /etc/httpd/conf.d/", !Ref WPDirectory, ".conf\n",
                     "   echo 'DocumentRoot /var/www/wordpress/", !Ref WPDirectory, "' >> /etc/httpd/conf.d/", !Ref WPDirectory, ".conf\n",
@@ -549,7 +652,7 @@ Resources:
         build_cacheclient:
           packages:
             yum:
-              gcc-c++: []  
+              gcc-c++: []
           files:
             /tmp/install_cacheclient.sh:
               content:
@@ -577,7 +680,7 @@ Resources:
                 !Sub |
                   #!/bin/bash -xe
                   # create hidden opcache directory locally & change owner to apache
-                  if [ ! -d /var/www/.opcache ]; then                    
+                  if [ ! -d /var/www/.opcache ]; then
                       mkdir -p /var/www/.opcache
                   fi
                   # enable opcache in /etc/php-5.5.d/opcache.ini
@@ -605,14 +708,14 @@ Resources:
                     "fi\n",
                     "\n",
                     "# make site directory\n",
-                    "if [ ! -d /var/www/wordpress/", !Ref WPDirectory, " ]; then\n",                    
+                    "if [ ! -d /var/www/wordpress/", !Ref WPDirectory, " ]; then\n",
                     "   mkdir -p /var/www/wordpress/", !Ref WPDirectory, "\n",
                     "\n",
                     "   cd /var/www/wordpress/", !Ref WPDirectory, "\n",
                     "   # install wordpress if not installed\n",
                     "   # use public alb host name if wp domain name was empty\n",
                     "   if ! $(wp core is-installed --allow-root); then\n",
-                    "       wp core download --version='", !Ref WPVersion, "' --locale='", !Ref WPLocale, "' --allow-root\n",  
+                    "       wp core download --version='", !Ref WPVersion, "' --locale='", !Ref WPLocale, "' --allow-root\n",
                     "       wp core config --dbname='", !Ref DatabaseName, "' --dbuser='", !Ref DatabaseMasterUsername, "' --dbpass='", !Ref DatabaseMasterPassword, "' --dbhost='", !Ref DatabaseClusterEndpointAddress, "' --dbprefix=wp_ --allow-root\n",
                     "       wp core install --url=", !If [ NoWPDomainName, !Ref PublicAlbHostname, !Join [ "", [ "'http://www.", !Ref WPDomainName, "'" ] ] ], " --title='", !Ref WPTitle, "' --admin_user='", !Ref WPAdminUsername, "' --admin_password='", !Ref WPAdminPassword, "' --admin_email='", !Ref WPAdminEmail, "' --skip-email --allow-root\n",
                     "       wp plugin install w3-total-cache\n",
@@ -621,7 +724,7 @@ Resources:
                     "       # enable HTTPS in wp-config.php if ACM Public SSL Certificate parameter was not empty\n",
                             !If [ NoSslCertificate, !Join [ '', [ "       sed -i \"/$table_prefix = 'wp_';/ a \\# No ACM Public SSL Certificate \" /var/www/wordpress/", !Ref WPDirectory, "/wp-config.php\n" ] ] , !Join [ '', [ "       sed -i \"/$table_prefix = 'wp_';/ a \\$_SERVER['HTTPS'] = 'on';\" /var/www/wordpress/", !Ref WPDirectory, "/wp-config.php\n" ] ] ],
                     "\n",
-                    "       # set permissions of wordpress site directories\n", 
+                    "       # set permissions of wordpress site directories\n",
                     "       chown -R apache:apache /var/www/wordpress/", !Ref WPDirectory, "\n",
                     "       chmod u+wrx /var/www/wordpress/", !Ref WPDirectory, "/wp-content/*\n",
                     "       if [ ! -f /var/www/wordpress/", !Ref WPDirectory, "/opcache-instanceid.php ]; then\n",
@@ -640,7 +743,7 @@ Resources:
               mode: 000500
               owner: root
               group: root
-        download_aws_ini: 
+        download_aws_ini:
           files:
             /tmp/download_aws_ini.sh:
               content:
@@ -665,7 +768,7 @@ Resources:
             install_wordpress:
               command: ./install_wordpress.sh
               cwd: /tmp
-              ignoreErrors: false          
+              ignoreErrors: false
         install_cacheclient:
           commands:
             install_cacheclient:
@@ -734,7 +837,7 @@ Resources:
                 !Join [
                   "",[
                     "#!/bin/bash -xe\n",
-                    "if [ ! -f /etc/httpd/conf.d/", !Ref WPDirectory, ".conf ]; then\n",                    
+                    "if [ ! -f /etc/httpd/conf.d/", !Ref WPDirectory, ".conf ]; then\n",
                     "   touch /etc/httpd/conf.d/", !Ref WPDirectory, ".conf\n",
                     "   echo 'ServerName 127.0.0.1:80' >> /etc/httpd/conf.d/", !Ref WPDirectory, ".conf\n",
                     "   echo 'DocumentRoot /var/www/wordpress/", !Ref WPDirectory, "' >> /etc/httpd/conf.d/", !Ref WPDirectory, ".conf\n",
@@ -757,7 +860,7 @@ Resources:
         build_cacheclient:
           packages:
             yum:
-              gcc-c++: []  
+              gcc-c++: []
           files:
             /tmp/install_cacheclient.sh:
               content:
@@ -785,7 +888,7 @@ Resources:
                 !Sub |
                   #!/bin/bash -xe
                   # create hidden opcache directory locally & change owner to apache
-                  if [ ! -d /var/www/.opcache ]; then                    
+                  if [ ! -d /var/www/.opcache ]; then
                       mkdir -p /var/www/.opcache
                   fi
                   # enable opcache in /etc/php-5.6.d/opcache.ini
@@ -813,14 +916,14 @@ Resources:
                     "fi\n",
                     "\n",
                     "# make site directory\n",
-                    "if [ ! -d /var/www/wordpress/", !Ref WPDirectory, " ]; then\n",                    
+                    "if [ ! -d /var/www/wordpress/", !Ref WPDirectory, " ]; then\n",
                     "   mkdir -p /var/www/wordpress/", !Ref WPDirectory, "\n",
                     "\n",
                     "   cd /var/www/wordpress/", !Ref WPDirectory, "\n",
                     "   # install wordpress if not installed\n",
                     "   # use public alb host name if wp domain name was empty\n",
                     "   if ! $(wp core is-installed --allow-root); then\n",
-                    "       wp core download --version='", !Ref WPVersion, "' --locale='", !Ref WPLocale, "' --allow-root\n",  
+                    "       wp core download --version='", !Ref WPVersion, "' --locale='", !Ref WPLocale, "' --allow-root\n",
                     "       wp core config --dbname='", !Ref DatabaseName, "' --dbuser='", !Ref DatabaseMasterUsername, "' --dbpass='", !Ref DatabaseMasterPassword, "' --dbhost='", !Ref DatabaseClusterEndpointAddress, "' --dbprefix=wp_ --allow-root\n",
                     "       wp core install --url=", !If [ NoWPDomainName, !Ref PublicAlbHostname, !Join [ "", [ "'http://www.", !Ref WPDomainName, "'" ] ] ], " --title='", !Ref WPTitle, "' --admin_user='", !Ref WPAdminUsername, "' --admin_password='", !Ref WPAdminPassword, "' --admin_email='", !Ref WPAdminEmail, "' --skip-email --allow-root\n",
                     "       wp plugin install w3-total-cache\n",
@@ -829,7 +932,7 @@ Resources:
                     "       # enable HTTPS in wp-config.php if ACM Public SSL Certificate parameter was not empty\n",
                             !If [ NoSslCertificate, !Join [ '', [ "       sed -i \"/$table_prefix = 'wp_';/ a \\# No ACM Public SSL Certificate \" /var/www/wordpress/", !Ref WPDirectory, "/wp-config.php\n" ] ] , !Join [ '', [ "       sed -i \"/$table_prefix = 'wp_';/ a \\$_SERVER['HTTPS'] = 'on';\" /var/www/wordpress/", !Ref WPDirectory, "/wp-config.php\n" ] ] ],
                     "\n",
-                    "       # set permissions of wordpress site directories\n", 
+                    "       # set permissions of wordpress site directories\n",
                     "       chown -R apache:apache /var/www/wordpress/", !Ref WPDirectory, "\n",
                     "       chmod u+wrx /var/www/wordpress/", !Ref WPDirectory, "/wp-content/*\n",
                     "       if [ ! -f /var/www/wordpress/", !Ref WPDirectory, "/opcache-instanceid.php ]; then\n",
@@ -848,7 +951,7 @@ Resources:
               mode: 000500
               owner: root
               group: root
-        download_aws_ini: 
+        download_aws_ini:
           files:
             /tmp/download_aws_ini.sh:
               content:
@@ -873,7 +976,7 @@ Resources:
             install_wordpress:
               command: ./install_wordpress.sh
               cwd: /tmp
-              ignoreErrors: false          
+              ignoreErrors: false
         install_cacheclient:
           commands:
             install_cacheclient:
@@ -942,7 +1045,7 @@ Resources:
                 !Join [
                   "",[
                     "#!/bin/bash -xe\n",
-                    "if [ ! -f /etc/httpd/conf.d/", !Ref WPDirectory, ".conf ]; then\n",                    
+                    "if [ ! -f /etc/httpd/conf.d/", !Ref WPDirectory, ".conf ]; then\n",
                     "   touch /etc/httpd/conf.d/", !Ref WPDirectory, ".conf\n",
                     "   echo 'ServerName 127.0.0.1:80' >> /etc/httpd/conf.d/", !Ref WPDirectory, ".conf\n",
                     "   echo 'DocumentRoot /var/www/wordpress/", !Ref WPDirectory, "' >> /etc/httpd/conf.d/", !Ref WPDirectory, ".conf\n",
@@ -965,7 +1068,7 @@ Resources:
         build_cacheclient:
           packages:
             yum:
-              gcc-c++: []  
+              gcc-c++: []
           files:
             /tmp/install_cacheclient.sh:
               content:
@@ -994,7 +1097,7 @@ Resources:
                 !Sub |
                   #!/bin/bash -xe
                   # create hidden opcache directory locally & change owner to apache
-                  if [ ! -d /var/www/.opcache ]; then                    
+                  if [ ! -d /var/www/.opcache ]; then
                       mkdir -p /var/www/.opcache
                   fi
                   # enable opcache in /etc/php-7.0.d/10-opcache.ini
@@ -1022,14 +1125,14 @@ Resources:
                     "fi\n",
                     "\n",
                     "# make site directory\n",
-                    "if [ ! -d /var/www/wordpress/", !Ref WPDirectory, " ]; then\n",                    
+                    "if [ ! -d /var/www/wordpress/", !Ref WPDirectory, " ]; then\n",
                     "   mkdir -p /var/www/wordpress/", !Ref WPDirectory, "\n",
                     "\n",
                     "   cd /var/www/wordpress/", !Ref WPDirectory, "\n",
                     "   # install wordpress if not installed\n",
                     "   # use public alb host name if wp domain name was empty\n",
                     "   if ! $(wp core is-installed --allow-root); then\n",
-                    "       wp core download --version='", !Ref WPVersion, "' --locale='", !Ref WPLocale, "' --allow-root\n",  
+                    "       wp core download --version='", !Ref WPVersion, "' --locale='", !Ref WPLocale, "' --allow-root\n",
                     "       wp core config --dbname='", !Ref DatabaseName, "' --dbuser='", !Ref DatabaseMasterUsername, "' --dbpass='", !Ref DatabaseMasterPassword, "' --dbhost='", !Ref DatabaseClusterEndpointAddress, "' --dbprefix=wp_ --allow-root\n",
                     "       wp core install --url=", !If [ NoWPDomainName, !Ref PublicAlbHostname, !Join [ "", [ "'http://www.", !Ref WPDomainName, "'" ] ] ], " --title='", !Ref WPTitle, "' --admin_user='", !Ref WPAdminUsername, "' --admin_password='", !Ref WPAdminPassword, "' --admin_email='", !Ref WPAdminEmail, "' --skip-email --allow-root\n",
                     "       wp plugin install w3-total-cache\n",
@@ -1038,7 +1141,7 @@ Resources:
                     "       # enable HTTPS in wp-config.php if ACM Public SSL Certificate parameter was not empty\n",
                             !If [ NoSslCertificate, !Join [ '', [ "       sed -i \"/$table_prefix = 'wp_';/ a \\# No ACM Public SSL Certificate \" /var/www/wordpress/", !Ref WPDirectory, "/wp-config.php\n" ] ] , !Join [ '', [ "       sed -i \"/$table_prefix = 'wp_';/ a \\$_SERVER['HTTPS'] = 'on';\" /var/www/wordpress/", !Ref WPDirectory, "/wp-config.php\n" ] ] ],
                     "\n",
-                    "       # set permissions of wordpress site directories\n", 
+                    "       # set permissions of wordpress site directories\n",
                     "       chown -R apache:apache /var/www/wordpress/", !Ref WPDirectory, "\n",
                     "       chmod u+wrx /var/www/wordpress/", !Ref WPDirectory, "/wp-content/*\n",
                     "       if [ ! -f /var/www/wordpress/", !Ref WPDirectory, "/opcache-instanceid.php ]; then\n",
@@ -1057,7 +1160,7 @@ Resources:
               mode: 000500
               owner: root
               group: root
-        download_aws_ini: 
+        download_aws_ini:
           files:
             /tmp/download_aws_ini.sh:
               content:
@@ -1082,7 +1185,7 @@ Resources:
             install_wordpress:
               command: ./install_wordpress.sh
               cwd: /tmp
-              ignoreErrors: false          
+              ignoreErrors: false
         install_cacheclient:
           commands:
             install_cacheclient:

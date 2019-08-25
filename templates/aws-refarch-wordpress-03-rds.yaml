@@ -10,7 +10,7 @@ Metadata:
   License:
     Description: 'Copyright 2018 Amazon.com, Inc. and its affiliates. All Rights Reserved.
                   SPDX-License-Identifier: MIT-0'
-  
+
   AWS::CloudFormation::Interface:
     ParameterGroups:
     - Label:
@@ -29,9 +29,9 @@ Metadata:
       DatabaseEncrpytedBoolean:
         default: Encrypted DB Cluster
       DatabaseCmk:
-        default: AWS KMS Customer Master Key (CMK) to encrypt DB 
+        default: AWS KMS Customer Master Key (CMK) to encrypt DB
       DatabaseInstanceType:
-        default: DB Instance Class 
+        default: DB Instance Class
       DatabaseMasterUsername:
         default: DB Master Username
       DatabaseMasterPassword:
@@ -61,19 +61,32 @@ Parameters:
     Type: String
   DatabaseInstanceType:
     AllowedValues:
+      - db.t2.micro
       - db.t2.small
       - db.t2.medium
-      - db.r3.large
-      - db.r3.xlarge
-      - db.r3.2xlarge
-      - db.r3.4xlarge
-      - db.r3.8xlarge
+      - db.t2.large
+      - db.t2.xlarge
+      - db.t2.2xlarge
+      - db.t3.micro
+      - db.t3.small
+      - db.t3.medium
+      - db.t3.large
+      - db.t3.xlarge
+      - db.t3.2xlarge
       - db.r4.large
       - db.r4.xlarge
       - db.r4.2xlarge
       - db.r4.4xlarge
       - db.r4.8xlarge
       - db.r4.16xlarge
+      - db.r5.large
+      - db.r5.xlarge
+      - db.r5.2xlarge
+      - db.r5.4xlarge
+      - db.r5.8xlarge
+      - db.r5.12xlarge
+      - db.r5.16xlarge
+      - db.r5.24xlarge
     ConstraintDescription: Must be a valid RDS instance class.
     Default: db.t2.medium
     Description: The Amazon RDS database instance class.
@@ -87,7 +100,7 @@ Parameters:
     Type: String
   DatabaseMasterPassword:
     AllowedPattern: ^([a-z0-9A-Z`~!#$%^&*()_+,\\-])*$
-    ConstraintDescription: Must be letters (upper or lower), numbers, and these special characters '_'`~!#$%^&*()_+,-    
+    ConstraintDescription: Must be letters (upper or lower), numbers, and these special characters '_'`~!#$%^&*()_+,-
     Description: The Amazon RDS master password.
     MaxLength: 41
     MinLength: 8
@@ -112,7 +125,7 @@ Parameters:
     - 6
     Default: 3
     Description: Number of subnets. This must match your selections in the list of subnets below.
-    Type: String 
+    Type: String
   Subnet:
     Description: Select existing subnets. The number selected must match the number of subnets above. Subnets selected must be in separate AZs.
     Type: List<AWS::EC2::Subnet::Id>
@@ -252,4 +265,3 @@ Outputs:
     Value: !Ref DataSubnetGroup
   DatabaseClusterEndpointAddress:
     Value: !GetAtt DatabaseCluster.Endpoint.Address
-
