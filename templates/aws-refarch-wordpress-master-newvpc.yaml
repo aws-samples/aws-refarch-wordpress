@@ -52,7 +52,7 @@ Metadata:
         default: File System Tier
       Parameters:
         - EfsPerformanceMode
-        - EfsEncrpytedBoolean
+        - EfsEncryptedBoolean
         - EfsCmk
         - EfsGrowth
         - EfsGrowthInstanceType
@@ -64,7 +64,7 @@ Metadata:
         default: Database Tier
       Parameters:
         - DatabaseInstanceType
-        - DatabaseEncrpytedBoolean
+        - DatabaseEncryptedBoolean
         - DatabaseCmk
         - DatabaseMasterUsername
         - DatabaseMasterPassword
@@ -100,7 +100,7 @@ Metadata:
         default: CloudFront Certificate ARN
       DatabaseCmk:
         default: AWS KMS CMK for RDS 
-      DatabaseEncrpytedBoolean:
+      DatabaseEncryptedBoolean:
         default: Encrypted DB Cluster
       DatabaseInstanceType:
         default: DB Instance Class
@@ -116,7 +116,7 @@ Metadata:
         default: AWS KMS CMK for EFS
       EfsCreateAlarms:
         default: Create EFS alarms
-      EfsEncrpytedBoolean:
+      EfsEncryptedBoolean:
         default: Encrpyted EFS?
       EfsGrowth:
         default: Add dummy data (GiB)
@@ -317,7 +317,7 @@ Parameters:
   DatabaseCmk:
     Description: AWS KMS Customer Master Key (CMK) to encrypt database cluster
     Type: String
-  DatabaseEncrpytedBoolean:
+  DatabaseEncryptedBoolean:
     AllowedValues:
       - true
       - false
@@ -457,7 +457,7 @@ Parameters:
     Default: t2.nano
     Description: The Amazon EC2 instance type that dynamically adjusts alarm thresholds based on permitted throughput changes.
     Type: String
-  EfsEncrpytedBoolean:
+  EfsEncryptedBoolean:
     AllowedValues:
       - true
       - false
@@ -1053,7 +1053,7 @@ Resources:
     Properties:
       Parameters:
         EncrpytedBoolean:
-          !Ref EfsEncrpytedBoolean
+          !Ref EfsEncryptedBoolean
         Cmk:
           !Ref EfsCmk
         EC2KeyName:
@@ -1194,7 +1194,7 @@ Resources:
         DatabaseName:
           !Ref DatabaseName
         DatabaseEncrpytedBoolean:
-          !Ref DatabaseEncrpytedBoolean
+          !Ref DatabaseEncryptedBoolean
         DatabaseCmk:
           !Ref DatabaseCmk
         DatabaseSecurityGroup:
