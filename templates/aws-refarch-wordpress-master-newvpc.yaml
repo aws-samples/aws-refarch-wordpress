@@ -625,7 +625,7 @@ Parameters:
     Description: Name of an EC2 KeyPair. Your bastion & Web instances will launch with this KeyPair.
     Type: AWS::EC2::KeyPair::KeyName
   PHPIniOverride:
-    Description: Full Amazon S3 https path to a php.ini override file (e.g. https://s3.amazonaws.com/refarch-wordpress-modified/samples/20-aws.ini)
+    Description: Full Amazon S3 https path to a php.ini override file (e.g. https://s3.amazonaws.com/k247work-github/refarch-wordpress-modified/samples/20-aws.ini)
     Type: String
   PHPVersion:
     AllowedValues:
