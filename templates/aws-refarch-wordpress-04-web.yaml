@@ -146,7 +146,7 @@ Parameters:
     Description: Number of subnets. This must match your selections in the list of subnets below.
     Type: String 
   PHPIniOverride:
-    Description: Full Amazon S3 https path to a php.ini override file (e.g. https://s3.amazonaws.com/refarch-wordpress-modified/samples/20-aws.ini)
+    Description: Full Amazon S3 https path to a php.ini override file (e.g. https://s3.amazonaws.com/k247work-github/refarch-wordpress-modified/samples/20-aws.ini)
     Type: String
   PHPVersion:
     AllowedValues:
@@ -553,7 +553,7 @@ Resources:
               content:
                 !Sub |
                   #!/bin/bash -xe
-                  wget -P /tmp/ https://s3.amazonaws.com/refarch-wordpress-modified/bits/AmazonElastiCacheClusterClient-1.0.1-PHP55-64bit.tgz
+                  wget -P /tmp/ https://s3.amazonaws.com/k247work-github/refarch-wordpress-modified/bits/AmazonElastiCacheClusterClient-1.0.1-PHP55-64bit.tgz
                   tar -xf '/tmp/AmazonElastiCacheClusterClient-1.0.1-PHP55-64bit.tgz'
                   cp '/tmp/AmazonElastiCacheClusterClient-1.0.0/amazon-elasticache-cluster-client.so' /usr/lib64/php/5.5/modules/
                   if [ ! -f /etc/php-5.5.d/50-memcached.ini ]; then
@@ -582,7 +582,7 @@ Resources:
                   sed -i 's/opcache.memory_consumption=.*/opcache.memory_consumption=512/' /etc/php-5.5.d/opcache.ini
                   # download opcache-instance.php to verify opcache status
                   if [ ! -f /var/www/wordpress/${WPDirectory}/opcache-instanceid.php ]; then
-                      wget -P /var/www/wordpress/${WPDirectory}/ https://s3.amazonaws.com/refarch-wordpress-modified/bits/opcache-instanceid.php
+                      wget -P /var/www/wordpress/${WPDirectory}/ https://s3.amazonaws.com/k247work-github/refarch-wordpress-modified/bits/opcache-instanceid.php
                   fi
               mode: 000500
               owner: root
@@ -621,7 +621,7 @@ Resources:
                     "       chown -R apache:apache /var/www/wordpress/", !Ref WPDirectory, "\n",
                     "       chmod u+wrx /var/www/wordpress/", !Ref WPDirectory, "/wp-content/*\n",
                     "       if [ ! -f /var/www/wordpress/", !Ref WPDirectory, "/opcache-instanceid.php ]; then\n",
-                    "         wget -P /var/www/wordpress/", !Ref WPDirectory, "/ https://s3.amazonaws.com/refarch-wordpress-modified/bits/opcache-instanceid.php\n",
+                    "         wget -P /var/www/wordpress/", !Ref WPDirectory, "/ https://s3.amazonaws.com/k247work-github/refarch-wordpress-modified/bits/opcache-instanceid.php\n",
                     "       fi\n",
                     "   fi\n",
                     "   RESULT=$?\n",
@@ -757,7 +757,7 @@ Resources:
               content:
                 !Sub |
                   #!/bin/bash -xe
-                  wget -P /tmp/ https://s3.amazonaws.com/refarch-wordpress-modified/bits/AmazonElastiCacheClusterClient-1.0.0-PHP56-64bit.tgz
+                  wget -P /tmp/ https://s3.amazonaws.com/k247work-github/refarch-wordpress-modified/bits/AmazonElastiCacheClusterClient-1.0.0-PHP56-64bit.tgz
                   tar -xf '/tmp/AmazonElastiCacheClusterClient-1.0.0-PHP56-64bit.tgz'
                   cp '/tmp/AmazonElastiCacheClusterClient-1.0.0/amazon-elasticache-cluster-client.so' /usr/lib64/php/5.6/modules/
                   if [ ! -f /etc/php-5.6.d/50-memcached.ini ]; then
@@ -786,7 +786,7 @@ Resources:
                   sed -i 's/opcache.memory_consumption=.*/opcache.memory_consumption=512/' /etc/php-5.6.d/10-opcache.ini
                   # download opcache-instance.php to verify opcache status
                   if [ ! -f /var/www/wordpress/${WPDirectory}/opcache-instanceid.php ]; then
-                      wget -P /var/www/wordpress/${WPDirectory}/ https://s3.amazonaws.com/refarch-wordpress-modified/bits/opcache-instanceid.php
+                      wget -P /var/www/wordpress/${WPDirectory}/ https://s3.amazonaws.com/k247work-github/refarch-wordpress-modified/bits/opcache-instanceid.php
                   fi
               mode: 000500
               owner: root
@@ -825,7 +825,7 @@ Resources:
                     "       chown -R apache:apache /var/www/wordpress/", !Ref WPDirectory, "\n",
                     "       chmod u+wrx /var/www/wordpress/", !Ref WPDirectory, "/wp-content/*\n",
                     "       if [ ! -f /var/www/wordpress/", !Ref WPDirectory, "/opcache-instanceid.php ]; then\n",
-                    "         wget -P /var/www/wordpress/", !Ref WPDirectory, "/ https://s3.amazonaws.com/refarch-wordpress-modified/bits/opcache-instanceid.php\n",
+                    "         wget -P /var/www/wordpress/", !Ref WPDirectory, "/ https://s3.amazonaws.com/k247work-github/refarch-wordpress-modified/bits/opcache-instanceid.php\n",
                     "       fi\n",
                     "   fi\n",
                     "   RESULT=$?\n",
@@ -961,7 +961,7 @@ Resources:
               content:
                 !Sub |
                   #!/bin/bash -xe
-                  wget -P /tmp/ https://s3.amazonaws.com/refarch-wordpress-modified/bits/AmazonElastiCacheClusterClient-2.0.1-PHP70-64bit.tar.gz
+                  wget -P /tmp/ https://s3.amazonaws.com/k247work-github/refarch-wordpress-modified/bits/AmazonElastiCacheClusterClient-2.0.1-PHP70-64bit.tar.gz
                   tar -xf '/tmp/AmazonElastiCacheClusterClient-2.0.1-PHP70-64bit.tar.gz'
                   cp '/tmp/artifact/amazon-elasticache-cluster-client.so' /usr/lib64/php/7.0/modules/
                   if [ ! -f /etc/php-7.0.d/50-memcached.ini ]; then
@@ -990,7 +990,7 @@ Resources:
                   sed -i 's/opcache.memory_consumption=.*/opcache.memory_consumption=512/' /etc/php-7.0.d/10-opcache.ini
                   # download opcache-instance.php to verify opcache status
                   if [ ! -f /var/www/wordpress/${WPDirectory}/opcache-instanceid.php ]; then
-                      wget -P /var/www/wordpress/${WPDirectory}/ https://s3.amazonaws.com/refarch-wordpress-modified/bits/opcache-instanceid.php
+                      wget -P /var/www/wordpress/${WPDirectory}/ https://s3.amazonaws.com/k247work-github/refarch-wordpress-modified/bits/opcache-instanceid.php
                   fi
               mode: 000500
               owner: root
@@ -1029,7 +1029,7 @@ Resources:
                     "       chown -R apache:apache /var/www/wordpress/", !Ref WPDirectory, "\n",
                     "       chmod u+wrx /var/www/wordpress/", !Ref WPDirectory, "/wp-content/*\n",
                     "       if [ ! -f /var/www/wordpress/", !Ref WPDirectory, "/opcache-instanceid.php ]; then\n",
-                    "         wget -P /var/www/wordpress/", !Ref WPDirectory, "/ https://s3.amazonaws.com/refarch-wordpress-modified/bits/opcache-instanceid.php\n",
+                    "         wget -P /var/www/wordpress/", !Ref WPDirectory, "/ https://s3.amazonaws.com/k247work-github/refarch-wordpress-modified/bits/opcache-instanceid.php\n",
                     "       fi\n",
                     "   fi\n",
                     "   RESULT=$?\n",
