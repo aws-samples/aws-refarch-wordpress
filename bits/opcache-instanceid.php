@@ -7,7 +7,8 @@ if (!extension_loaded('Zend OPcache')) {
     require 'data-sample.php';
 }
 
-$instance_id = file_get_contents("http://instance-data/latest/meta-data/instance-id"); echo $instance_id, "\n";
+$instance_id = file_get_contents("http://169.254.169.254/latest/meta-data/instance-id");
+echo "<div style='margin-left:6.1em;font:21px/41px Helvetica'>Instance Id: $instance_id</div>";
 
 class OpCacheDataModel
 {
