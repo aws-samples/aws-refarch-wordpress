@@ -20,5 +20,4 @@ jobs:
           aws-secret-access-key: ${{ secrets.AWS_SECRET_ACCESS_KEY_S3 }}
           aws-region: us-west-2
       - name: S3 sync
-        working-directory: templates
-        run: aws s3 sync . s3://k247work-github/wp-refarch-templates/ --delete --grants read=uri=http://acs.amazonaws.com/groups/global/AllUsers --exclude "README.md"
+        run: aws s3 sync . s3://k247work-github/refarch-wordpress-modified/ --delete --grants read=uri=http://acs.amazonaws.com/groups/global/AllUsers --exclude "images/"
