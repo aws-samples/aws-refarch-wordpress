@@ -146,7 +146,7 @@ Parameters:
     Description: Number of subnets. This must match your selections in the list of subnets below.
     Type: String 
   PHPIniOverride:
-    Description: Full Amazon S3 https path to a php.ini override file (e.g. https://s3.amazonaws.com/refarch-wordpress-modified/bits/20-aws.ini)
+    Description: Full Amazon S3 https path to a php.ini override file (e.g. https://s3.amazonaws.com/refarch-wordpress-modified/samples/20-aws.ini)
     Type: String
   PHPVersion:
     AllowedValues:
@@ -517,8 +517,6 @@ Resources:
               httpd24: []
               mysql56: []
               php55: []
-              php55-devel: []
-              php55-pear: []
               php55-mysqlnd: []
           files:
             /tmp/create_site_conf.sh:
@@ -555,15 +553,14 @@ Resources:
               content:
                 !Sub |
                   #!/bin/bash -xe
-                  pecl install igbinary
                   wget -P /tmp/ https://s3.amazonaws.com/refarch-wordpress-modified/bits/AmazonElastiCacheClusterClient-1.0.1-PHP55-64bit.tgz
                   tar -xf '/tmp/AmazonElastiCacheClusterClient-1.0.1-PHP55-64bit.tgz'
                   cp '/tmp/AmazonElastiCacheClusterClient-1.0.0/amazon-elasticache-cluster-client.so' /usr/lib64/php/5.5/modules/
                   if [ ! -f /etc/php-5.5.d/50-memcached.ini ]; then
                       touch /etc/php-5.5.d/50-memcached.ini
                   fi
-                  echo 'extension=igbinary.so;' >> /etc/php-5.5.d/50-memcached.ini
-                  echo 'extension=/usr/lib64/php/5.5/modules/amazon-elasticache-cluster-client.so;' >> /etc/php-5.5.d/50-memcached.ini
+                  sed -i '3i extension=/usr/lib64/php/5.5/modules/amazon-elasticache-cluster-client.so;' /etc/php-5.5.d/50-memcached.ini
+                  sed -i '3i extension=igbinary.so;' /etc/php-5.5.d/50-memcached.ini
               mode: 000500
               owner: root
               group: root
@@ -615,7 +612,6 @@ Resources:
                     "       wp core download --version='", !Ref WPVersion, "' --locale='", !Ref WPLocale, "' --allow-root\n",  
                     "       wp core config --dbname='", !Ref DatabaseName, "' --dbuser='", !Ref DatabaseMasterUsername, "' --dbpass='", !Ref DatabaseMasterPassword, "' --dbhost='", !Ref DatabaseClusterEndpointAddress, "' --dbprefix=wp_ --allow-root\n",
                     "       wp core install --url=", !If [ NoWPDomainName, !Ref PublicAlbHostname, !Join [ "", [ "'http://www.", !Ref WPDomainName, "'" ] ] ], " --title='", !Ref WPTitle, "' --admin_user='", !Ref WPAdminUsername, "' --admin_password='", !Ref WPAdminPassword, "' --admin_email='", !Ref WPAdminEmail, "' --skip-email --allow-root\n",
-                    "       wp plugin install w3-total-cache\n",
                     "       sed -i \"/$table_prefix = 'wp_';/ a \\define('WP_HOME', 'http://' . \\$_SERVER['HTTP_HOST']); \" /var/www/wordpress/", !Ref WPDirectory, "/wp-config.php\n",
                     "       sed -i \"/$table_prefix = 'wp_';/ a \\define('WP_SITEURL', 'http://' . \\$_SERVER['HTTP_HOST']); \" /var/www/wordpress/", !Ref WPDirectory, "/wp-config.php\n",
                     "       # enable HTTPS in wp-config.php if ACM Public SSL Certificate parameter was not empty\n",
@@ -725,8 +721,6 @@ Resources:
               httpd24: []
               mysql56: []
               php56: []
-              php56-devel: []
-              php56-pear: []
               php56-mysqlnd: []
           files:
             /tmp/create_site_conf.sh:
@@ -763,15 +757,14 @@ Resources:
               content:
                 !Sub |
                   #!/bin/bash -xe
-                  pecl install igbinary
                   wget -P /tmp/ https://s3.amazonaws.com/refarch-wordpress-modified/bits/AmazonElastiCacheClusterClient-1.0.0-PHP56-64bit.tgz
                   tar -xf '/tmp/AmazonElastiCacheClusterClient-1.0.0-PHP56-64bit.tgz'
                   cp '/tmp/AmazonElastiCacheClusterClient-1.0.0/amazon-elasticache-cluster-client.so' /usr/lib64/php/5.6/modules/
                   if [ ! -f /etc/php-5.6.d/50-memcached.ini ]; then
                       touch /etc/php-5.6.d/50-memcached.ini
                   fi
-                  echo 'extension=igbinary.so;' >> /etc/php-5.6.d/50-memcached.ini
-                  echo 'extension=/usr/lib64/php/5.6/modules/amazon-elasticache-cluster-client.so;' >> /etc/php-5.6.d/50-memcached.ini
+                  sed -i '3i extension=/usr/lib64/php/5.6/modules/amazon-elasticache-cluster-client.so;' /etc/php-5.6.d/50-memcached.ini
+                  sed -i '3i extension=igbinary.so;' /etc/php-5.6.d/50-memcached.ini
               mode: 000500
               owner: root
               group: root
@@ -823,7 +816,6 @@ Resources:
                     "       wp core download --version='", !Ref WPVersion, "' --locale='", !Ref WPLocale, "' --allow-root\n",  
                     "       wp core config --dbname='", !Ref DatabaseName, "' --dbuser='", !Ref DatabaseMasterUsername, "' --dbpass='", !Ref DatabaseMasterPassword, "' --dbhost='", !Ref DatabaseClusterEndpointAddress, "' --dbprefix=wp_ --allow-root\n",
                     "       wp core install --url=", !If [ NoWPDomainName, !Ref PublicAlbHostname, !Join [ "", [ "'http://www.", !Ref WPDomainName, "'" ] ] ], " --title='", !Ref WPTitle, "' --admin_user='", !Ref WPAdminUsername, "' --admin_password='", !Ref WPAdminPassword, "' --admin_email='", !Ref WPAdminEmail, "' --skip-email --allow-root\n",
-                    "       wp plugin install w3-total-cache\n",
                     "       sed -i \"/$table_prefix = 'wp_';/ a \\define('WP_HOME', 'http://' . \\$_SERVER['HTTP_HOST']); \" /var/www/wordpress/", !Ref WPDirectory, "/wp-config.php\n",
                     "       sed -i \"/$table_prefix = 'wp_';/ a \\define('WP_SITEURL', 'http://' . \\$_SERVER['HTTP_HOST']); \" /var/www/wordpress/", !Ref WPDirectory, "/wp-config.php\n",
                     "       # enable HTTPS in wp-config.php if ACM Public SSL Certificate parameter was not empty\n",
@@ -933,8 +925,6 @@ Resources:
               httpd24: []
               mysql56: []
               php70: []
-              php70-devel: []
-              php7-pear: []
               php70-mysqlnd: []
           files:
             /tmp/create_site_conf.sh:
@@ -971,16 +961,14 @@ Resources:
               content:
                 !Sub |
                   #!/bin/bash -xe
-                  ln -s /usr/bin/pecl7 /usr/bin/pecl #just so pecl is available easily
-                  pecl7 install igbinary
                   wget -P /tmp/ https://s3.amazonaws.com/refarch-wordpress-modified/bits/AmazonElastiCacheClusterClient-2.0.1-PHP70-64bit.tar.gz
                   tar -xf '/tmp/AmazonElastiCacheClusterClient-2.0.1-PHP70-64bit.tar.gz'
                   cp '/tmp/artifact/amazon-elasticache-cluster-client.so' /usr/lib64/php/7.0/modules/
                   if [ ! -f /etc/php-7.0.d/50-memcached.ini ]; then
                       touch /etc/php-7.0.d/50-memcached.ini
                   fi
-                  echo 'extension=igbinary.so;' >> /etc/php-7.0.d/50-memcached.ini
-                  echo 'extension=/usr/lib64/php/7.0/modules/amazon-elasticache-cluster-client.so;' >> /etc/php-7.0.d/50-memcached.ini
+                  sed -i '3i extension=/usr/lib64/php/7.0/modules/amazon-elasticache-cluster-client.so;' /etc/php-7.0.d/50-memcached.ini
+                  sed -i '3i extension=igbinary.so;' /etc/php-7.0.d/50-memcached.ini
               mode: 000500
               owner: root
               group: root
@@ -1032,7 +1020,6 @@ Resources:
                     "       wp core download --version='", !Ref WPVersion, "' --locale='", !Ref WPLocale, "' --allow-root\n",  
                     "       wp core config --dbname='", !Ref DatabaseName, "' --dbuser='", !Ref DatabaseMasterUsername, "' --dbpass='", !Ref DatabaseMasterPassword, "' --dbhost='", !Ref DatabaseClusterEndpointAddress, "' --dbprefix=wp_ --allow-root\n",
                     "       wp core install --url=", !If [ NoWPDomainName, !Ref PublicAlbHostname, !Join [ "", [ "'http://www.", !Ref WPDomainName, "'" ] ] ], " --title='", !Ref WPTitle, "' --admin_user='", !Ref WPAdminUsername, "' --admin_password='", !Ref WPAdminPassword, "' --admin_email='", !Ref WPAdminEmail, "' --skip-email --allow-root\n",
-                    "       wp plugin install w3-total-cache\n",
                     "       sed -i \"/$table_prefix = 'wp_';/ a \\define('WP_HOME', 'http://' . \\$_SERVER['HTTP_HOST']); \" /var/www/wordpress/", !Ref WPDirectory, "/wp-config.php\n",
                     "       sed -i \"/$table_prefix = 'wp_';/ a \\define('WP_SITEURL', 'http://' . \\$_SERVER['HTTP_HOST']); \" /var/www/wordpress/", !Ref WPDirectory, "/wp-config.php\n",
                     "       # enable HTTPS in wp-config.php if ACM Public SSL Certificate parameter was not empty\n",

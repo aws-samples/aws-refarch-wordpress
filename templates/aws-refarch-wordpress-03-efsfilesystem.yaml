@@ -154,12 +154,6 @@ Parameters:
     Default: generalPurpose
     Description: Select the performance mode of the file system.
     Type: String
-  EfsCopyDataFrom:
-    Description: Clone EFS from existing EFS
-    Type: String
-  WPDirectory:
-    Description: Wordpress directory
-    Type: String
   SecurityGroup:
     Description: Select the Amazon EFS security group.
     Type: AWS::EC2::SecurityGroup::Id   
@@ -400,8 +394,6 @@ Resources:
                 FILE_SYSTEM_ID=$1
                 DATA_DIRECTORY=$2
                 GROWTH=$3
-                COPY_SYSTEM_ID=$4
-                WP_DIR=$5
 
                 if [ $# -lt 3 ]; then
                   echo "Invalid # of arguments. Require: file system id, data directory, file system growth (GiB) "
@@ -462,27 +454,12 @@ Resources:
                   fi
                 done
 
-                #Sync data from 
-                
-                if [[ ! -z $COPY_SYSTEM_ID ]];
-                  then
-                    sudo mkdir -p /$COPY_SYSTEM_ID
-                    sudo chown ec2-user:ec2-user /$COPY_SYSTEM_ID
-                    sudo mountpoint -q /$COPY_SYSTEM_ID || sudo mount -t nfs4 -o nfsvers=4.1,rsize=1048576,wsize=1048576,hard,timeo=600,retrans=2 $COPY_SYSTEM_ID.efs.$region.amazonaws.com:/ /$COPY_SYSTEM_ID
-                    COPY_SOURCE=/$COPY_SYSTEM_ID
-                    if [ -d "/$COPY_SOURCE/$WP_DIR" ]; then
-                      COPY_SOURCE=/$COPY_SYSTEM_ID/$WP_DIR #If the wordpress folder is there, ensure we get only the contents
-                    fi
-                    sudo mkdir -p /$FILE_SYSTEM_ID/$WP_DIR
-                    sudo rsync -r $COPY_SOURCE/* /$FILE_SYSTEM_ID/$WP_DIR/
-                fi
-
                 # set ASG to zero which terminates instance
                 aws autoscaling update-auto-scaling-group --auto-scaling-group-name $asg_name --desired-capacity 0 --region $region
 
               mode: 000777
               owner: root
-              group: root
+              group: root             
     Properties:
       BlockDeviceMappings:
         - DeviceName: /dev/xvda
@@ -512,7 +489,7 @@ Resources:
             "- yum --enablerepo=epel install nload -y\n",
             "- ntpstat\n",
             "- /opt/aws/bin/cfn-init --configsets efs_add_storage --verbose --stack ", !Ref 'AWS::StackName', " --resource LaunchConfiguration --region ", !Ref 'AWS::Region',"\n",
-            "- /tmp/efs-add-storage.sh ", !Ref ElasticFileSystem, " throughput_data ", !Ref Growth, " ", !Ref EfsCopyDataFrom, " ", !Ref WPDirectory, "\n",
+            "- /tmp/efs-add-storage.sh ", !Ref ElasticFileSystem, " throughput_data ", !Ref Growth,"\n",
             "- /opt/aws/bin/cfn-signal -e $? --stack ", !Ref 'AWS::StackName', " --resource AutoScalingGroup --region ", !Ref 'AWS::Region',"\n"
             ]
           ]

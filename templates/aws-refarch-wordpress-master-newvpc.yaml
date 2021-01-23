@@ -625,7 +625,7 @@ Parameters:
     Description: Name of an EC2 KeyPair. Your bastion & Web instances will launch with this KeyPair.
     Type: AWS::EC2::KeyPair::KeyName
   PHPIniOverride:
-    Description: Full Amazon S3 https path to a php.ini override file (e.g. https://s3.amazonaws.com/refarch-wordpress-modified/bits/20-aws.ini)
+    Description: Full Amazon S3 https path to a php.ini override file (e.g. https://s3.amazonaws.com/refarch-wordpress-modified/samples/20-aws.ini)
     Type: String
   PHPVersion:
     AllowedValues:
@@ -1291,7 +1291,7 @@ Outputs:
 
   StackStatus:
     Description: Master Stack Status
-    Value: !If [ AvailableAWSRegion, !Join [ '', [ 'Stack created in an available region: ', !Ref 'AWS::Region' ] ], "!!ERROR!!! - Nothing to do! - unavailable AWS Region. You must create this stack in an available AWS Region: 'us-east-1', 'us-east-2', 'us-west-2', 'eu-west-1', 'ap-southeast-2'." ]
+    Value: !If [ AvailableAWSRegion, !Join [ '', [ 'Stack created in an available region: ', !Ref 'AWS::Region' ] ], "!!ERROR!!! - Nothing to do! - unavailable AWS Region. You must create this stack in an available AWS Region: 'us-east-1', 'us-east-2', 'us-west-2', 'eu-west-1', 'ap-southeast-2', 'ap-northeast-1'." ]
   WPSiteUrl:
     Description: The URL of the WordPress site
     Value: !If [ CreateRecordSet, !Join [ '', [ 'http://www.', !Ref WPDomainName ] ], !If [ DeployCloudFront, !GetAtt [ cloudfront, Outputs.DnsHostname ], !GetAtt [ publicalb, Outputs.PublicAlbHostname ] ] ]
