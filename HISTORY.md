@@ -1,5 +1,15 @@
 ## History
 ---
+Version: 2.0.2 ( + x by k247work )
+
+Published Date: 2021-01-27 by k247work
+
+### Changes
+Add ap-northeast-1 (Tokyo) as available region.
+Change S3 url of resources.
+Add .github/workflow/workflow.yaml for using Github Action.
+
+---
 Version: 2.0.2
 
 Published Date: 2018-03-06
