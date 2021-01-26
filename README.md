@@ -2,9 +2,9 @@
 
 # **Hosting WordPress on AWS modified by K247work**
 
-### Version 2.0.2 ( +x )
+### Version 2.0.2-x
 
-ara-wp-2.0.2 ( +x )
+ara-wp-2.0.2-x
 
 ---
 
@@ -19,7 +19,7 @@ The repository consists of a set of nested templates which are run in order from
 
 ## Update
 
-Please refer to [history.md](/HISTORY.md) for a detailed list of changes in 2.0.2. ( + x )
+Please refer to [history.md](/HISTORY.md) for a detailed list of changes in 2.0.2-x
 
 ## Parameters
 
