@@ -217,13 +217,13 @@ Parameters:
 
   BastionInstanceType:
     AllowedValues:
-    - t2.nano 
-    - t2.micro 
-    - t2.small 
-    - t2.medium 
-    - t2.large 
-    - t2.xlarge 
-    - t2.2xlarge 
+    - t3.nano
+    - t3.micro
+    - t3.small
+    - t3.medium
+    - t3.large
+    - t3.xlarge
+    - t3.2xlarge
     - m3.medium 
     - m3.large 
     - m3.xlarge 
@@ -307,7 +307,7 @@ Parameters:
     - p3.8xlarge 
     - p3.16xlarge
     ConstraintDescription: Must be a valid Amazon EC2 instance type.
-    Default: t2.nano
+    Default: t3.nano
     Description: Bastion EC2 instance type.
     Type: String
   CloudFrontAcmCertificate:
@@ -326,21 +326,18 @@ Parameters:
     Type: String
   DatabaseInstanceType:
     AllowedValues:
-      - db.t2.small
-      - db.t2.medium
-      - db.r3.large
-      - db.r3.xlarge
-      - db.r3.2xlarge
-      - db.r3.4xlarge
-      - db.r3.8xlarge
-      - db.r4.large
-      - db.r4.xlarge
-      - db.r4.2xlarge
-      - db.r4.4xlarge
-      - db.r4.8xlarge
-      - db.r4.16xlarge
+      - db.t3.small
+      - db.t3.medium
+      - db.r5.large
+      - db.r5.xlarge
+      - db.r5.2xlarge
+      - db.r5.4xlarge
+      - db.r5.8xlarge
+      - db.r5.12large
+      - db.r5.16xlarge
+      - db.r5.24xlarge
     ConstraintDescription: Must be a valid RDS instance class.
-    Default: db.t2.medium
+    Default: db.t3.medium
     Description: The Amazon RDS database instance class.
     Type: String
   DatabaseMasterUsername:
@@ -364,13 +361,13 @@ Parameters:
     Type: String
   EfsAlarmsInstanceType:
     AllowedValues:
-    - t2.nano 
-    - t2.micro 
-    - t2.small 
-    - t2.medium 
-    - t2.large 
-    - t2.xlarge 
-    - t2.2xlarge 
+    - t3.nano
+    - t3.micro
+    - t3.small
+    - t3.medium
+    - t3.large
+    - t3.xlarge
+    - t3.2xlarge
     - m3.medium 
     - m3.large 
     - m3.xlarge 
@@ -454,7 +451,7 @@ Parameters:
     - p3.8xlarge 
     - p3.16xlarge
     ConstraintDescription: Must be a valid Amazon EC2 instance type.
-    Default: t2.nano
+    Default: t3.nano
     Description: The Amazon EC2 instance type that dynamically adjusts alarm thresholds based on permitted throughput changes.
     Type: String
   EfsEncrpytedBoolean:
@@ -491,14 +488,21 @@ Parameters:
     Type: Number
   EfsGrowthInstanceType:
     AllowedValues:
-    - t2.nano 
-    - t2.micro 
-    - t2.small 
-    - t2.medium 
-    - t2.large 
-    - t2.xlarge 
-    - t2.2xlarge 
-    - m3.medium 
+    - t3.nano
+    - t3.micro
+    - t3.small
+    - t3.medium
+    - t3.large
+    - t3.xlarge
+    - t3.2xlarge
+    - t3.nano
+    - t3.micro
+    - t3.small
+    - t3.medium
+    - t3.large
+    - t3.xlarge
+    - t3.2xlarge
+    - m3.medium
     - m3.large 
     - m3.xlarge 
     - m3.2xlarge 
@@ -599,9 +603,9 @@ Parameters:
     Type: String
   ElastiCacheNodeType:
     AllowedValues:
-      - cache.t2.micro
-      - cache.t2.small
-      - cache.t2.medium
+      - cache.t3.micro
+      - cache.t3.small
+      - cache.t3.medium
       - cache.m4.large
       - cache.m4.xlarge
       - cache.m4.2xlarge
@@ -611,13 +615,14 @@ Parameters:
       - cache.m3.large
       - cache.m3.xlarge
       - cache.m3.2xlarge
-      - cache.r3.large
-      - cache.r3.xlarge
-      - cache.r3.2xlarge
-      - cache.r3.4xlarge
-      - cache.r3.8xlarge
+      - cache.r5.large
+      - cache.r5.xlarge
+      - cache.r5.2xlarge
+      - cache.r5.4xlarge
+      - cache.r5.12xlarge
+      - cache.r5.24xlarge
     ConstraintDescription: Must be a valid Amazon ElastiCache node type.
-    Default: cache.t2.medium
+    Default: cache.t3.medium
     Description: The Amazon ElastiCache cluster node type.
     Type: String
   EC2KeyName:
@@ -679,13 +684,13 @@ Parameters:
     Type: String
   WebInstanceType:
     AllowedValues:
-      - t2.nano 
-      - t2.micro 
-      - t2.small 
-      - t2.medium 
-      - t2.large 
-      - t2.xlarge 
-      - t2.2xlarge 
+      - t3.nano
+      - t3.micro
+      - t3.small
+      - t3.medium
+      - t3.large
+      - t3.xlarge
+      - t3.2xlarge
       - m3.medium 
       - m3.large 
       - m3.xlarge 
@@ -769,7 +774,7 @@ Parameters:
       - p3.8xlarge 
       - p3.16xlarge
     ConstraintDescription: Must be a valid Amazon EC2 instance type.
-    Default: t2.large
+    Default: t3.large
     Description: The Amazon EC2 instance type for your web instances.
     Type: String
   AdminEmail:
