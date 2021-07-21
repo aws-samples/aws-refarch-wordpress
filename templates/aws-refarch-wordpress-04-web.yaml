@@ -447,7 +447,7 @@ Resources:
     Type: AWS::AutoScaling::AutoScalingGroup
     Properties:
       Cooldown: 60
-      HealthCheckGracePeriod: 120
+      HealthCheckGracePeriod: 300
       HealthCheckType: ELB
       LaunchConfigurationName:
         !If
