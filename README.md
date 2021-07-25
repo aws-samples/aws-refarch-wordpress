@@ -41,9 +41,9 @@ You can launch this CloudFormation stack, using your account, in the following A
 | eu-central-1 |EU (Frankfurt)| [![cloudformation-launch-stack](images/cloudformation-launch-stack.png)](https://console.aws.amazon.com/cloudformation/home?region=eu-central-1#/stacks/new?stackName=WordPress&templateURL=https://s3.amazonaws.com/aws-refarch/wordpress/latest/templates/aws-refarch-wordpress-master-newvpc.yaml) |
 | ap-southeast-2 |AP (Sydney)| [![cloudformation-launch-stack](images/cloudformation-launch-stack.png)](https://console.aws.amazon.com/cloudformation/home?region=ap-southeast-2#/stacks/new?stackName=WordPress&templateURL=https://s3.amazonaws.com/aws-refarch/wordpress/latest/templates/aws-refarch-wordpress-master-newvpc.yaml) |
 
-#### Select WordPress version
+#### WordPress version
 
-The version of WordPress can be selected. Possible values are latest, nightly, 4.5, 4.6, 4.7, 4.8, 4.9.
+The latest version of WordPress can be installed. In June 2021, 5.7.2 can be installed automatically and 5.8 can be installed manually.  
 
 #### Override PHP.ini defaults by downloading an overrides ini file from Amazon S3
 
@@ -152,7 +152,7 @@ Since files will be offloaded to S3, ensure to add the S3 bucket as an origin on
 
 ## Master Template
 The master template receives all input parameters and passes them to the appropriate nested template which are executed in order based on conditions and dependencies.
-Review the template here [aws-refarch-wordpress-master.yaml](templates/aws-refarch-wordpress-master.yaml)
+Review the template here [aws-refarch-wordpress-master-newvpc.yaml](templates/aws-refarch-wordpress-master-newvpc.yaml)
 
 ### AWS Resources Created:
 
