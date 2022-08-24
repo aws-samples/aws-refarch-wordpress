@@ -573,7 +573,7 @@ Resources:
       FunctionName: !Join [ '', [ 'efs-', !Ref ElasticFileSystem, '-size-monitor' ] ]
       Handler: index.handler
       Role: !GetAtt LambdaRole.Arn
-      Runtime: python2.7
+      Runtime: python3.9
       Timeout: 60
   LambdaRole:
     Type: AWS::IAM::Role
