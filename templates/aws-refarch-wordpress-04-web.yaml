@@ -127,7 +127,7 @@ Parameters:
     Description: The Amazon RDS master database name.
     Type: String
   ElasticFileSystem:
-    AllowedPattern: ^(fs-)([a-z0-9]{8})$
+    AllowedPattern: ^(fs-)([a-z0-9]{17})$
     Description: The Amazon EFS file system id.
     Type: String
   EC2KeyName:
