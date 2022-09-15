@@ -54,7 +54,6 @@ Metadata:
         - EfsPerformanceMode
         - EfsEncrpytedBoolean
         - EfsCmk
-        - EfsCopyDataFrom
         - EfsGrowth
         - EfsGrowthInstanceType
         - EfsCreateAlarms
@@ -121,9 +120,6 @@ Metadata:
         default: Encrpyted EFS?
       EfsGrowth:
         default: Add dummy data (GiB)
-      EfsCopyDataFrom:
-        Description: Clone EFS files from existing EFS (Enter existing EFS file system ID)
-        Type: String
       EfsGrowthInstanceType:
         default: Instance Type
       EfsCriticalThreshold:
@@ -1071,8 +1067,6 @@ Resources:
           !GetAtt [ securitygroups, Outputs.EfsSecurityGroup ]
         Growth:
           !Ref EfsGrowth
-        EfsCopyDataFrom:
-          !Ref EfsCopyDataFrom
         InstanceType:
           !Ref EfsGrowthInstanceType
         NumberOfSubnets:
