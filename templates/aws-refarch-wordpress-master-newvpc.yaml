@@ -1063,8 +1063,6 @@ Resources:
           !Ref EfsCmk
         EC2KeyName:
           !Ref EC2KeyName
-	WPDirectory:
-	  !Ref WPDirectory
         SecurityGroup:
           !GetAtt [ securitygroups, Outputs.EfsSecurityGroup ]
         Growth:
@@ -1092,6 +1090,8 @@ Resources:
           !GetAtt [ efsfilesystem, Outputs.ElasticFileSystem ]
         EmailAddress:
           !Ref AdminEmail
+	WPDirectory:
+	  !Ref WPDirectory
         SecurityGroup:
           !GetAtt [ securitygroups, Outputs.EfsSecurityGroup ]
         InstanceType:
