@@ -217,10 +217,95 @@ Parameters:
 
   BastionInstanceType:
     AllowedValues:
-    - t3.medium
-    - t3.micro
     - t3.nano
+    - t3.micro
     - t3.small
+    - t3.medium
+    - t3.large
+    - t3.xlarge
+    - t3.2xlarge
+    - m3.medium 
+    - m3.large 
+    - m3.xlarge 
+    - m3.2xlarge 
+    - m4.large 
+    - m4.xlarge 
+    - m4.2xlarge 
+    - m4.4xlarge 
+    - m4.10xlarge 
+    - m4.16xlarge 
+    - m5.large 
+    - m5.xlarge 
+    - m5.2xlarge 
+    - m5.4xlarge 
+    - m5.12xlarge 
+    - m5.24xlarge 
+    - c3.large 
+    - c3.xlarge 
+    - c3.2xlarge 
+    - c3.4xlarge 
+    - c3.8xlarge 
+    - c4.large 
+    - c4.xlarge 
+    - c4.2xlarge 
+    - c4.4xlarge 
+    - c4.8xlarge 
+    - c5.large 
+    - c5.xlarge 
+    - c5.2xlarge 
+    - c5.4xlarge 
+    - c5.9xlarge 
+    - c5.18xlarge
+    - r3.large 
+    - r3.xlarge 
+    - r3.2xlarge 
+    - r3.4xlarge 
+    - r3.8xlarge 
+    - r4.large 
+    - r4.xlarge 
+    - r4.2xlarge 
+    - r4.4xlarge 
+    - r4.8xlarge 
+    - r4.16xlarge 
+    - x1.16xlarge 
+    - x1.32xlarge 
+    - x1e.xlarge 
+    - x1e.2xlarge 
+    - x1e.4xlarge 
+    - x1e.8xlarge 
+    - x1e.16xlarge 
+    - x1e.32xlarge
+    - d2.xlarge 
+    - d2.2xlarge 
+    - d2.4xlarge 
+    - d2.8xlarge 
+    - h1.2xlarge 
+    - h1.4xlarge 
+    - h1.8xlarge 
+    - h1.16xlarge 
+    - i2.xlarge 
+    - i2.2xlarge 
+    - i2.4xlarge 
+    - i2.8xlarge 
+    - i3.large 
+    - i3.xlarge 
+    - i3.2xlarge 
+    - i3.4xlarge 
+    - i3.8xlarge 
+    - i3.16xlarge
+    - f1.2xlarge 
+    - f1.16xlarge 
+    - g2.2xlarge 
+    - g2.8xlarge 
+    - g3.4xlarge 
+    - g3.8xlarge 
+    - g3.16xlarge 
+    - p2.xlarge 
+    - p2.8xlarge 
+    - p2.16xlarge 
+    - p3.2xlarge 
+    - p3.8xlarge 
+    - p3.16xlarge
     ConstraintDescription: Must be a valid Amazon EC2 instance type.
     Default: t3.nano
     Description: Bastion EC2 instance type.
@@ -242,7 +327,6 @@ Parameters:
   DatabaseInstanceType:
     AllowedValues:
       - db.t3.small
-      - db.m5d.large
       - db.t3.medium
       - db.r5.large
       - db.r5.xlarge
@@ -281,6 +365,91 @@ Parameters:
     - t3.micro
     - t3.small
     - t3.medium
+    - t3.large
+    - t3.xlarge
+    - t3.2xlarge
+    - m3.medium 
+    - m3.large 
+    - m3.xlarge 
+    - m3.2xlarge 
+    - m4.large 
+    - m4.xlarge 
+    - m4.2xlarge 
+    - m4.4xlarge 
+    - m4.10xlarge 
+    - m4.16xlarge 
+    - m5.large 
+    - m5.xlarge 
+    - m5.2xlarge 
+    - m5.4xlarge 
+    - m5.12xlarge 
+    - m5.24xlarge 
+    - c3.large 
+    - c3.xlarge 
+    - c3.2xlarge 
+    - c3.4xlarge 
+    - c3.8xlarge 
+    - c4.large 
+    - c4.xlarge 
+    - c4.2xlarge 
+    - c4.4xlarge 
+    - c4.8xlarge 
+    - c5.large 
+    - c5.xlarge 
+    - c5.2xlarge 
+    - c5.4xlarge 
+    - c5.9xlarge 
+    - c5.18xlarge
+    - r3.large 
+    - r3.xlarge 
+    - r3.2xlarge 
+    - r3.4xlarge 
+    - r3.8xlarge 
+    - r4.large 
+    - r4.xlarge 
+    - r4.2xlarge 
+    - r4.4xlarge 
+    - r4.8xlarge 
+    - r4.16xlarge 
+    - x1.16xlarge 
+    - x1.32xlarge 
+    - x1e.xlarge 
+    - x1e.2xlarge 
+    - x1e.4xlarge 
+    - x1e.8xlarge 
+    - x1e.16xlarge 
+    - x1e.32xlarge
+    - d2.xlarge 
+    - d2.2xlarge 
+    - d2.4xlarge 
+    - d2.8xlarge 
+    - h1.2xlarge 
+    - h1.4xlarge 
+    - h1.8xlarge 
+    - h1.16xlarge 
+    - i2.xlarge 
+    - i2.2xlarge 
+    - i2.4xlarge 
+    - i2.8xlarge 
+    - i3.large 
+    - i3.xlarge 
+    - i3.2xlarge 
+    - i3.4xlarge 
+    - i3.8xlarge 
+    - i3.16xlarge
+    - f1.2xlarge 
+    - f1.16xlarge 
+    - g2.2xlarge 
+    - g2.8xlarge 
+    - g3.4xlarge 
+    - g3.8xlarge 
+    - g3.16xlarge 
+    - p2.xlarge 
+    - p2.8xlarge 
+    - p2.16xlarge 
+    - p3.2xlarge 
+    - p3.8xlarge 
+    - p3.16xlarge
     ConstraintDescription: Must be a valid Amazon EC2 instance type.
     Default: t3.nano
     Description: The Amazon EC2 instance type that dynamically adjusts alarm thresholds based on permitted throughput changes.
@@ -452,9 +621,8 @@ Parameters:
       - cache.r5.4xlarge
       - cache.r5.12xlarge
       - cache.r5.24xlarge
-      - cache.r6g.large
     ConstraintDescription: Must be a valid Amazon ElastiCache node type.
-    Default: cache.r6g.large
+    Default: cache.t3.medium
     Description: The Amazon ElastiCache cluster node type.
     Type: String
   EC2KeyName:
@@ -466,10 +634,10 @@ Parameters:
     Type: String
   PHPVersion:
     AllowedValues:
-    - 8.1
-    - 8.0
-    - 7.4
-    Default: 8.1
+    - 5.5
+    - 5.6
+    - 7.0
+    Default: 7.0
     Description: The version of PHP to install.
     Type: String 
   PublicAlbAcmCertificate:
@@ -521,6 +689,90 @@ Parameters:
       - t3.small
       - t3.medium
       - t3.large
+      - t3.xlarge
+      - t3.2xlarge
+      - m3.medium 
+      - m3.large 
+      - m3.xlarge 
+      - m3.2xlarge 
+      - m4.large 
+      - m4.xlarge 
+      - m4.2xlarge 
+      - m4.4xlarge 
+      - m4.10xlarge 
+      - m4.16xlarge 
+      - m5.large 
+      - m5.xlarge 
+      - m5.2xlarge 
+      - m5.4xlarge 
+      - m5.12xlarge 
+      - m5.24xlarge 
+      - c3.large 
+      - c3.xlarge 
+      - c3.2xlarge 
+      - c3.4xlarge 
+      - c3.8xlarge 
+      - c4.large 
+      - c4.xlarge 
+      - c4.2xlarge 
+      - c4.4xlarge 
+      - c4.8xlarge 
+      - c5.large 
+      - c5.xlarge 
+      - c5.2xlarge 
+      - c5.4xlarge 
+      - c5.9xlarge 
+      - c5.18xlarge
+      - r3.large 
+      - r3.xlarge 
+      - r3.2xlarge 
+      - r3.4xlarge 
+      - r3.8xlarge 
+      - r4.large 
+      - r4.xlarge 
+      - r4.2xlarge 
+      - r4.4xlarge 
+      - r4.8xlarge 
+      - r4.16xlarge 
+      - x1.16xlarge 
+      - x1.32xlarge 
+      - x1e.xlarge 
+      - x1e.2xlarge 
+      - x1e.4xlarge 
+      - x1e.8xlarge 
+      - x1e.16xlarge 
+      - x1e.32xlarge
+      - d2.xlarge 
+      - d2.2xlarge 
+      - d2.4xlarge 
+      - d2.8xlarge 
+      - h1.2xlarge 
+      - h1.4xlarge 
+      - h1.8xlarge 
+      - h1.16xlarge 
+      - i2.xlarge 
+      - i2.2xlarge 
+      - i2.4xlarge 
+      - i2.8xlarge 
+      - i3.large 
+      - i3.xlarge 
+      - i3.2xlarge 
+      - i3.4xlarge 
+      - i3.8xlarge 
+      - i3.16xlarge
+      - f1.2xlarge 
+      - f1.16xlarge 
+      - g2.2xlarge 
+      - g2.8xlarge 
+      - g3.4xlarge 
+      - g3.8xlarge 
+      - g3.16xlarge 
+      - p2.xlarge 
+      - p2.8xlarge 
+      - p2.16xlarge 
+      - p3.2xlarge 
+      - p3.8xlarge 
+      - p3.16xlarge
     ConstraintDescription: Must be a valid Amazon EC2 instance type.
     Default: t3.large
     Description: The Amazon EC2 instance type for your web instances.
@@ -811,8 +1063,6 @@ Resources:
           !Ref EfsCmk
         EC2KeyName:
           !Ref EC2KeyName
-        WPDirectory:
-          !Ref WPDirectory
         SecurityGroup:
           !GetAtt [ securitygroups, Outputs.EfsSecurityGroup ]
         Growth:
