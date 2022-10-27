@@ -1,0 +1,7 @@
+backend "s3" {
+    bucket = "live-streaming-bucket"
+
+    key     = "live-streaming-key"
+    region  = "us-east-1"
+    profile = "saml"
+  }
