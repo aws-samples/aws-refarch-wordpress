@@ -150,10 +150,10 @@ Parameters:
     Type: String
   PHPVersion:
     AllowedValues:
-    - 8.1
     - 8.0
     - 7.4
-    Default: 8.1
+    - 5.5
+    Default: 8.0
     Description: The version of PHP to install.
     Type: String 
   PublicAlbTargetGroupArn:
@@ -258,7 +258,7 @@ Conditions:
     !Equals [ 5, !Ref NumberOfSubnets ]
   NumberOfSubnets6:
     !Equals [ 6, !Ref NumberOfSubnets ]
-  PHP55:
+  PHP80:
     !Equals [ 8.1, !Ref PHPVersion ]
   PHP56:
     !Equals [ 8.0, !Ref PHPVersion ]
@@ -297,33 +297,33 @@ Mappings:
 
   RegionMap:
     ap-northeast-1:
-      AMI: ami-da9e2cbc
+      AMI: ami-0de5311b2a443fb89
     ap-northeast-2:
-      AMI: ami-1196317f
+      AMI: ami-09cf633fe86e51bf0
     ap-south-1:
-      AMI: ami-d5c18eba
+      AMI: ami-0e6329e222e662a52
     ap-southeast-1:
-      AMI: ami-c63d6aa5
+      AMI: ami-094bbd9e922dc515d
     ap-southeast-2:
-      AMI: ami-ff4ea59d
+      AMI: ami-02a66f06b3557a897
     ca-central-1:
-      AMI: ami-d29e25b6
+      AMI: ami-088d4832275406edf
     eu-central-1:
-      AMI: ami-bf2ba8d0
+      AMI: ami-070b208e993b59cea
     eu-west-1:
-      AMI: ami-1a962263
+      AMI: ami-0ee415e1b8b71305f
     eu-west-2:
-      AMI: ami-e7d6c983
+      AMI: ami-0648ea225c13e0729
     sa-east-1:
-      AMI: ami-286f2a44
+      AMI: ami-0122c4b16734197ac
     us-east-1:
-      AMI: ami-55ef662f
+      AMI: ami-09d3b3274b6c5d4aa
     us-east-2:
-      AMI: ami-15e9c770
+      AMI: ami-089a545a9ed9893b6
     us-west-1:
-      AMI: ami-a51f27c5
+      AMI: ami-017c001a88dd93847
     us-west-2:
-      AMI: ami-bf4193c7
+      AMI: ami-0d593311db5abb72b
 
 Resources:
 
@@ -367,8 +367,8 @@ Resources:
       HealthCheckType: ELB
       LaunchConfigurationName:
         !If
-          [ PHP55,
-          !Ref WebLaunchConfiguration55,
+          [ PHP80,
+          !Ref WebLaunchConfiguration80,
           !If
             [ PHP56,
             !Ref WebLaunchConfiguration56,
@@ -408,9 +408,9 @@ Resources:
     CreationPolicy:
       ResourceSignal:
         Count: !Ref WebAsgMin
-        Timeout: PT15M
-  WebLaunchConfiguration55:
-    Condition: PHP55
+        Timeout: PT60M
+  WebLaunchConfiguration80:
+    Condition: PHP80
     Type: AWS::AutoScaling::LaunchConfiguration
     Metadata:
       AWS::CloudFormation::Init:
@@ -430,18 +430,17 @@ Resources:
           packages:
             yum:
               awslogs: []
-              httpd24: []
-              mysql56: []
-              php55: []
-              php55-devel: []
-              php55-pear: []
-              php55-mysqlnd: []
+              httpd: []
+              mariadb-server: []
           files:
             /tmp/create_site_conf.sh:
               content:
                 !Join [
                   "",[
                     "#!/bin/bash -xe\n",
+                    "amazon-linux-extras enable php8.0",
+                    "yum clean metadata",
+                    "yum install php", 
                     "if [ ! -f /etc/httpd/conf.d/", !Ref WPDirectory, ".conf ]; then\n",                    
                     "   touch /etc/httpd/conf.d/", !Ref WPDirectory, ".conf\n",
                     "   echo 'ServerName 127.0.0.1:80' >> /etc/httpd/conf.d/", !Ref WPDirectory, ".conf\n",
@@ -465,28 +464,33 @@ Resources:
         build_cacheclient:
           packages:
             yum:
+              php-cli: []
+              php-pdo: []
+              php-devel: []
+              php-pear: []
+              php-mysqlnd: []
               gcc-c++: []  
           files:
             /tmp/install_cacheclient.sh:
               content:
                 !Sub |
                   #!/bin/bash -xe
-                  pecl install igbinary
-                  wget -P /tmp/ https://s3.amazonaws.com/aws-refarch/wordpress/latest/bits/AmazonElastiCacheClusterClient-1.0.1-PHP55-64bit.tgz
-                  tar -xf '/tmp/AmazonElastiCacheClusterClient-1.0.1-PHP55-64bit.tgz'
-                  cp '/tmp/AmazonElastiCacheClusterClient-1.0.0/amazon-elasticache-cluster-client.so' /usr/lib64/php/5.5/modules/
-                  if [ ! -f /etc/php-5.5.d/50-memcached.ini ]; then
-                      touch /etc/php-5.5.d/50-memcached.ini
+                  sudo pecl install igbinary
+                  wget -P /tmp/ https://s3.amazonaws.com/aws-refarch/wordpress/latest/bits/AmazonElastiCacheClusterClient-PHP80-64bit-libmemcached-1.0.19-openssl1.1.tar.gz
+                  tar -xf '/tmp/AmazonElastiCacheClusterClient-PHP80-64bit-libmemcached-1.0.19-openssl1.1.tar.gz'
+                  cp '/tmp/AmazonElastiCacheClusterClient-PHP80-64bit-libmemcached-1.0.19-openssl1.1.so' /usr/lib64/php/modules/
+                  if [ ! -f /etc/php.d/50-memcached.ini ]; then
+                      touch /etc/php.d/50-memcached.ini
                   fi
-                  echo 'extension=igbinary.so;' >> /etc/php-5.5.d/50-memcached.ini
-                  echo 'extension=/usr/lib64/php/5.5/modules/amazon-elasticache-cluster-client.so;' >> /etc/php-5.5.d/50-memcached.ini
+                  echo 'extension=igbinary.so;' >> /etc/php.d/50-memcached.ini
+                  echo 'extension=/usr/lib64/php/modules/AmazonElastiCacheClusterClient-PHP80-64bit-libmemcached-1.0.19-openssl1.1..so;' >> /etc/php.d/50-memcached.ini
               mode: 000500
               owner: root
               group: root
         build_opcache:
           packages:
             yum:
-              php55-opcache: []
+              php-opcache: []
           files:
             /tmp/install_opcache.sh:
               content:
@@ -496,9 +500,9 @@ Resources:
                   if [ ! -d /var/www/.opcache ]; then                    
                       mkdir -p /var/www/.opcache
                   fi
-                  # enable opcache in /etc/php-5.5.d/opcache.ini
-                  sed -i 's/;opcache.file_cache=.*/opcache.file_cache=\/var\/www\/.opcache/' /etc/php-5.5.d/opcache.ini
-                  sed -i 's/opcache.memory_consumption=.*/opcache.memory_consumption=512/' /etc/php-5.5.d/opcache.ini
+                  # enable opcache in /etc/php.d/opcache.ini
+                  sed -i 's/;opcache.file_cache=.*/opcache.file_cache=\/var\/www\/.opcache/' /etc/php.d/opcache.ini
+                  sed -i 's/opcache.memory_consumption=.*/opcache.memory_consumption=512/' /etc/php.d/opcache.ini
                   # download opcache-instance.php to verify opcache status
                   if [ ! -f /var/www/wordpress/${WPDirectory}/opcache-instanceid.php ]; then
                       wget -P /var/www/wordpress/${WPDirectory}/ https://s3.amazonaws.com/aws-refarch/wordpress/latest/bits/opcache-instanceid.php
@@ -564,7 +568,7 @@ Resources:
                   "",[
                     "#!/bin/bash -x\n",
                     "\n",
-                    "wget -P /etc/php-5.5.d/ ", !Ref PHPIniOverride, "\n"
+                    "wget -P /etc/php.d/ ", !Ref PHPIniOverride, "\n"
                   ]
                 ]
               mode: 000500
@@ -613,9 +617,11 @@ Resources:
           !Sub |
             #!/bin/bash -xe
             yum update -y
+            amazon-linux-extras enable php8.0
+            yum clean metadata
             mkdir -p /var/www/wordpress
             mount -t nfs4 -o nfsvers=4.1,rsize=1048576,wsize=1048576,hard,timeo=600,retrans=2 ${ElasticFileSystem}.efs.${AWS::Region}.amazonaws.com:/ /var/www/wordpress
-            /opt/aws/bin/cfn-init --configsets deploy_webserver --verbose --stack ${AWS::StackName} --resource WebLaunchConfiguration55 --region ${AWS::Region}
+            /opt/aws/bin/cfn-init --configsets deploy_webserver --verbose --stack ${AWS::StackName} --resource WebLaunchConfiguration80 --region ${AWS::Region}
             /opt/aws/bin/cfn-signal --exit-code $? --stack ${AWS::StackName} --resource WebAutoScalingGroup --region ${AWS::Region}
   WebLaunchConfiguration56:
     Condition: PHP56

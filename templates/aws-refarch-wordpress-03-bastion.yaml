@@ -110,33 +110,33 @@ Mappings:
 
   RegionMap:
     ap-northeast-1:
-      AMI: ami-da9e2cbc
+      AMI: ami-0de5311b2a443fb89
     ap-northeast-2:
-      AMI: ami-1196317f
+      AMI: ami-09cf633fe86e51bf0
     ap-south-1:
-      AMI: ami-d5c18eba
+      AMI: ami-0e6329e222e662a52
     ap-southeast-1:
-      AMI: ami-c63d6aa5
+      AMI: ami-094bbd9e922dc515d
     ap-southeast-2:
-      AMI: ami-ff4ea59d
+      AMI: ami-02a66f06b3557a897
     ca-central-1:
-      AMI: ami-d29e25b6
+      AMI: ami-088d4832275406edf
     eu-central-1:
-      AMI: ami-bf2ba8d0
+      AMI: ami-070b208e993b59cea
     eu-west-1:
-      AMI: ami-1a962263
+      AMI: ami-0ee415e1b8b71305f
     eu-west-2:
-      AMI: ami-e7d6c983
+      AMI: ami-0648ea225c13e0729
     sa-east-1:
-      AMI: ami-286f2a44
+      AMI: ami-0122c4b16734197ac
     us-east-1:
-      AMI: ami-55ef662f
+      AMI: ami-09d3b3274b6c5d4aa
     us-east-2:
-      AMI: ami-15e9c770
+      AMI: ami-089a545a9ed9893b6
     us-west-1:
-      AMI: ami-a51f27c5
+      AMI: ami-017c001a88dd93847
     us-west-2:
-      AMI: ami-bf4193c7
+      AMI: ami-0d593311db5abb72b
 
 Resources:
 
