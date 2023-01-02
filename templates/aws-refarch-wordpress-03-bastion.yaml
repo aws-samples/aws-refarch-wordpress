@@ -60,7 +60,7 @@ Parameters:
     - 6
     Default: 3
     Description: Number of subnets. This must match your selections in the list of subnets below.
-    Type: String 
+    Type: String
   Subnet:
     Description: Select existing subnets. The number selected must match the number of subnets above. Subnets selected must be in separate AZs.
     Type: List<AWS::EC2::Subnet::Id>
@@ -146,7 +146,9 @@ Resources:
       Cooldown: 60
       HealthCheckGracePeriod: 120
       HealthCheckType: EC2
-      LaunchConfigurationName: !Ref BastionLaunchConfiguration
+      LaunchTemplate:
+        LaunchTemplateId: !Ref BastionLaunchTemplate
+        Version: !GetAtt BastionLaunchTemplate.LatestVersionNumber
       MaxSize: 1
       MinSize: 0
       Tags:
@@ -175,16 +177,19 @@ Resources:
               ]
             ]
           ]
-  BastionLaunchConfiguration:
-    Type: AWS::AutoScaling::LaunchConfiguration
+  BastionLaunchTemplate:
+    Type: AWS::EC2::LaunchTemplate
     Properties:
-      IamInstanceProfile: !Ref BastionInstanceProfile
-      ImageId: !FindInMap [ RegionMap, !Ref 'AWS::Region', AMI ]
-      InstanceMonitoring: true
-      InstanceType: !Ref BastionInstanceType
-      KeyName: !Ref EC2KeyName
-      SecurityGroups:
-        - !Ref BastionSecurityGroup
+      LaunchTemplateData:
+        IamInstanceProfile:
+          Name: !Ref BastionInstanceProfile
+        ImageId: !FindInMap [ RegionMap, !Ref 'AWS::Region', AMI ]
+        Monitoring:
+          Enabled: true
+        InstanceType: !Ref BastionInstanceType
+        KeyName: !Ref EC2KeyName
+        SecurityGroupIds:
+          - !Ref BastionSecurityGroup
   BastionInstanceProfile:
     Type: AWS::IAM::InstanceProfile
     Properties:

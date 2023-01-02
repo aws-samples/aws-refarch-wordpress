@@ -177,7 +177,9 @@ Resources:
       Cooldown: 60
       HealthCheckGracePeriod: 120
       HealthCheckType: EC2
-      LaunchConfigurationName: !Ref LaunchConfiguration
+      LaunchTemplate:
+        LaunchTemplateId: !Ref LaunchTemplate
+        Version: !GetAtt LaunchTemplate.LatestVersionNumber
       MaxSize: 1
       MinSize: 0
       DesiredCapacity: 1
@@ -314,8 +316,8 @@ Resources:
             Action:
               - sns:Publish
             Resource: !Ref SNSTopic
-  LaunchConfiguration:
-    Type: AWS::AutoScaling::LaunchConfiguration
+  LaunchTemplate:
+    Type: AWS::EC2::LaunchTemplate
     DependsOn: WarningAlarm
     Metadata:
       AWS::CloudFormation::Init:
@@ -425,22 +427,24 @@ Resources:
               owner: root
               group: root             
     Properties:
-      BlockDeviceMappings:
-        - DeviceName: /dev/xvda
-          Ebs:
+      LaunchTemplateData:
+        BlockDeviceMappings:
+          - DeviceName: /dev/xvda
+            Ebs:
             DeleteOnTermination: true
             VolumeSize: 10
             VolumeType: gp2
-      IamInstanceProfile: !Ref InstanceProfile
-      ImageId: !FindInMap [ RegionMap, !Ref 'AWS::Region', AMI ]
-      InstanceMonitoring: true
-      InstanceType: !Ref InstanceType
-      KeyName: !Ref EC2KeyName
-      SecurityGroups:
-      - !Ref SecurityGroup
-      UserData:
-        "Fn::Base64":
-          !Sub |
+        IamInstanceProfile:
+          Name: !Ref InstanceProfile
+        ImageId: !FindInMap [ RegionMap, !Ref 'AWS::Region', AMI ]
+        Monitoring:
+          Enabled: true
+        InstanceType: !Ref InstanceType
+        KeyName: !Ref EC2KeyName
+        SecurityGroupIds:
+          - !Ref SecurityGroup
+        UserData:
+          "Fn::Base64": !Sub |
             #cloud-config
             repo_update: true
             repo_upgrade: all
