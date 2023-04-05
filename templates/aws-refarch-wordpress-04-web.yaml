@@ -438,9 +438,9 @@ Resources:
                 !Join [
                   "",[
                     "#!/bin/bash -xe\n",
-                    "amazon-linux-extras enable php8.0",
-                    "yum clean metadata",
-                    "yum install php", 
+                    "amazon-linux-extras enable php8.0\n",
+                    "yum clean metadata\n",
+                    "yum -y install php\n", 
                     "if [ ! -f /etc/httpd/conf.d/", !Ref WPDirectory, ".conf ]; then\n",                    
                     "   touch /etc/httpd/conf.d/", !Ref WPDirectory, ".conf\n",
                     "   echo 'ServerName 127.0.0.1:80' >> /etc/httpd/conf.d/", !Ref WPDirectory, ".conf\n",
